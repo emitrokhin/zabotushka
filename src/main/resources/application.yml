@@ -1,0 +1,29 @@
+quarkus:
+  datasource:
+    db-kind: postgresql
+    username: ${PG_LOGIN}
+    password: ${PG_PASSWORD}
+
+    jdbc:
+      url: jdbc:postgresql://${PG_HOST}:5432/${PG_DB_NAME}
+      max-size: 16
+
+  hibernate-orm:
+    schema-management:
+      strategy: drop-and-create
+
+  rest-client:
+    logging:
+      scope: request-response
+      body-limit: 2000
+    telegram-api:
+      url: https://api.telegram.org/bot${app.telegram.bot-token}/test
+
+app:
+  telegram:
+    bot-token: ${TELEGRAM_BOT_TOKEN}
+
+"%prod":
+  rest-client:
+    telegram-api:
+      url: "https://api.telegram.org/bot${app.telegram.bot-token}/"
