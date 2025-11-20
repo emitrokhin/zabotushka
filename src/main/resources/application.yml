@@ -1,20 +1,22 @@
 quarkus:
-  datasource:
-
-  hibernate-orm:
-    schema-management:
-      strategy: drop-and-create
-
   rest-client:
     logging:
       scope: request-response
       body-limit: 2000
     telegram-api:
       url: https://api.telegram.org/bot${app.telegram.bot-token}/test
+    "ru.mitrohinayulya.zabotushka.client.MyGreenwayLoginApi":
+      url: https://greenwaystart.com
+      follow-redirects: true
+    "ru.mitrohinayulya.zabotushka.client.MyGreenwayApi":
+      url: https://pyapi.greenwaystart.com/pyapi/v1
 
 app:
   telegram:
     bot-token: ${TELEGRAM_BOT_TOKEN}
+  greenway:
+    id: ${GREENWAY_ID}
+    password: ${GREENWAY_PASSWORD}
 
 "%prod":
   rest-client:
