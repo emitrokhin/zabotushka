@@ -1,5 +1,6 @@
 package ru.mitrohinayulya.zabotushka.resource;
 
+import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
@@ -26,6 +27,7 @@ import java.util.Optional;
 @Path("/greenway")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@Authenticated
 public class GreenwayResource {
 
     private static final Logger log = LoggerFactory.getLogger(GreenwayResource.class);

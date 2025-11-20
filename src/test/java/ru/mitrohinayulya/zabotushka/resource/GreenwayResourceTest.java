@@ -37,6 +37,7 @@ class GreenwayResourceTest {
 
         // When & Then: авторизация успешна
         given()
+            .auth().basic("admin", "admin")
             .contentType(ContentType.JSON)
             .body("""
                 {
@@ -52,6 +53,41 @@ class GreenwayResourceTest {
     }
 
     @Test
+    void testAuthorize_Unauthorized_NoBasicAuth() {
+        // When & Then: без Basic Auth доступ запрещен
+        given()
+            .contentType(ContentType.JSON)
+            .body("""
+                {
+                    "greenwayId": 123456,
+                    "regDate": "2023-01-15"
+                }
+                """)
+            .when()
+            .post("/greenway/authorize")
+            .then()
+            .statusCode(401);
+    }
+
+    @Test
+    void testAuthorize_Unauthorized_WrongCredentials() {
+        // When & Then: с неправильными учетными данными доступ запрещен
+        given()
+            .auth().basic("wrong", "wrong")
+            .contentType(ContentType.JSON)
+            .body("""
+                {
+                    "greenwayId": 123456,
+                    "regDate": "2023-01-15"
+                }
+                """)
+            .when()
+            .post("/greenway/authorize")
+            .then()
+            .statusCode(401);
+    }
+
+    @Test
     void testAuthorize_DateMismatch() {
         // Given: партнер существует, но дата регистрации не совпадает
         var partner = createPartner(123456, "2023-01-15");
@@ -61,6 +97,7 @@ class GreenwayResourceTest {
 
         // When & Then: авторизация не удалась (неправильная дата)
         given()
+            .auth().basic("admin", "admin")
             .contentType(ContentType.JSON)
             .body("""
                 {
@@ -85,6 +122,7 @@ class GreenwayResourceTest {
 
         // When & Then: партнер не найден
         given()
+            .auth().basic("admin", "admin")
             .contentType(ContentType.JSON)
             .body("""
                 {
@@ -108,6 +146,7 @@ class GreenwayResourceTest {
 
         // When & Then: список пуст
         given()
+            .auth().basic("admin", "admin")
             .contentType(ContentType.JSON)
             .body("""
                 {
@@ -130,6 +169,7 @@ class GreenwayResourceTest {
 
         // When & Then: возвращается 500
         given()
+            .auth().basic("admin", "admin")
             .contentType(ContentType.JSON)
             .body("""
                 {

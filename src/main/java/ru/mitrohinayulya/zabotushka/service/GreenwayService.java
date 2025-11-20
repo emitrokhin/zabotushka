@@ -66,14 +66,19 @@ public class GreenwayService {
      * Авторизация в системе MyGreenway (получение session_id из cookies)
      */
     private String login() {
-        log.info("Logging in to MyGreenway as user: {}", config.id());
+        var id = config.id().orElseThrow(() ->
+            new IllegalStateException("Greenway ID is not configured"));
+        var password = config.password().orElseThrow(() ->
+            new IllegalStateException("Greenway password is not configured"));
+
+        log.info("Logging in to MyGreenway as user: {}", id);
 
         var form = new Form()
                 .param("type", "auth")
                 .param("action", "login")
                 .param("REMEMBER", "0")
-                .param("NAME", config.id())
-                .param("PASSWORD", config.password());
+                .param("NAME", id)
+                .param("PASSWORD", password);
 
         try (var response = loginApi.login(form)) {
             // Извлекаем session_id из cookies

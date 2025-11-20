@@ -1,4 +1,7 @@
 quarkus:
+  http:
+    auth:
+      basic: true
   rest-client:
     logging:
       scope: request-response
@@ -17,6 +20,9 @@ app:
   greenway:
     id: ${GREENWAY_ID}
     password: ${GREENWAY_PASSWORD}
+  basic-auth:
+    username: ${BASIC_AUTH_USERNAME}
+    password: ${BASIC_AUTH_PASSWORD}
 
 "%prod":
   rest-client:
