@@ -1,0 +1,21 @@
+# Test configuration
+quarkus:
+  test:
+    profile: test
+  datasource:
+    db-kind: h2
+    jdbc:
+      url: jdbc:h2:mem:test
+
+# Disable Greenway init in tests
+greenway:
+  init:
+    enabled: false
+
+# Test credentials
+app:
+  telegram:
+    bot-token: test-token
+  greenway:
+    id: test-id
+    password: test-password

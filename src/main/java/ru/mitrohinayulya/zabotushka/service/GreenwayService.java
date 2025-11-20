@@ -6,6 +6,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Form;
 import jakarta.ws.rs.core.NewCookie;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,9 @@ public class GreenwayService {
     @RestClient
     MyGreenwayApi apiClient;
 
+    @ConfigProperty(name = "greenway.init.enabled", defaultValue = "true")
+    boolean initEnabled;
+
     private final AtomicReference<String> accessToken = new AtomicReference<>();
     private final AtomicReference<String> refreshToken = new AtomicReference<>();
 
@@ -47,6 +51,11 @@ public class GreenwayService {
      */
     @PostConstruct
     void initialize() {
+        if (!initEnabled) {
+            log.info("Greenway service initialization disabled");
+            return;
+        }
+
         log.info("Initializing Greenway service at startup");
         var sessionId = login();
         createSession(sessionId);
