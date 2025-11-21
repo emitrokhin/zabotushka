@@ -16,13 +16,13 @@ quarkus:
 
 app:
   telegram:
-    bot-token: ${TELEGRAM_BOT_TOKEN}
+    bot-token: ${TELEGRAM_BOT_TOKEN:}
   greenway:
-    id: ${GREENWAY_ID}
-    password: ${GREENWAY_PASSWORD}
+    id: ${GREENWAY_ID:}
+    password: ${GREENWAY_PASSWORD:}
   basic-auth:
-    username: ${BASIC_AUTH_USERNAME}
-    password: ${BASIC_AUTH_PASSWORD}
+    username: ${BASIC_AUTH_USERNAME:admin}
+    password: ${BASIC_AUTH_PASSWORD:admin}
 
 "%prod":
   rest-client:

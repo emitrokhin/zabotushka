@@ -39,6 +39,9 @@ public class GreenwayService {
     @RestClient
     MyGreenwayApi apiClient;
 
+    @Inject
+    PeriodCalculator periodCalculator;
+
     @ConfigProperty(name = "greenway.init.enabled", defaultValue = "true")
     boolean initEnabled;
 
@@ -209,5 +212,29 @@ public class GreenwayService {
 
             throw new GreenwayApiException("Error fetching partner list: " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * Получает предыдущий период
+     */
+    public int getPreviousPeriod() {
+        return periodCalculator.calculatePreviousPeriod();
+    }
+
+    /**
+     * Находит партнера по ID в списке партнеров
+     */
+    public java.util.Optional<ru.mitrohinayulya.zabotushka.dto.greenway.Partner> findPartnerById(
+            ru.mitrohinayulya.zabotushka.dto.greenway.PartnerListResponse response,
+            Long partnerId) {
+
+        if (response == null || response.partners() == null || response.partners().isEmpty()) {
+            return java.util.Optional.empty();
+        }
+
+        return response.partners().stream()
+                .filter(partner -> partner.number() != null)
+                .filter(partner -> partner.number().equals(partnerId.intValue()))
+                .findFirst();
     }
 }
