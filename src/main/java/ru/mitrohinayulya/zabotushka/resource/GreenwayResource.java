@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mitrohinayulya.zabotushka.dto.greenway.*;
 import ru.mitrohinayulya.zabotushka.exception.GreenwayApiException;
+import ru.mitrohinayulya.zabotushka.service.AuthorizedUserService;
 import ru.mitrohinayulya.zabotushka.service.GreenwayService;
 
 import java.util.List;
@@ -30,22 +31,46 @@ public class GreenwayResource {
     @Inject
     GreenwayService greenwayService;
 
+    @Inject
+    AuthorizedUserService authorizedUserService;
+
     /**
      * Метод для авторизации партнера MyGreenway
      * <p>
-     * Проверяет существование партнера и совпадение даты регистрации.
-     * Если партнер найден и дата регистрации совпадает, возвращает статус "authorized",
-     * иначе "not_authorized".
+     * Проверяет существование пользователя в БД по telegramId.
+     * Если пользователь существует и данные совпадают - возвращает "authorized" (повторная авторизация).
+     * Если пользователь существует, но данные не совпадают - возвращает ошибку 403.
+     * Если пользователя нет - проверяет через Greenway API и сохраняет в БД при успехе.
      *
-     * @param request Запрос с ID партнера и датой регистрации
-     * @return Ответ со статусом авторизации
+     * @param request Запрос с telegramId, greenwayId и датой регистрации
+     * @return Ответ со статусом авторизации или ошибка
      */
     @POST
     @Path("/authorize")
     public Response authorize(@Valid AuthorizeRequest request) {
-        log.info("Authorizing partner with greenwayId={}, regDate={}",
-                request.greenwayId(), request.regDate());
+        log.info("Authorizing partner with telegramId={}, greenwayId={}, regDate={}",
+                request.telegramId(), request.greenwayId(), request.regDate());
 
+        // Проверяем существование пользователя по telegramId
+        if (authorizedUserService.existsByTelegramId(request.telegramId())) {
+            // Пользователь существует - проверяем совпадение данных
+            if (authorizedUserService.matchesStoredData(
+                    request.telegramId(),
+                    request.greenwayId(),
+                    request.regDate())) {
+                // Данные совпадают - это повторная авторизация
+                log.info("Re-authorization successful for telegramId={}", request.telegramId());
+                return Response.ok(AuthorizeResponse.createAuthorized()).build();
+            } else {
+                // Данные не совпадают - отклоняем
+                log.warn("Authorization rejected: data mismatch for telegramId={}", request.telegramId());
+                return Response.status(Response.Status.FORBIDDEN)
+                        .entity(ErrorResponse.of("Authorization data does not match stored credentials"))
+                        .build();
+            }
+        }
+
+        // Пользователя нет в БД - выполняем обычную авторизацию через Greenway API
         try {
             var partnerListResponse = greenwayService.getPartnerList(request.greenwayId(), 0);
 
@@ -77,12 +102,19 @@ public class GreenwayResource {
 
     /**
      * Проверяет авторизацию партнера по дате регистрации
+     * и сохраняет пользователя в БД при успешной авторизации
      */
     private Response authorizePartner(Partner partner, AuthorizeRequest request) {
         boolean isAuthorized = Objects.equals(partner.regDate(), request.regDate());
 
         if (isAuthorized) {
-            log.info("Partner authorized successfully: greenwayId={}", request.greenwayId());
+            // Сохраняем авторизованного пользователя в БД
+            authorizedUserService.saveAuthorizedUser(
+                    request.telegramId(),
+                    request.greenwayId(),
+                    request.regDate());
+            log.info("Partner authorized successfully and saved to DB: telegramId={}, greenwayId={}",
+                    request.telegramId(), request.greenwayId());
             return Response.ok(AuthorizeResponse.createAuthorized()).build();
         }
 

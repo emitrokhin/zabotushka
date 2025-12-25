@@ -6,13 +6,18 @@ import jakarta.validation.constraints.NotNull;
 /**
  * Запрос на авторизацию партнера MyGreenway
  *
+ * @param telegramId ID пользователя в Telegram
  * @param greenwayId ID партнера в системе Greenway
  * @param regDate    Дата регистрации партнера в формате YYYY-MM-DD
  */
 public record AuthorizeRequest(
+    @NotNull(message = "telegramId is required")
+    @JsonProperty("telegramId")
+    Long telegramId,
+
     @NotNull(message = "greenwayId is required")
     @JsonProperty("greenwayId")
-    long greenwayId,
+    Long greenwayId,
 
     @NotNull(message = "regDate is required")
     @JsonProperty("regDate")

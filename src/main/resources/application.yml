@@ -2,6 +2,21 @@ quarkus:
   http:
     auth:
       basic: true
+  datasource:
+    db-kind: postgresql
+    username: ${PG_LOGIN}
+    password: ${PG_PASSWORD}
+    jdbc:
+      url: jdbc:postgresql://localhost:5432/${PG_DB_NAME}
+  hibernate-orm:
+    database:
+      generation: validate
+    log:
+      sql: true
+  flyway:
+    migrate-at-start: true
+    baseline-on-migrate: true
+    baseline-version: 0
   rest-client:
     logging:
       scope: request-response

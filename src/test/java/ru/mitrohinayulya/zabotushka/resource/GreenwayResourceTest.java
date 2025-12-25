@@ -2,11 +2,14 @@ package ru.mitrohinayulya.zabotushka.resource;
 
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.junit.TestProfile;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
+import ru.mitrohinayulya.zabotushka.GreenwayServiceTestProfile;
 import ru.mitrohinayulya.zabotushka.dto.greenway.Partner;
 import ru.mitrohinayulya.zabotushka.dto.greenway.PartnerListResponse;
 import ru.mitrohinayulya.zabotushka.exception.GreenwayApiException;
+import ru.mitrohinayulya.zabotushka.service.AuthorizedUserService;
 import ru.mitrohinayulya.zabotushka.service.GreenwayService;
 
 import java.util.List;
@@ -14,32 +17,37 @@ import java.util.List;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Тесты для GreenwayResource
  */
 @QuarkusTest
-@io.quarkus.test.junit.TestProfile(ru.mitrohinayulya.zabotushka.TestProfile.class)
+@TestProfile(GreenwayServiceTestProfile.class)
 class GreenwayResourceTest {
 
     @InjectMock
     GreenwayService greenwayService;
 
+    @InjectMock
+    AuthorizedUserService authorizedUserService;
+
     @Test
-    void testAuthorize_Success() {
-        // Given: партнер существует и дата регистрации совпадает
-        var partner = createPartner(123456, "2023-01-15");
-        var response = new PartnerListResponse(null, List.of(partner), null, null);
+    void testAuthorize_Success_FirstTime() {
+        // Given: новый пользователь (не существует в БД), партнер существует и дата регистрации совпадает
+        var partner = createPartner(123456);
+        var partnerListResponse = new PartnerListResponse(null, List.of(partner), null, null);
 
-        when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
+        when(authorizedUserService.existsByTelegramId(1001L)).thenReturn(false);
+        when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(partnerListResponse);
 
-        // When & Then: авторизация успешна
+        // When & Then: авторизация успешна и пользователь сохранен в БД
         given()
             .auth().basic("admin", "admin")
             .contentType(ContentType.JSON)
             .body("""
                 {
+                    "telegramId": 1001,
                     "greenwayId": 123456,
                     "regDate": "2023-01-15"
                 }
@@ -49,6 +57,65 @@ class GreenwayResourceTest {
             .then()
             .statusCode(200)
             .body("authorized", is("authorized"));
+
+        // Проверяем что пользователь был сохранен
+        verify(authorizedUserService, times(1)).saveAuthorizedUser(1001L, 123456L, "2023-01-15");
+    }
+
+    @Test
+    void testAuthorize_Success_ReauthorizationWithMatchingData() {
+        // Given: пользователь уже существует в БД с такими же данными (повторная авторизация)
+        when(authorizedUserService.existsByTelegramId(1002L)).thenReturn(true);
+        when(authorizedUserService.matchesStoredData(1002L, 123456L, "2023-01-15")).thenReturn(true);
+
+        // When & Then: авторизация успешна БЕЗ обращения к Greenway API
+        given()
+            .auth().basic("admin", "admin")
+            .contentType(ContentType.JSON)
+            .body("""
+                {
+                    "telegramId": 1002,
+                    "greenwayId": 123456,
+                    "regDate": "2023-01-15"
+                }
+                """)
+            .when()
+            .post("/greenway/authorize")
+            .then()
+            .statusCode(200)
+            .body("authorized", is("authorized"));
+
+        // Проверяем что к Greenway API НЕ обращались
+        verify(greenwayService, never()).getPartnerList(anyLong(), anyInt());
+        // Проверяем что пользователь НЕ был сохранен повторно
+        verify(authorizedUserService, never()).saveAuthorizedUser(anyLong(), anyLong(), anyString());
+    }
+
+    @Test
+    void testAuthorize_Forbidden_ReauthorizationWithMismatchedData() {
+        // Given: пользователь существует в БД, но данные не совпадают
+        when(authorizedUserService.existsByTelegramId(1003L)).thenReturn(true);
+        when(authorizedUserService.matchesStoredData(1003L, 123456L, "2023-01-20")).thenReturn(false);
+
+        // When & Then: возвращается 403 Forbidden
+        given()
+            .auth().basic("admin", "admin")
+            .contentType(ContentType.JSON)
+            .body("""
+                {
+                    "telegramId": 1003,
+                    "greenwayId": 123456,
+                    "regDate": "2023-01-20"
+                }
+                """)
+            .when()
+            .post("/greenway/authorize")
+            .then()
+            .statusCode(403)
+            .body("error", is("Authorization data does not match stored credentials"));
+
+        // Проверяем что к Greenway API НЕ обращались
+        verify(greenwayService, never()).getPartnerList(anyLong(), anyInt());
     }
 
     @Test
@@ -58,6 +125,7 @@ class GreenwayResourceTest {
             .contentType(ContentType.JSON)
             .body("""
                 {
+                    "telegramId": 1004,
                     "greenwayId": 123456,
                     "regDate": "2023-01-15"
                 }
@@ -76,6 +144,7 @@ class GreenwayResourceTest {
             .contentType(ContentType.JSON)
             .body("""
                 {
+                    "telegramId": 1005,
                     "greenwayId": 123456,
                     "regDate": "2023-01-15"
                 }
@@ -88,10 +157,11 @@ class GreenwayResourceTest {
 
     @Test
     void testAuthorize_DateMismatch() {
-        // Given: партнер существует, но дата регистрации не совпадает
-        var partner = createPartner(123456, "2023-01-15");
+        // Given: новый пользователь, партнер существует, но дата регистрации не совпадает
+        var partner = createPartner(123456);
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
+        when(authorizedUserService.existsByTelegramId(1006L)).thenReturn(false);
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
 
         // When & Then: авторизация не удалась (неправильная дата)
@@ -100,6 +170,7 @@ class GreenwayResourceTest {
             .contentType(ContentType.JSON)
             .body("""
                 {
+                    "telegramId": 1006,
                     "greenwayId": 123456,
                     "regDate": "2023-01-20"
                 }
@@ -113,10 +184,11 @@ class GreenwayResourceTest {
 
     @Test
     void testAuthorize_PartnerNotFound() {
-        // Given: партнер не найден в списке
-        var otherPartner = createPartner(999999, "2023-01-15");
+        // Given: новый пользователь, партнер не найден в списке
+        var otherPartner = createPartner(999999);
         var response = new PartnerListResponse(null, List.of(otherPartner), null, null);
 
+        when(authorizedUserService.existsByTelegramId(1007L)).thenReturn(false);
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
 
         // When & Then: партнер не найден
@@ -125,6 +197,7 @@ class GreenwayResourceTest {
             .contentType(ContentType.JSON)
             .body("""
                 {
+                    "telegramId": 1007,
                     "greenwayId": 123456,
                     "regDate": "2023-01-15"
                 }
@@ -138,9 +211,10 @@ class GreenwayResourceTest {
 
     @Test
     void testAuthorize_EmptyPartnerList() {
-        // Given: список партнеров пустой
+        // Given: новый пользователь, список партнеров пустой
         var response = new PartnerListResponse(null, List.of(), null, null);
 
+        when(authorizedUserService.existsByTelegramId(1008L)).thenReturn(false);
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
 
         // When & Then: список пуст
@@ -149,6 +223,7 @@ class GreenwayResourceTest {
             .contentType(ContentType.JSON)
             .body("""
                 {
+                    "telegramId": 1008,
                     "greenwayId": 123456,
                     "regDate": "2023-01-15"
                 }
@@ -162,7 +237,8 @@ class GreenwayResourceTest {
 
     @Test
     void testAuthorize_ApiException() {
-        // Given: API выбрасывает исключение
+        // Given: новый пользователь, API выбрасывает исключение
+        when(authorizedUserService.existsByTelegramId(1009L)).thenReturn(false);
         when(greenwayService.getPartnerList(anyLong(), anyInt()))
             .thenThrow(new GreenwayApiException("API Error", "ERROR_CODE", "Error details"));
 
@@ -172,6 +248,7 @@ class GreenwayResourceTest {
             .contentType(ContentType.JSON)
             .body("""
                 {
+                    "telegramId": 1009,
                     "greenwayId": 123456,
                     "regDate": "2023-01-15"
                 }
@@ -188,7 +265,7 @@ class GreenwayResourceTest {
     @Test
     void testCheckUserId_Success() {
         // Given: партнер существует
-        var partner = createPartner(123456, "2023-01-15");
+        var partner = createPartner(123456);
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
@@ -228,7 +305,7 @@ class GreenwayResourceTest {
     @Test
     void testCompareLO_Greater() {
         // Given: у партнера LO больше чем переданное значение
-        var partner = createPartnerWithLO(123456, 150.0);
+        var partner = createPartnerWithLO(150.0);
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
@@ -251,7 +328,7 @@ class GreenwayResourceTest {
     @Test
     void testCompareLO_Less() {
         // Given: у партнера LO меньше чем переданное значение
-        var partner = createPartnerWithLO(123456, 50.0);
+        var partner = createPartnerWithLO(50.0);
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
@@ -271,7 +348,7 @@ class GreenwayResourceTest {
     @Test
     void testCompareLO_Equal() {
         // Given: у партнера LO равно переданному значению
-        var partner = createPartnerWithLO(123456, 100.0);
+        var partner = createPartnerWithLO(100.0);
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
@@ -291,7 +368,7 @@ class GreenwayResourceTest {
     @Test
     void testCompareLOPeriod_Success() {
         // Given: партнер существует в предыдущем периоде
-        var partner = createPartnerWithLO(123456, 200.0);
+        var partner = createPartnerWithLO(200.0);
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
         when(greenwayService.getPreviousPeriod()).thenReturn(75);
@@ -315,7 +392,7 @@ class GreenwayResourceTest {
     @Test
     void testCompareSGO_Greater() {
         // Given: у партнера SGO больше чем переданное значение
-        var partner = createPartnerWithSGO(123456, 500.0);
+        var partner = createPartnerWithSGO();
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
@@ -358,7 +435,7 @@ class GreenwayResourceTest {
     @Test
     void testGetQualification_Success() {
         // Given: партнер с квалификацией L2
-        var partner = createPartnerWithQualification(123456, "L2");
+        var partner = createPartnerWithQualification("L2");
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
@@ -378,7 +455,7 @@ class GreenwayResourceTest {
     @Test
     void testGetQualificationExact_Success() {
         // Given: партнер с квалификацией L2
-        var partner = createPartnerWithQualification(123456, "L2");
+        var partner = createPartnerWithQualification("L2");
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
@@ -398,7 +475,7 @@ class GreenwayResourceTest {
     @Test
     void testGetQualificationPeriod_Success() {
         // Given: партнер с квалификацией M1 в прошлом периоде
-        var partner = createPartnerWithQualification(123456, "M1");
+        var partner = createPartnerWithQualification("M1");
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
         when(greenwayService.getPreviousPeriod()).thenReturn(75);
@@ -419,8 +496,8 @@ class GreenwayResourceTest {
     @Test
     void testGetQualificationBest_CurrentBetter() {
         // Given: текущая квалификация лучше предыдущей (M > L)
-        var currentPartner = createPartnerWithQualification(123456, "M1");
-        var previousPartner = createPartnerWithQualification(123456, "L2");
+        var currentPartner = createPartnerWithQualification("M1");
+        var previousPartner = createPartnerWithQualification("L2");
 
         var currentResponse = new PartnerListResponse(null, List.of(currentPartner), null, null);
         var previousResponse = new PartnerListResponse(null, List.of(previousPartner), null, null);
@@ -448,8 +525,8 @@ class GreenwayResourceTest {
     @Test
     void testGetQualificationBest_PreviousBetter() {
         // Given: предыдущая квалификация лучше текущей (GM > S)
-        var currentPartner = createPartnerWithQualification(123456, "S1");
-        var previousPartner = createPartnerWithQualification(123456, "GM4");
+        var currentPartner = createPartnerWithQualification("S1");
+        var previousPartner = createPartnerWithQualification("GM4");
 
         var currentResponse = new PartnerListResponse(null, List.of(currentPartner), null, null);
         var previousResponse = new PartnerListResponse(null, List.of(previousPartner), null, null);
@@ -498,7 +575,7 @@ class GreenwayResourceTest {
     /**
      * Вспомогательный метод для создания тестового партнера
      */
-    private Partner createPartner(int number, String regDate) {
+    private Partner createPartner(int number) {
         return new Partner(
             number,           // id
             "Иванов",         // lastName
@@ -509,7 +586,7 @@ class GreenwayResourceTest {
             "+79001234567",   // phone
             number,           // number
             "ACTIVE",         // agreementState
-            regDate,          // regDate
+                "2023-01-15",          // regDate
             "Россия",         // countryName
             1,                // cityId
             "Москва",         // cityName
@@ -527,16 +604,16 @@ class GreenwayResourceTest {
         );
     }
 
-    private Partner createPartnerWithLO(int number, double lo) {
+    private Partner createPartnerWithLO(double lo) {
         return new Partner(
-                number,
+                123456,
                 "Иванов",
                 "Иван",
                 "Иванович",
                 "1990-01-01",
                 "test@example.com",
                 "+79001234567",
-                number,
+                123456,
                 "ACTIVE",
                 "2023-01-15",
                 "Россия",
@@ -556,16 +633,16 @@ class GreenwayResourceTest {
         );
     }
 
-    private Partner createPartnerWithSGO(int number, double sgo) {
+    private Partner createPartnerWithSGO() {
         return new Partner(
-                number,
+                123456,
                 "Иванов",
                 "Иван",
                 "Иванович",
                 "1990-01-01",
                 "test@example.com",
                 "+79001234567",
-                number,
+                123456,
                 "ACTIVE",
                 "2023-01-15",
                 "Россия",
@@ -577,7 +654,7 @@ class GreenwayResourceTest {
                 null,
                 0.0,
                 0.0,
-                sgo,             // sgo
+                500.0,             // sgo
                 "NO",
                 1,
                 false,
@@ -585,16 +662,16 @@ class GreenwayResourceTest {
         );
     }
 
-    private Partner createPartnerWithQualification(int number, String qualification) {
+    private Partner createPartnerWithQualification(String qualification) {
         return new Partner(
-                number,
+                123456,
                 "Иванов",
                 "Иван",
                 "Иванович",
                 "1990-01-01",
                 "test@example.com",
                 "+79001234567",
-                number,
+                123456,
                 "ACTIVE",
                 "2023-01-15",
                 "Россия",

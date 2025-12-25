@@ -6,7 +6,7 @@ import java.util.Set;
 /**
  * Профиль для тестов - отключает GreenwayService startup
  */
-public class TestProfile implements QuarkusTestProfile {
+public class GreenwayServiceTestProfile implements QuarkusTestProfile {
 
     @Override
     public Set<Class<?>> getEnabledAlternatives() {
