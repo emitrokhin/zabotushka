@@ -9,8 +9,6 @@ quarkus:
     jdbc:
       url: jdbc:postgresql://localhost:5432/${PG_DB_NAME}
   hibernate-orm:
-    database:
-      generation: validate
     log:
       sql: true
   flyway:
@@ -22,7 +20,7 @@ quarkus:
       scope: request-response
       body-limit: 2000
     telegram-api:
-      url: https://api.telegram.org/bot${app.telegram.bot-token}/test
+      url: https://api.telegram.org/bot${app.telegram.bot-token}
     "ru.mitrohinayulya.zabotushka.client.MyGreenwayLoginApi":
       url: https://greenwaystart.com
       follow-redirects: true
@@ -30,8 +28,13 @@ quarkus:
       url: https://pyapi.greenwaystart.com/pyapi/v1
 
 app:
+  host: ${HOST}
   telegram:
-    bot-token: ${TELEGRAM_BOT_TOKEN:}
+    bot-token: ${TELEGRAM_BOT_TOKEN}
+    webhook:
+      path: /telegram/webhook
+      secret: ${TELEGRAM_WEBHOOK_SECRET}
+      enabled: ${TELEGRAM_WEBHOOK_ENABLED:true}
   greenway:
     id: ${GREENWAY_ID:}
     password: ${GREENWAY_PASSWORD:}
@@ -42,4 +45,4 @@ app:
 "%prod":
   rest-client:
     telegram-api:
-      url: "https://api.telegram.org/bot${app.telegram.bot-token}/"
+      url: "https://api.telegram.org/bot${app.telegram.bot-token}"

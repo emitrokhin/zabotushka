@@ -19,8 +19,12 @@ greenway:
 
 # Test credentials
 app:
+  host: http://localhost:8081
   telegram:
     bot-token: test-token
+    webhook:
+      secret: test-secret
+      enabled: false
   greenway:
     id: test-id
     password: test-password
