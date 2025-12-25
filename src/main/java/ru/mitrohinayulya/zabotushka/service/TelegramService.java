@@ -12,11 +12,7 @@ import ru.mitrohinayulya.zabotushka.client.TelegramApi;
 import ru.mitrohinayulya.zabotushka.config.ChatGroupRequirements;
 import ru.mitrohinayulya.zabotushka.dto.greenway.Partner;
 import ru.mitrohinayulya.zabotushka.dto.greenway.QualificationLevel;
-import ru.mitrohinayulya.zabotushka.dto.telegram.ApproveChatJoinRequest;
-import ru.mitrohinayulya.zabotushka.dto.telegram.ChatJoinRequest;
-import ru.mitrohinayulya.zabotushka.dto.telegram.DeclineChatJoinRequest;
-import ru.mitrohinayulya.zabotushka.dto.telegram.SendMessageRequest;
-import ru.mitrohinayulya.zabotushka.dto.telegram.SetWebhookRequest;
+import ru.mitrohinayulya.zabotushka.dto.telegram.*;
 
 /**
  * Сервис для работы с Telegram Bot API
@@ -28,6 +24,7 @@ public class TelegramService {
     private static final Logger log = LoggerFactory.getLogger(TelegramService.class);
     private static final String APPROVED_MESSAGE = "Ваш запрос на вступление одобрен";
     private static final String DECLINED_MESSAGE = "Ваш запрос на вступление отклонен. Условия не выполнены";
+    private static final String REMOVED_MESSAGE = "Вы были удалены из группы, так как не соответствуете требованиям по квалификации";
 
     @Inject
     @RestClient
@@ -214,6 +211,96 @@ public class TelegramService {
             }
         } catch (Exception e) {
             log.error("Error sending message: chatId={}", chatId, e);
+        }
+    }
+
+    /**
+     * Проверяет, является ли пользователь участником группы
+     */
+    public boolean isMemberOfChat(Long chatId, Long userId) {
+        try {
+            var request = GetChatMemberRequest.of(chatId, userId);
+            var response = telegramApi.getChatMember(request);
+
+            if (Boolean.TRUE.equals(response.ok()) && response.result() != null) {
+                return response.result().isMember();
+            }
+            return false;
+        } catch (Exception e) {
+            log.error("Error checking chat membership: chatId={}, userId={}", chatId, userId, e);
+            return false;
+        }
+    }
+
+    /**
+     * Удаляет пользователя из группы и отправляет ему уведомление
+     * Использует метод unbanChatMember согласно требованиям
+     */
+    public void removeMemberFromChat(Long chatId, Long userId) {
+        try {
+            // Сначала баним пользователя
+            var banRequest = BanChatMemberRequest.of(chatId, userId);
+            var banResponse = telegramApi.banChatMember(banRequest);
+
+            if (Boolean.TRUE.equals(banResponse.ok())) {
+                log.info("User banned from chat: chatId={}, userId={}", chatId, userId);
+
+                // Затем разбаниваем, чтобы пользователь мог вернуться
+                var unbanRequest = UnbanChatMemberRequest.of(chatId, userId);
+                var unbanResponse = telegramApi.unbanChatMember(unbanRequest);
+
+                if (Boolean.TRUE.equals(unbanResponse.ok())) {
+                    log.info("User unbanned successfully (removed without permanent ban): chatId={}, userId={}",
+                            chatId, userId);
+                    sendMessage(userId, REMOVED_MESSAGE);
+                } else {
+                    log.error("Failed to unban user: chatId={}, userId={}, description={}",
+                            chatId, userId, unbanResponse.description());
+                }
+            } else {
+                log.error("Failed to ban user: chatId={}, userId={}, description={}",
+                        chatId, userId, banResponse.description());
+            }
+        } catch (Exception e) {
+            log.error("Error removing user from chat: chatId={}, userId={}", chatId, userId, e);
+        }
+    }
+
+    /**
+     * Проверяет соответствие квалификации пользователя требованиям группы
+     * и удаляет его, если квалификация не соответствует
+     */
+    public void checkAndRemoveIfNotQualified(Long chatId, Long userId, Long greenwayId) {
+        log.info("Checking qualification for user: chatId={}, userId={}, greenwayId={}",
+                chatId, userId, greenwayId);
+
+        // Проверяем, является ли пользователь участником группы
+        if (!isMemberOfChat(chatId, userId)) {
+            log.info("User is not a member of chat: chatId={}, userId={}", chatId, userId);
+            return;
+        }
+
+        // Находим требования для группы
+        var groupRequirements = ChatGroupRequirements.findByChatId(chatId);
+        if (groupRequirements.isEmpty()) {
+            log.warn("No requirements found for chatId={}", chatId);
+            return;
+        }
+
+        // Получаем лучшую квалификацию пользователя
+        var qualification = getBestQualification(greenwayId);
+
+        log.info("User qualification check: chatId={}, userId={}, greenwayId={}, qualification={}",
+                chatId, userId, greenwayId, qualification);
+
+        // Проверяем соответствие квалификации требованиям группы
+        if (!groupRequirements.get().isQualificationAllowed(qualification)) {
+            log.info("Qualification does not meet requirements, removing user: chatId={}, userId={}, qualification={}",
+                    chatId, userId, qualification);
+            removeMemberFromChat(chatId, userId);
+        } else {
+            log.info("Qualification meets requirements: chatId={}, userId={}, qualification={}",
+                    chatId, userId, qualification);
         }
     }
 }

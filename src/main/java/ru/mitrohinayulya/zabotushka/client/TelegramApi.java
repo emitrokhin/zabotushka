@@ -6,11 +6,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
-import ru.mitrohinayulya.zabotushka.dto.telegram.ApproveChatJoinRequest;
-import ru.mitrohinayulya.zabotushka.dto.telegram.DeclineChatJoinRequest;
-import ru.mitrohinayulya.zabotushka.dto.telegram.SendMessageRequest;
-import ru.mitrohinayulya.zabotushka.dto.telegram.SetWebhookRequest;
-import ru.mitrohinayulya.zabotushka.dto.telegram.TelegramResponse;
+import ru.mitrohinayulya.zabotushka.dto.telegram.*;
 
 /**
  * REST client for Telegram Bot API
@@ -35,4 +31,16 @@ public interface TelegramApi {
     @POST
     @Path("/sendMessage")
     TelegramResponse<Object> sendMessage(SendMessageRequest request);
+
+    @POST
+    @Path("/getChatMember")
+    TelegramResponse<ChatMember> getChatMember(GetChatMemberRequest request);
+
+    @POST
+    @Path("/banChatMember")
+    TelegramResponse<Boolean> banChatMember(BanChatMemberRequest request);
+
+    @POST
+    @Path("/unbanChatMember")
+    TelegramResponse<Boolean> unbanChatMember(UnbanChatMemberRequest request);
 }

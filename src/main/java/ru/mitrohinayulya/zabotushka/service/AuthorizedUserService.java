@@ -5,6 +5,7 @@ import jakarta.transaction.Transactional;
 import ru.mitrohinayulya.zabotushka.entity.AuthorizedUser;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Сервис для работы с авторизованными пользователями
@@ -50,5 +51,12 @@ public class AuthorizedUserService {
      */
     public AuthorizedUser findByTelegramId(Long telegramId) {
         return AuthorizedUser.findByTelegramId(telegramId);
+    }
+
+    /**
+     * Получает всех авторизованных пользователей
+     */
+    public List<AuthorizedUser> findAll() {
+        return AuthorizedUser.listAll();
     }
 }
