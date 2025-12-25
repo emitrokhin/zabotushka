@@ -12,6 +12,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mitrohinayulya.zabotushka.dto.telegram.Update;
+import ru.mitrohinayulya.zabotushka.service.TelegramService;
 
 /**
  * REST ресурс для обработки Telegram webhook
@@ -27,6 +28,9 @@ public class TelegramWebhookResource {
     @Inject
     @ConfigProperty(name = "app.telegram.webhook.secret")
     String webhookSecret;
+
+    @Inject
+    TelegramService telegramService;
 
     @POST
     public Response handleWebhook(
@@ -52,8 +56,8 @@ public class TelegramWebhookResource {
                 chatJoinRequest.from().id(),
                 chatJoinRequest.bio());
 
-        // TODO: Добавить логику обработки запроса на вступление в чат
-        // Здесь будет проверка условий и принятие решения о принятии/отклонении заявки
+        // Обработка запроса на вступление в чат
+        telegramService.processChatJoinRequest(chatJoinRequest);
 
         return Response.ok().build();
     }

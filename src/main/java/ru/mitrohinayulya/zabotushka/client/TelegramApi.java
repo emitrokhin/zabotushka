@@ -6,6 +6,9 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+import ru.mitrohinayulya.zabotushka.dto.telegram.ApproveChatJoinRequest;
+import ru.mitrohinayulya.zabotushka.dto.telegram.DeclineChatJoinRequest;
+import ru.mitrohinayulya.zabotushka.dto.telegram.SendMessageRequest;
 import ru.mitrohinayulya.zabotushka.dto.telegram.SetWebhookRequest;
 import ru.mitrohinayulya.zabotushka.dto.telegram.TelegramResponse;
 
@@ -20,4 +23,16 @@ public interface TelegramApi {
     @POST
     @Path("/setWebhook")
     TelegramResponse<Boolean> setWebhook(SetWebhookRequest request);
+
+    @POST
+    @Path("/approveChatJoinRequest")
+    TelegramResponse<Boolean> approveChatJoinRequest(ApproveChatJoinRequest request);
+
+    @POST
+    @Path("/declineChatJoinRequest")
+    TelegramResponse<Boolean> declineChatJoinRequest(DeclineChatJoinRequest request);
+
+    @POST
+    @Path("/sendMessage")
+    TelegramResponse<Object> sendMessage(SendMessageRequest request);
 }
