@@ -4,6 +4,7 @@ import io.quarkus.runtime.Startup;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
@@ -13,6 +14,9 @@ import ru.mitrohinayulya.zabotushka.config.ChatGroupRequirements;
 import ru.mitrohinayulya.zabotushka.dto.greenway.Partner;
 import ru.mitrohinayulya.zabotushka.dto.greenway.QualificationLevel;
 import ru.mitrohinayulya.zabotushka.dto.telegram.*;
+import ru.mitrohinayulya.zabotushka.entity.UserGroupMembership;
+
+import java.time.LocalDateTime;
 
 /**
  * Сервис для работы с Telegram Bot API
@@ -84,6 +88,7 @@ public class TelegramService {
     /**
      * Обрабатывает запрос на вступление в группу
      */
+    @Transactional
     public void processChatJoinRequest(ChatJoinRequest chatJoinRequest) {
         var chatId = chatJoinRequest.chat().id();
         var userId = chatJoinRequest.from().id();
@@ -166,12 +171,36 @@ public class TelegramService {
             if (Boolean.TRUE.equals(response.ok())) {
                 log.info("Join request approved successfully: chatId={}, userId={}", chatId, userId);
                 sendMessage(userId, APPROVED_MESSAGE);
+
+                // Сохраняем информацию о членстве в БД
+                saveMembership(chatId, userId);
             } else {
                 log.error("Failed to approve join request: chatId={}, userId={}, description={}",
                         chatId, userId, response.description());
             }
         } catch (Exception e) {
             log.error("Error approving join request: chatId={}, userId={}", chatId, userId, e);
+        }
+    }
+
+    /**
+     * Сохраняет информацию о членстве пользователя в группе
+     */
+    private void saveMembership(Long chatId, Long userId) {
+        try {
+            if (!UserGroupMembership.exists(userId, chatId)) {
+                var membership = new UserGroupMembership();
+                membership.telegramId = userId;
+                membership.chatId = chatId;
+                membership.joinedAt = LocalDateTime.now();
+                membership.persist();
+
+                log.info("Membership saved: chatId={}, userId={}", chatId, userId);
+            } else {
+                log.debug("Membership already exists: chatId={}, userId={}", chatId, userId);
+            }
+        } catch (Exception e) {
+            log.error("Error saving membership: chatId={}, userId={}", chatId, userId, e);
         }
     }
 
@@ -253,6 +282,9 @@ public class TelegramService {
                     log.info("User unbanned successfully (removed without permanent ban): chatId={}, userId={}",
                             chatId, userId);
                     sendMessage(userId, REMOVED_MESSAGE);
+
+                    // Удаляем информацию о членстве из БД
+                    removeMembershipFromDb(chatId, userId);
                 } else {
                     log.error("Failed to unban user: chatId={}, userId={}, description={}",
                             chatId, userId, unbanResponse.description());
@@ -267,6 +299,22 @@ public class TelegramService {
     }
 
     /**
+     * Удаляет информацию о членстве пользователя в группе из БД
+     */
+    private void removeMembershipFromDb(Long chatId, Long userId) {
+        try {
+            boolean removed = UserGroupMembership.removeMembership(userId, chatId);
+            if (removed) {
+                log.info("Membership removed from DB: chatId={}, userId={}", chatId, userId);
+            } else {
+                log.warn("Membership not found in DB: chatId={}, userId={}", chatId, userId);
+            }
+        } catch (Exception e) {
+            log.error("Error removing membership from DB: chatId={}, userId={}", chatId, userId, e);
+        }
+    }
+
+    /**
      * Проверяет соответствие квалификации пользователя требованиям группы
      * и удаляет его, если квалификация не соответствует
      */
@@ -276,7 +324,9 @@ public class TelegramService {
 
         // Проверяем, является ли пользователь участником группы
         if (!isMemberOfChat(chatId, userId)) {
-            log.info("User is not a member of chat: chatId={}, userId={}", chatId, userId);
+            log.info("User is not a member of chat (left by themselves): chatId={}, userId={}", chatId, userId);
+            // Пользователь покинул группу сам - удаляем запись из БД
+            removeMembershipFromDb(chatId, userId);
             return;
         }
 
