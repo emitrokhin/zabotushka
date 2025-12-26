@@ -17,7 +17,7 @@ import ru.mitrohinayulya.zabotushka.service.TelegramService;
 /**
  * REST ресурс для обработки Telegram webhook
  */
-@Path("${app.telegram.webhook.path}")
+@Path("/telegram/webhook")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class TelegramWebhookResource {
