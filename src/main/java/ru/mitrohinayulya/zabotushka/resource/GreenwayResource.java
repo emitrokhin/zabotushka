@@ -142,7 +142,7 @@ public class GreenwayResource {
 
         return partners.stream()
                 .filter(partner -> partner.number() != null)
-                .filter(partner -> partner.number().equals(greenwayId.intValue()))
+                .filter(partner -> partner.number().longValue() == greenwayId)
                 .findFirst();
     }
 
