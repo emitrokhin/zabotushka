@@ -7,7 +7,7 @@ quarkus:
     username: ${PG_LOGIN}
     password: ${PG_PASSWORD}
     jdbc:
-      url: jdbc:postgresql://localhost:5432/${PG_DB_NAME}
+      url: jdbc:postgresql://${PG_HOST}:5432/${PG_DB_NAME}
   flyway:
     migrate-at-start: true
     baseline-on-migrate: true
