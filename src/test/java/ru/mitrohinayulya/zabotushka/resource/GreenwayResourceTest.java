@@ -49,7 +49,7 @@ class GreenwayResourceTest {
                 {
                     "telegramId": 1001,
                     "greenwayId": 123456,
-                    "regDate": "2023-01-15"
+                    "regDate": "15.01.2023"
                 }
                 """)
             .when()
@@ -59,14 +59,14 @@ class GreenwayResourceTest {
             .body("authorized", is("authorized"));
 
         // Проверяем что пользователь был сохранен
-        verify(authorizedUserService, times(1)).saveAuthorizedUser(1001L, 123456L, "2023-01-15");
+        verify(authorizedUserService, times(1)).saveAuthorizedUser(1001L, 123456L, "15.01.2023");
     }
 
     @Test
     void testAuthorize_Success_ReauthorizationWithMatchingData() {
         // Given: пользователь уже существует в БД с такими же данными (повторная авторизация)
         when(authorizedUserService.existsByTelegramId(1002L)).thenReturn(true);
-        when(authorizedUserService.matchesStoredData(1002L, 123456L, "2023-01-15")).thenReturn(true);
+        when(authorizedUserService.matchesStoredData(1002L, 123456L, "15.01.2023")).thenReturn(true);
 
         // When & Then: авторизация успешна БЕЗ обращения к Greenway API
         given()
@@ -76,7 +76,7 @@ class GreenwayResourceTest {
                 {
                     "telegramId": 1002,
                     "greenwayId": 123456,
-                    "regDate": "2023-01-15"
+                    "regDate": "15.01.2023"
                 }
                 """)
             .when()
@@ -95,7 +95,7 @@ class GreenwayResourceTest {
     void testAuthorize_Forbidden_ReauthorizationWithMismatchedData() {
         // Given: пользователь существует в БД, но данные не совпадают
         when(authorizedUserService.existsByTelegramId(1003L)).thenReturn(true);
-        when(authorizedUserService.matchesStoredData(1003L, 123456L, "2023-01-20")).thenReturn(false);
+        when(authorizedUserService.matchesStoredData(1003L, 123456L, "20.01.2023")).thenReturn(false);
 
         // When & Then: возвращается 403 Forbidden
         given()
@@ -105,7 +105,7 @@ class GreenwayResourceTest {
                 {
                     "telegramId": 1003,
                     "greenwayId": 123456,
-                    "regDate": "2023-01-20"
+                    "regDate": "20.01.2023"
                 }
                 """)
             .when()
@@ -132,7 +132,7 @@ class GreenwayResourceTest {
                 {
                     "telegramId": 9999,
                     "greenwayId": 123456,
-                    "regDate": "2023-01-15"
+                    "regDate": "15.01.2023"
                 }
                 """)
             .when()
@@ -156,7 +156,7 @@ class GreenwayResourceTest {
                 {
                     "telegramId": 1004,
                     "greenwayId": 123456,
-                    "regDate": "2023-01-15"
+                    "regDate": "15.01.2023"
                 }
                 """)
             .when()
@@ -175,7 +175,7 @@ class GreenwayResourceTest {
                 {
                     "telegramId": 1005,
                     "greenwayId": 123456,
-                    "regDate": "2023-01-15"
+                    "regDate": "15.01.2023"
                 }
                 """)
             .when()
@@ -201,7 +201,7 @@ class GreenwayResourceTest {
                 {
                     "telegramId": 1006,
                     "greenwayId": 123456,
-                    "regDate": "2023-01-20"
+                    "regDate": "20.01.2023"
                 }
                 """)
             .when()
@@ -228,7 +228,7 @@ class GreenwayResourceTest {
                 {
                     "telegramId": 1007,
                     "greenwayId": 123456,
-                    "regDate": "2023-01-15"
+                    "regDate": "15.01.2023"
                 }
                 """)
             .when()
@@ -254,7 +254,7 @@ class GreenwayResourceTest {
                 {
                     "telegramId": 1008,
                     "greenwayId": 123456,
-                    "regDate": "2023-01-15"
+                    "regDate": "15.01.2023"
                 }
                 """)
             .when()
@@ -279,7 +279,7 @@ class GreenwayResourceTest {
                 {
                     "telegramId": 1009,
                     "greenwayId": 123456,
-                    "regDate": "2023-01-15"
+                    "regDate": "15.01.2023"
                 }
                 """)
             .when()
@@ -610,12 +610,12 @@ class GreenwayResourceTest {
             "Иванов",         // lastName
             "Иван",           // firstName
             "Иванович",       // patronymic
-            "1990-01-01",     // birthday
+            "01.01.1990",     // birthday
             "test@example.com", // email
             "+79001234567",   // phone
             number,           // number
             "ACTIVE",         // agreementState
-                "2023-01-15",          // regDate
+                "15.01.2023",          // regDate
             "Россия",         // countryName
             1,                // cityId
             "Москва",         // cityName
@@ -639,12 +639,12 @@ class GreenwayResourceTest {
                 "Иванов",
                 "Иван",
                 "Иванович",
-                "1990-01-01",
+                "01.01.1990",
                 "test@example.com",
                 "+79001234567",
                 123456,
                 "ACTIVE",
-                "2023-01-15",
+                "15.01.2023",
                 "Россия",
                 1,
                 "Москва",
@@ -668,12 +668,12 @@ class GreenwayResourceTest {
                 "Иванов",
                 "Иван",
                 "Иванович",
-                "1990-01-01",
+                "01.01.1990",
                 "test@example.com",
                 "+79001234567",
                 123456,
                 "ACTIVE",
-                "2023-01-15",
+                "15.01.2023",
                 "Россия",
                 1,
                 "Москва",
@@ -697,12 +697,12 @@ class GreenwayResourceTest {
                 "Иванов",
                 "Иван",
                 "Иванович",
-                "1990-01-01",
+                "01.01.1990",
                 "test@example.com",
                 "+79001234567",
                 123456,
                 "ACTIVE",
-                "2023-01-15",
+                "15.01.2023",
                 "Россия",
                 1,
                 "Москва",

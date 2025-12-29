@@ -11,6 +11,16 @@ quarkus:
       generation: drop-and-create
   flyway:
     migrate-at-start: false
+  rest-client:
+    access-bot-api:
+      url: https://api.telegram.org/bot-test-access-token
+    message-bot-api:
+      url: https://api.telegram.org/bot-test-message-token
+    "ru.mitrohinayulya.zabotushka.client.MyGreenwayLoginApi":
+      url: https://greenwaystart.com
+      follow-redirects: true
+    "ru.mitrohinayulya.zabotushka.client.MyGreenwayApi":
+      url: https://pyapi.greenwaystart.com/pyapi/v1
 
 # Disable Greenway init in tests
 greenway:
@@ -21,7 +31,8 @@ greenway:
 app:
   host: http://localhost:8081
   telegram:
-    bot-token: test-token
+    access-bot-token: test-access-token
+    message-bot-token: test-message-token
     webhook:
       secret: test-secret
       enabled: false
