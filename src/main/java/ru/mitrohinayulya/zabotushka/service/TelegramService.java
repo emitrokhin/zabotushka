@@ -9,7 +9,8 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.mitrohinayulya.zabotushka.client.TelegramApi;
+import ru.mitrohinayulya.zabotushka.client.AccessBotApi;
+import ru.mitrohinayulya.zabotushka.client.MessageBotApi;
 import ru.mitrohinayulya.zabotushka.config.ChatGroupRequirements;
 import ru.mitrohinayulya.zabotushka.dto.greenway.Partner;
 import ru.mitrohinayulya.zabotushka.dto.greenway.QualificationLevel;
@@ -32,7 +33,11 @@ public class TelegramService {
 
     @Inject
     @RestClient
-    TelegramApi telegramApi;
+    AccessBotApi accessBotApi;
+
+    @Inject
+    @RestClient
+    MessageBotApi messageBotApi;
 
     @Inject
     GreenwayService greenwayService;
@@ -73,7 +78,7 @@ public class TelegramService {
             log.info("Registering Telegram webhook: url={}", fullWebhookUrl);
 
             var request = SetWebhookRequest.forChatJoinRequests(fullWebhookUrl, webhookSecret);
-            var response = telegramApi.setWebhook(request);
+            var response = accessBotApi.setWebhook(request);
 
             if (Boolean.TRUE.equals(response.ok())) {
                 log.info("Telegram webhook registered successfully");
@@ -166,7 +171,7 @@ public class TelegramService {
     private void approveJoinRequest(Long chatId, Long userId) {
         try {
             var request = ApproveChatJoinRequest.of(chatId, userId);
-            var response = telegramApi.approveChatJoinRequest(request);
+            var response = accessBotApi.approveChatJoinRequest(request);
 
             if (Boolean.TRUE.equals(response.ok())) {
                 log.info("Join request approved successfully: chatId={}, userId={}", chatId, userId);
@@ -210,7 +215,7 @@ public class TelegramService {
     private void declineJoinRequest(Long chatId, Long userId) {
         try {
             var request = DeclineChatJoinRequest.of(chatId, userId);
-            var response = telegramApi.declineChatJoinRequest(request);
+            var response = accessBotApi.declineChatJoinRequest(request);
 
             if (Boolean.TRUE.equals(response.ok())) {
                 log.info("Join request declined successfully: chatId={}, userId={}", chatId, userId);
@@ -230,7 +235,7 @@ public class TelegramService {
     private void sendMessage(Long chatId, String text) {
         try {
             var request = SendMessageRequest.of(chatId, text);
-            var response = telegramApi.sendMessage(request);
+            var response = messageBotApi.sendMessage(request);
 
             if (Boolean.TRUE.equals(response.ok())) {
                 log.info("Message sent successfully: chatId={}", chatId);
@@ -249,7 +254,7 @@ public class TelegramService {
     public boolean isMemberOfChat(Long chatId, Long userId) {
         try {
             var request = GetChatMemberRequest.of(chatId, userId);
-            var response = telegramApi.getChatMember(request);
+            var response = accessBotApi.getChatMember(request);
 
             if (Boolean.TRUE.equals(response.ok()) && response.result() != null) {
                 return response.result().isMember();
@@ -269,14 +274,14 @@ public class TelegramService {
         try {
             // Сначала баним пользователя
             var banRequest = BanChatMemberRequest.of(chatId, userId);
-            var banResponse = telegramApi.banChatMember(banRequest);
+            var banResponse = accessBotApi.banChatMember(banRequest);
 
             if (Boolean.TRUE.equals(banResponse.ok())) {
                 log.info("User banned from chat: chatId={}, userId={}", chatId, userId);
 
                 // Затем разбаниваем, чтобы пользователь мог вернуться
                 var unbanRequest = UnbanChatMemberRequest.of(chatId, userId);
-                var unbanResponse = telegramApi.unbanChatMember(unbanRequest);
+                var unbanResponse = accessBotApi.unbanChatMember(unbanRequest);
 
                 if (Boolean.TRUE.equals(unbanResponse.ok())) {
                     log.info("User unbanned successfully (removed without permanent ban): chatId={}, userId={}",

@@ -9,12 +9,13 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import ru.mitrohinayulya.zabotushka.dto.telegram.*;
 
 /**
- * REST client for Telegram Bot API
+ * REST client for Telegram Bot API - Access Bot
+ * Handles webhook registration and access control operations
  */
-@RegisterRestClient(configKey = "telegram-api")
+@RegisterRestClient(configKey = "access-bot-api")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public interface TelegramApi {
+public interface AccessBotApi {
 
     @POST
     @Path("/setWebhook")
@@ -27,10 +28,6 @@ public interface TelegramApi {
     @POST
     @Path("/declineChatJoinRequest")
     TelegramResponse<Boolean> declineChatJoinRequest(DeclineChatJoinRequest request);
-
-    @POST
-    @Path("/sendMessage")
-    TelegramResponse<Object> sendMessage(SendMessageRequest request);
 
     @POST
     @Path("/getChatMember")

@@ -6,7 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.mitrohinayulya.zabotushka.client.TelegramApi;
+import ru.mitrohinayulya.zabotushka.client.AccessBotApi;
+import ru.mitrohinayulya.zabotushka.client.MessageBotApi;
 import ru.mitrohinayulya.zabotushka.dto.greenway.Partner;
 import ru.mitrohinayulya.zabotushka.dto.greenway.PartnerListResponse;
 import ru.mitrohinayulya.zabotushka.dto.telegram.*;
@@ -27,7 +28,10 @@ import static org.mockito.Mockito.*;
 class TelegramServiceTest {
 
     @Mock
-    TelegramApi telegramApi;
+    AccessBotApi accessBotApi;
+
+    @Mock
+    MessageBotApi messageBotApi;
 
     @Mock
     GreenwayService greenwayService;
@@ -74,17 +78,17 @@ class TelegramServiceTest {
                 .thenReturn(Optional.of(previousPartner));
 
         var approveResponse = new TelegramResponse<Boolean>(true, null, null);
-        when(telegramApi.approveChatJoinRequest(any())).thenReturn(approveResponse);
+        when(accessBotApi.approveChatJoinRequest(any())).thenReturn(approveResponse);
 
-        when(telegramApi.sendMessage(any())).thenReturn(new TelegramResponse<>(true, null, null));
+        when(messageBotApi.sendMessage(any())).thenReturn(new TelegramResponse<>(true, null, null));
 
         // When: обрабатываем запрос
         telegramService.processChatJoinRequest(chatJoinRequest);
 
         // Then: запрос одобрен
-        verify(telegramApi, times(1)).approveChatJoinRequest(any(ApproveChatJoinRequest.class));
-        verify(telegramApi, never()).declineChatJoinRequest(any());
-        verify(telegramApi, times(1)).sendMessage(any(SendMessageRequest.class));
+        verify(accessBotApi, times(1)).approveChatJoinRequest(any(ApproveChatJoinRequest.class));
+        verify(accessBotApi, never()).declineChatJoinRequest(any());
+        verify(messageBotApi, times(1)).sendMessage(any(SendMessageRequest.class));
     }
 
     @Test
@@ -106,17 +110,17 @@ class TelegramServiceTest {
                 .thenReturn(Optional.of(previousPartner));
 
         var declineResponse = new TelegramResponse<Boolean>(true, null, null);
-        when(telegramApi.declineChatJoinRequest(any())).thenReturn(declineResponse);
+        when(accessBotApi.declineChatJoinRequest(any())).thenReturn(declineResponse);
 
-        when(telegramApi.sendMessage(any())).thenReturn(new TelegramResponse<>(true, null, null));
+        when(messageBotApi.sendMessage(any())).thenReturn(new TelegramResponse<>(true, null, null));
 
         // When: обрабатываем запрос
         telegramService.processChatJoinRequest(chatJoinRequest);
 
         // Then: запрос отклонен
-        verify(telegramApi, never()).approveChatJoinRequest(any());
-        verify(telegramApi, times(1)).declineChatJoinRequest(any(DeclineChatJoinRequest.class));
-        verify(telegramApi, times(1)).sendMessage(any(SendMessageRequest.class));
+        verify(accessBotApi, never()).approveChatJoinRequest(any());
+        verify(accessBotApi, times(1)).declineChatJoinRequest(any(DeclineChatJoinRequest.class));
+        verify(messageBotApi, times(1)).sendMessage(any(SendMessageRequest.class));
     }
 
     @Test
@@ -125,16 +129,16 @@ class TelegramServiceTest {
         when(authorizedUserService.findByTelegramId(12345L)).thenReturn(null);
 
         var declineResponse = new TelegramResponse<Boolean>(true, null, null);
-        when(telegramApi.declineChatJoinRequest(any())).thenReturn(declineResponse);
+        when(accessBotApi.declineChatJoinRequest(any())).thenReturn(declineResponse);
 
-        when(telegramApi.sendMessage(any())).thenReturn(new TelegramResponse<>(true, null, null));
+        when(messageBotApi.sendMessage(any())).thenReturn(new TelegramResponse<>(true, null, null));
 
         // When: обрабатываем запрос
         telegramService.processChatJoinRequest(chatJoinRequest);
 
         // Then: запрос отклонен, к Greenway API не обращались
-        verify(telegramApi, never()).approveChatJoinRequest(any());
-        verify(telegramApi, times(1)).declineChatJoinRequest(any(DeclineChatJoinRequest.class));
+        verify(accessBotApi, never()).approveChatJoinRequest(any());
+        verify(accessBotApi, times(1)).declineChatJoinRequest(any(DeclineChatJoinRequest.class));
         verify(greenwayService, never()).getPartnerList(anyLong(), anyInt());
     }
 
@@ -146,16 +150,16 @@ class TelegramServiceTest {
                 12345L, 1234567890L, "Test bio", null);
 
         var declineResponse = new TelegramResponse<Boolean>(true, null, null);
-        when(telegramApi.declineChatJoinRequest(any())).thenReturn(declineResponse);
+        when(accessBotApi.declineChatJoinRequest(any())).thenReturn(declineResponse);
 
-        when(telegramApi.sendMessage(any())).thenReturn(new TelegramResponse<>(true, null, null));
+        when(messageBotApi.sendMessage(any())).thenReturn(new TelegramResponse<>(true, null, null));
 
         // When: обрабатываем запрос
         telegramService.processChatJoinRequest(unknownChatRequest);
 
         // Then: запрос отклонен, к Greenway API не обращались
-        verify(telegramApi, never()).approveChatJoinRequest(any());
-        verify(telegramApi, times(1)).declineChatJoinRequest(any(DeclineChatJoinRequest.class));
+        verify(accessBotApi, never()).approveChatJoinRequest(any());
+        verify(accessBotApi, times(1)).declineChatJoinRequest(any(DeclineChatJoinRequest.class));
         verify(greenwayService, never()).getPartnerList(anyLong(), anyInt());
     }
 
@@ -178,16 +182,16 @@ class TelegramServiceTest {
                 .thenReturn(Optional.of(previousPartner));
 
         var approveResponse = new TelegramResponse<Boolean>(true, null, null);
-        when(telegramApi.approveChatJoinRequest(any())).thenReturn(approveResponse);
+        when(accessBotApi.approveChatJoinRequest(any())).thenReturn(approveResponse);
 
-        when(telegramApi.sendMessage(any())).thenReturn(new TelegramResponse<>(true, null, null));
+        when(messageBotApi.sendMessage(any())).thenReturn(new TelegramResponse<>(true, null, null));
 
         // When: обрабатываем запрос
         telegramService.processChatJoinRequest(chatJoinRequest);
 
         // Then: запрос одобрен (берется лучшая квалификация M из предыдущего периода)
-        verify(telegramApi, times(1)).approveChatJoinRequest(any(ApproveChatJoinRequest.class));
-        verify(telegramApi, never()).declineChatJoinRequest(any());
+        verify(accessBotApi, times(1)).approveChatJoinRequest(any(ApproveChatJoinRequest.class));
+        verify(accessBotApi, never()).declineChatJoinRequest(any());
     }
 
     @Test
@@ -207,16 +211,16 @@ class TelegramServiceTest {
                 .thenReturn(Optional.of(currentPartner), Optional.of(previousPartner));
 
         var declineResponse = new TelegramResponse<Boolean>(true, null, null);
-        when(telegramApi.declineChatJoinRequest(any())).thenReturn(declineResponse);
+        when(accessBotApi.declineChatJoinRequest(any())).thenReturn(declineResponse);
 
-        when(telegramApi.sendMessage(any())).thenReturn(new TelegramResponse<>(true, null, null));
+        when(messageBotApi.sendMessage(any())).thenReturn(new TelegramResponse<>(true, null, null));
 
         // When: обрабатываем запрос
         telegramService.processChatJoinRequest(chatJoinRequest);
 
         // Then: запрос отклонен
-        verify(telegramApi, never()).approveChatJoinRequest(any());
-        verify(telegramApi, times(1)).declineChatJoinRequest(any(DeclineChatJoinRequest.class));
+        verify(accessBotApi, never()).approveChatJoinRequest(any());
+        verify(accessBotApi, times(1)).declineChatJoinRequest(any(DeclineChatJoinRequest.class));
     }
 
     @Test
@@ -242,16 +246,16 @@ class TelegramServiceTest {
                 .thenReturn(Optional.of(previousPartner));
 
         var approveResponse = new TelegramResponse<Boolean>(true, null, null);
-        when(telegramApi.approveChatJoinRequest(any())).thenReturn(approveResponse);
+        when(accessBotApi.approveChatJoinRequest(any())).thenReturn(approveResponse);
 
-        when(telegramApi.sendMessage(any())).thenReturn(new TelegramResponse<>(true, null, null));
+        when(messageBotApi.sendMessage(any())).thenReturn(new TelegramResponse<>(true, null, null));
 
         // When: обрабатываем запрос
         telegramService.processChatJoinRequest(group2Request);
 
         // Then: запрос одобрен (L достаточно для GROUP_2)
-        verify(telegramApi, times(1)).approveChatJoinRequest(any(ApproveChatJoinRequest.class));
-        verify(telegramApi, never()).declineChatJoinRequest(any());
+        verify(accessBotApi, times(1)).approveChatJoinRequest(any(ApproveChatJoinRequest.class));
+        verify(accessBotApi, never()).declineChatJoinRequest(any());
     }
 
     @Test
@@ -259,14 +263,14 @@ class TelegramServiceTest {
         // Given: пользователь является участником группы
         var chatMember = new ChatMember("member", new User(12345L, false, "Test", null, null, null));
         var response = new TelegramResponse<>(true, chatMember, null);
-        when(telegramApi.getChatMember(any(GetChatMemberRequest.class))).thenReturn(response);
+        when(accessBotApi.getChatMember(any(GetChatMemberRequest.class))).thenReturn(response);
 
         // When: проверяем членство
         var result = telegramService.isMemberOfChat(-1001968543887L, 12345L);
 
         // Then: возвращается true
         assertThat(result).isTrue();
-        verify(telegramApi, times(1)).getChatMember(any(GetChatMemberRequest.class));
+        verify(accessBotApi, times(1)).getChatMember(any(GetChatMemberRequest.class));
     }
 
     @Test
@@ -274,7 +278,7 @@ class TelegramServiceTest {
         // Given: пользователь не является участником группы
         var chatMember = new ChatMember("left", new User(12345L, false, "Test", null, null, null));
         var response = new TelegramResponse<>(true, chatMember, null);
-        when(telegramApi.getChatMember(any(GetChatMemberRequest.class))).thenReturn(response);
+        when(accessBotApi.getChatMember(any(GetChatMemberRequest.class))).thenReturn(response);
 
         // When: проверяем членство
         var result = telegramService.isMemberOfChat(-1001968543887L, 12345L);
@@ -286,7 +290,7 @@ class TelegramServiceTest {
     @Test
     void testIsMemberOfChat_ApiError() {
         // Given: ошибка при запросе к API
-        when(telegramApi.getChatMember(any(GetChatMemberRequest.class)))
+        when(accessBotApi.getChatMember(any(GetChatMemberRequest.class)))
                 .thenThrow(new RuntimeException("API error"));
 
         // When: проверяем членство
@@ -303,17 +307,17 @@ class TelegramServiceTest {
         var unbanResponse = new TelegramResponse<Boolean>(true, true, null);
         var messageResponse = new TelegramResponse<>(true, null, null);
 
-        when(telegramApi.banChatMember(any(BanChatMemberRequest.class))).thenReturn(banResponse);
-        when(telegramApi.unbanChatMember(any(UnbanChatMemberRequest.class))).thenReturn(unbanResponse);
-        when(telegramApi.sendMessage(any(SendMessageRequest.class))).thenReturn(messageResponse);
+        when(accessBotApi.banChatMember(any(BanChatMemberRequest.class))).thenReturn(banResponse);
+        when(accessBotApi.unbanChatMember(any(UnbanChatMemberRequest.class))).thenReturn(unbanResponse);
+        when(messageBotApi.sendMessage(any(SendMessageRequest.class))).thenReturn(messageResponse);
 
         // When: удаляем пользователя
         telegramService.removeMemberFromChat(-1001968543887L, 12345L);
 
         // Then: вызваны все методы
-        verify(telegramApi, times(1)).banChatMember(any(BanChatMemberRequest.class));
-        verify(telegramApi, times(1)).unbanChatMember(any(UnbanChatMemberRequest.class));
-        verify(telegramApi, times(1)).sendMessage(any(SendMessageRequest.class));
+        verify(accessBotApi, times(1)).banChatMember(any(BanChatMemberRequest.class));
+        verify(accessBotApi, times(1)).unbanChatMember(any(UnbanChatMemberRequest.class));
+        verify(messageBotApi, times(1)).sendMessage(any(SendMessageRequest.class));
     }
 
     @Test
@@ -321,15 +325,15 @@ class TelegramServiceTest {
         // Given: неудачный бан пользователя
         var banResponse = new TelegramResponse<Boolean>(false, null, "Error");
 
-        when(telegramApi.banChatMember(any(BanChatMemberRequest.class))).thenReturn(banResponse);
+        when(accessBotApi.banChatMember(any(BanChatMemberRequest.class))).thenReturn(banResponse);
 
         // When: удаляем пользователя
         telegramService.removeMemberFromChat(-1001968543887L, 12345L);
 
         // Then: unban и сообщение не вызваны
-        verify(telegramApi, times(1)).banChatMember(any(BanChatMemberRequest.class));
-        verify(telegramApi, never()).unbanChatMember(any());
-        verify(telegramApi, never()).sendMessage(any());
+        verify(accessBotApi, times(1)).banChatMember(any(BanChatMemberRequest.class));
+        verify(accessBotApi, never()).unbanChatMember(any());
+        verify(messageBotApi, never()).sendMessage(any());
     }
 
     @Test
@@ -337,14 +341,14 @@ class TelegramServiceTest {
         // Given: пользователь не является участником группы
         var chatMember = new ChatMember("left", new User(12345L, false, "Test", null, null, null));
         var response = new TelegramResponse<>(true, chatMember, null);
-        when(telegramApi.getChatMember(any(GetChatMemberRequest.class))).thenReturn(response);
+        when(accessBotApi.getChatMember(any(GetChatMemberRequest.class))).thenReturn(response);
 
         // When: проверяем и удаляем если не квалифицирован
         telegramService.checkAndRemoveIfNotQualified(-1001968543887L, 12345L, 999888L);
 
         // Then: не обращаемся к Greenway API и не удаляем
         verify(greenwayService, never()).getPartnerList(anyLong(), anyInt());
-        verify(telegramApi, never()).banChatMember(any());
+        verify(accessBotApi, never()).banChatMember(any());
     }
 
     @Test
@@ -352,7 +356,7 @@ class TelegramServiceTest {
         // Given: пользователь является участником, но квалификация недостаточна
         var chatMember = new ChatMember("member", new User(12345L, false, "Test", null, null, null));
         var getMemberResponse = new TelegramResponse<>(true, chatMember, null);
-        when(telegramApi.getChatMember(any(GetChatMemberRequest.class))).thenReturn(getMemberResponse);
+        when(accessBotApi.getChatMember(any(GetChatMemberRequest.class))).thenReturn(getMemberResponse);
 
         // Квалификация L (недостаточно для GROUP_1, требует M или GM)
         var currentPartner = createPartner("L2");
@@ -372,17 +376,17 @@ class TelegramServiceTest {
         var unbanResponse = new TelegramResponse<Boolean>(true, true, null);
         var messageResponse = new TelegramResponse<>(true, null, null);
 
-        when(telegramApi.banChatMember(any(BanChatMemberRequest.class))).thenReturn(banResponse);
-        when(telegramApi.unbanChatMember(any(UnbanChatMemberRequest.class))).thenReturn(unbanResponse);
-        when(telegramApi.sendMessage(any(SendMessageRequest.class))).thenReturn(messageResponse);
+        when(accessBotApi.banChatMember(any(BanChatMemberRequest.class))).thenReturn(banResponse);
+        when(accessBotApi.unbanChatMember(any(UnbanChatMemberRequest.class))).thenReturn(unbanResponse);
+        when(messageBotApi.sendMessage(any(SendMessageRequest.class))).thenReturn(messageResponse);
 
         // When: проверяем и удаляем
         telegramService.checkAndRemoveIfNotQualified(-1001968543887L, 12345L, 999888L);
 
         // Then: пользователь удален
-        verify(telegramApi, times(1)).banChatMember(any(BanChatMemberRequest.class));
-        verify(telegramApi, times(1)).unbanChatMember(any(UnbanChatMemberRequest.class));
-        verify(telegramApi, atLeastOnce()).sendMessage(any(SendMessageRequest.class));
+        verify(accessBotApi, times(1)).banChatMember(any(BanChatMemberRequest.class));
+        verify(accessBotApi, times(1)).unbanChatMember(any(UnbanChatMemberRequest.class));
+        verify(messageBotApi, atLeastOnce()).sendMessage(any(SendMessageRequest.class));
     }
 
     @Test
@@ -390,7 +394,7 @@ class TelegramServiceTest {
         // Given: пользователь является участником и квалификация достаточна
         var chatMember = new ChatMember("member", new User(12345L, false, "Test", null, null, null));
         var getMemberResponse = new TelegramResponse<>(true, chatMember, null);
-        when(telegramApi.getChatMember(any(GetChatMemberRequest.class))).thenReturn(getMemberResponse);
+        when(accessBotApi.getChatMember(any(GetChatMemberRequest.class))).thenReturn(getMemberResponse);
 
         // Квалификация M (достаточно для GROUP_1)
         var currentPartner = createPartner("M2");
@@ -410,8 +414,8 @@ class TelegramServiceTest {
         telegramService.checkAndRemoveIfNotQualified(-1001968543887L, 12345L, 999888L);
 
         // Then: пользователь НЕ удален
-        verify(telegramApi, never()).banChatMember(any());
-        verify(telegramApi, never()).unbanChatMember(any());
+        verify(accessBotApi, never()).banChatMember(any());
+        verify(accessBotApi, never()).unbanChatMember(any());
     }
 
     @Test
@@ -419,14 +423,14 @@ class TelegramServiceTest {
         // Given: группа не найдена в требованиях
         var chatMember = new ChatMember("member", new User(12345L, false, "Test", null, null, null));
         var getMemberResponse = new TelegramResponse<>(true, chatMember, null);
-        when(telegramApi.getChatMember(any(GetChatMemberRequest.class))).thenReturn(getMemberResponse);
+        when(accessBotApi.getChatMember(any(GetChatMemberRequest.class))).thenReturn(getMemberResponse);
 
         // When: проверяем для неизвестной группы
         telegramService.checkAndRemoveIfNotQualified(-9999999999L, 12345L, 999888L);
 
         // Then: не обращаемся к Greenway API и не удаляем
         verify(greenwayService, never()).getPartnerList(anyLong(), anyInt());
-        verify(telegramApi, never()).banChatMember(any());
+        verify(accessBotApi, never()).banChatMember(any());
     }
 
     // Helper methods
