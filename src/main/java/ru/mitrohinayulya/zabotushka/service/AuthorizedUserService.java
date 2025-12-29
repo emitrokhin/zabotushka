@@ -61,13 +61,6 @@ public class AuthorizedUserService {
     }
 
     /**
-     * Поиск пользователя по greenwayId
-     */
-    public AuthorizedUser findByGreenwayId(Long greenwayId) {
-        return AuthorizedUser.findByGreenwayId(greenwayId);
-    }
-
-    /**
      * Проверка существования пользователя по greenwayId
      */
     public boolean existsByGreenwayId(Long greenwayId) {

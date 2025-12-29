@@ -49,13 +49,6 @@ public class AuthorizedUser extends PanacheEntityBase {
     }
 
     /**
-     * Поиск пользователя по greenwayId
-     */
-    public static AuthorizedUser findByGreenwayId(Long greenwayId) {
-        return find("greenwayId", greenwayId).firstResult();
-    }
-
-    /**
      * Проверка существования пользователя по greenwayId
      */
     public static boolean existsByGreenwayId(Long greenwayId) {

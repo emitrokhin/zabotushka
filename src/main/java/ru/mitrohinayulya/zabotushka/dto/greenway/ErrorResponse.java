@@ -14,8 +14,4 @@ public record ErrorResponse(
     public static ErrorResponse of(String error) {
         return new ErrorResponse(error);
     }
-
-    public static ErrorResponse userAlreadyExists() {
-        return new ErrorResponse("User with this telegramId already exists");
-    }
 }
