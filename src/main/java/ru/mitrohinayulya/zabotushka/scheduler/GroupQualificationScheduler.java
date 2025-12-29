@@ -59,8 +59,10 @@ public class GroupQualificationScheduler {
                     var user = authorizedUserService.findByTelegramId(membership.telegramId);
 
                     if (user == null) {
-                        log.warn("User not found in authorized users: telegramId={}, chatId={}",
+                        log.warn("User not found in authorized users, removing orphaned membership: telegramId={}, chatId={}",
                                 membership.telegramId, group.getChatId());
+                        handleOrphanedMembership(membership, group.getChatId());
+                        totalRemoved++;
                         continue;
                     }
 
@@ -108,5 +110,20 @@ public class GroupQualificationScheduler {
                      user.telegramId, group.getChatId(), e);
             return false;
         }
+    }
+
+    /**
+     * Обрабатывает orphaned membership - удаляет пользователя из группы и запись из БД
+     */
+    private void handleOrphanedMembership(UserGroupMembership membership, Long chatId) {
+        try {
+            telegramService.removeMemberFromChat(chatId, membership.telegramId);
+        } catch (Exception e) {
+            log.error("Failed to remove user from chat: telegramId={}, chatId={}",
+                    membership.telegramId, chatId, e);
+        }
+
+        // Удаляем запись о членстве из БД даже если не удалось удалить из группы
+        membership.delete();
     }
 }

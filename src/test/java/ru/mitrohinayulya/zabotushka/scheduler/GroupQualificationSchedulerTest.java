@@ -118,7 +118,7 @@ class GroupQualificationSchedulerTest {
 
     @Test
     void testCheckGroupQualifications_UserNotFound() {
-        // Given: есть членство, но пользователь не найден в БД
+        // Given: есть членство, но пользователь не найден в БД (orphaned membership)
         var chatId1 = -1001968543887L;
         var chatId2 = -1001891048040L;
         var chatId3 = -1001835476759L;
@@ -142,7 +142,10 @@ class GroupQualificationSchedulerTest {
         // When: запускаем проверку
         scheduler.checkGroupQualifications();
 
-        // Then: квалификация не проверяется для несуществующего пользователя
+        // Then: пользователь удаляется из группы и orphaned membership удаляется
+        verify(telegramService, times(1)).removeMemberFromChat(chatId1, 12345L);
+        verify(membership, times(1)).delete();
+        // Квалификация не проверяется (нет user объекта)
         verify(telegramService, never()).checkAndRemoveIfNotQualified(anyLong(), anyLong(), anyLong());
         verify(membership, never()).persist();
     }
