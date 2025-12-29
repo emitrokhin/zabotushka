@@ -13,8 +13,10 @@ import ru.mitrohinayulya.zabotushka.exception.GreenwayApiException;
 import ru.mitrohinayulya.zabotushka.service.AuthorizedUserService;
 import ru.mitrohinayulya.zabotushka.service.GreenwayService;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -114,7 +116,7 @@ public class GreenwayResource {
      * и сохраняет пользователя в БД при успешной авторизации
      */
     private Response authorizePartner(Partner partner, AuthorizeRequest request) {
-        boolean isAuthorized = Objects.equals(partner.regDate(), request.regDate());
+        boolean isAuthorized = compareDates(partner.regDate(), request.regDate());
 
         if (isAuthorized) {
             // Сохраняем авторизованного пользователя в БД
@@ -130,6 +132,37 @@ public class GreenwayResource {
         log.warn("Partner authorization failed: greenwayId={}, expected regDate={}, actual regDate={}",
                 request.greenwayId(), request.regDate(), partner.regDate());
         return buildNotAuthorizedResponse(Response.Status.UNAUTHORIZED);
+    }
+
+    /**
+     * Сравнивает две даты, парсинг обе в LocalDate для корректного сравнения.
+     * Это предотвращает проблемы с разными форматами строк.
+     * Ожидаемый формат: DD.MM.YYYY (например, 29.12.2025)
+     *
+     * @param date1 первая дата (из API)
+     * @param date2 вторая дата (из запроса)
+     * @return true если даты равны
+     */
+    private boolean compareDates(String date1, String date2) {
+        if (date1 == null || date2 == null) {
+            return false;
+        }
+
+        // Если строки идентичны, сразу возвращаем true
+        if (date1.equals(date2)) {
+            return true;
+        }
+
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+            LocalDate localDate1 = LocalDate.parse(date1, formatter);
+            LocalDate localDate2 = LocalDate.parse(date2, formatter);
+            return localDate1.equals(localDate2);
+        } catch (DateTimeParseException e) {
+            log.warn("Failed to parse dates for comparison: date1={}, date2={}", date1, date2, e);
+            // Fallback to string comparison if parsing fails
+            return false;
+        }
     }
 
     /**
