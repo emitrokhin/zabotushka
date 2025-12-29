@@ -28,8 +28,6 @@ public class TelegramService {
 
     private static final Logger log = LoggerFactory.getLogger(TelegramService.class);
     private static final String APPROVED_MESSAGE = "Ваш запрос на вступление одобрен";
-    private static final String DECLINED_MESSAGE = "Ваш запрос на вступление отклонен. Условия не выполнены";
-    private static final String REMOVED_MESSAGE = "Вы были удалены из группы, так как не соответствуете требованиям по квалификации";
 
     @Inject
     @RestClient
@@ -166,6 +164,18 @@ public class TelegramService {
     }
 
     /**
+     * Возвращает название клуба по chatId
+     */
+    private String getChatGroupName(Long chatId) {
+        if (chatId.equals(-1001968543887L)) return "Золотой клуб";
+        if (chatId.equals(-1001891048040L)) return "Серебряный клуб";
+        if (chatId.equals(-1001835476759L)) return "Бронзовый клуб";
+        if (chatId.equals(-1001811106801L)) return "Могу себе позволить";
+        if (chatId.equals(-1001929076200L)) return "Могу себе позволить chat";
+        return "клуб";
+    }
+
+    /**
      * Одобряет запрос на вступление и отправляет сообщение пользователю
      */
     private void approveJoinRequest(Long chatId, Long userId) {
@@ -219,7 +229,9 @@ public class TelegramService {
 
             if (Boolean.TRUE.equals(response.ok())) {
                 log.info("Join request declined successfully: chatId={}, userId={}", chatId, userId);
-                sendMessage(userId, DECLINED_MESSAGE);
+                var chatName = getChatGroupName(chatId);
+                var message = String.format("Ваш запрос на вступление в «%s» отклонен. Условия не выполнены", chatName);
+                sendMessage(userId, message);
             } else {
                 log.error("Failed to decline join request: chatId={}, userId={}, description={}",
                         chatId, userId, response.description());
@@ -286,7 +298,9 @@ public class TelegramService {
                 if (Boolean.TRUE.equals(unbanResponse.ok())) {
                     log.info("User unbanned successfully (removed without permanent ban): chatId={}, userId={}",
                             chatId, userId);
-                    sendMessage(userId, REMOVED_MESSAGE);
+                    var chatName = getChatGroupName(chatId);
+                    var message = String.format("Вы были удалены из «%s», так как не соответствуете требованиям по квалификации", chatName);
+                    sendMessage(userId, message);
 
                     // Удаляем информацию о членстве из БД
                     removeMembershipFromDb(chatId, userId);
