@@ -11,6 +11,6 @@ public record UnbanChatMemberRequest(
         @JsonProperty("only_if_banned") Boolean onlyIfBanned
 ) {
     public static UnbanChatMemberRequest of(Long chatId, Long userId) {
-        return new UnbanChatMemberRequest(chatId, userId, true);
+        return new UnbanChatMemberRequest(chatId, userId, false);
     }
 }
