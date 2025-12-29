@@ -11,7 +11,10 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "authorized_users",
-       uniqueConstraints = @UniqueConstraint(columnNames = "telegram_id"))
+       uniqueConstraints = {
+           @UniqueConstraint(name = "uk_telegram_id", columnNames = "telegram_id"),
+           @UniqueConstraint(name = "uk_greenway_id", columnNames = "greenway_id")
+       })
 public class AuthorizedUser extends PanacheEntityBase {
 
     @Id
@@ -43,5 +46,19 @@ public class AuthorizedUser extends PanacheEntityBase {
      */
     public static boolean existsByTelegramId(Long telegramId) {
         return count("telegramId", telegramId) > 0;
+    }
+
+    /**
+     * Поиск пользователя по greenwayId
+     */
+    public static AuthorizedUser findByGreenwayId(Long greenwayId) {
+        return find("greenwayId", greenwayId).firstResult();
+    }
+
+    /**
+     * Проверка существования пользователя по greenwayId
+     */
+    public static boolean existsByGreenwayId(Long greenwayId) {
+        return count("greenwayId", greenwayId) > 0;
     }
 }

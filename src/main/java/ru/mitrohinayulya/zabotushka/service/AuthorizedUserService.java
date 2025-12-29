@@ -59,4 +59,18 @@ public class AuthorizedUserService {
     public List<AuthorizedUser> findAll() {
         return AuthorizedUser.listAll();
     }
+
+    /**
+     * Поиск пользователя по greenwayId
+     */
+    public AuthorizedUser findByGreenwayId(Long greenwayId) {
+        return AuthorizedUser.findByGreenwayId(greenwayId);
+    }
+
+    /**
+     * Проверка существования пользователя по greenwayId
+     */
+    public boolean existsByGreenwayId(Long greenwayId) {
+        return AuthorizedUser.existsByGreenwayId(greenwayId);
+    }
 }

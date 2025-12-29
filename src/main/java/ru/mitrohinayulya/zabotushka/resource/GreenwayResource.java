@@ -70,6 +70,15 @@ public class GreenwayResource {
             }
         }
 
+        // Проверяем, не используется ли этот greenwayId другим пользователем
+        if (authorizedUserService.existsByGreenwayId(request.greenwayId())) {
+            log.warn("Authorization rejected: greenwayId={} is already associated with another Telegram account",
+                    request.greenwayId());
+            return Response.status(Response.Status.CONFLICT)
+                    .entity(ErrorResponse.of("This Greenway ID is already associated with another Telegram account"))
+                    .build();
+        }
+
         // Пользователя нет в БД - выполняем обычную авторизацию через Greenway API
         try {
             var partnerListResponse = greenwayService.getPartnerList(request.greenwayId(), 0);

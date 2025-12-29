@@ -119,6 +119,35 @@ class GreenwayResourceTest {
     }
 
     @Test
+    void testAuthorize_Conflict_GreenwayIdAlreadyUsed() {
+        // Given: новый пользователь (другой telegram_id), но greenway_id уже используется другим пользователем
+        when(authorizedUserService.existsByTelegramId(9999L)).thenReturn(false);
+        when(authorizedUserService.existsByGreenwayId(123456L)).thenReturn(true);
+
+        // When & Then: возвращается 409 Conflict
+        given()
+            .auth().basic("admin", "admin")
+            .contentType(ContentType.JSON)
+            .body("""
+                {
+                    "telegramId": 9999,
+                    "greenwayId": 123456,
+                    "regDate": "2023-01-15"
+                }
+                """)
+            .when()
+            .post("/greenway/authorize")
+            .then()
+            .statusCode(409)
+            .body("error", is("This Greenway ID is already associated with another Telegram account"));
+
+        // Проверяем что к Greenway API НЕ обращались
+        verify(greenwayService, never()).getPartnerList(anyLong(), anyInt());
+        // Проверяем что пользователь НЕ был сохранен
+        verify(authorizedUserService, never()).saveAuthorizedUser(anyLong(), anyLong(), anyString());
+    }
+
+    @Test
     void testAuthorize_Unauthorized_NoBasicAuth() {
         // When & Then: без Basic Auth доступ запрещен
         given()
