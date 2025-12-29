@@ -39,6 +39,9 @@ class TelegramServiceTest {
     @Mock
     AuthorizedUserService authorizedUserService;
 
+    @Mock
+    TelegramRateLimiter rateLimiter;
+
     @InjectMocks
     TelegramService telegramService;
 
@@ -57,6 +60,12 @@ class TelegramServiceTest {
         authorizedUser.telegramId = 12345L;
         authorizedUser.greenwayId = 999888L;
         authorizedUser.regDate = "2023-01-15";
+
+        // Настраиваем мок rateLimiter для выполнения переданных действий без задержки
+        when(rateLimiter.execute(any())).thenAnswer(invocation -> {
+            var supplier = invocation.getArgument(0, java.util.function.Supplier.class);
+            return supplier.get();
+        });
     }
 
     @Test
