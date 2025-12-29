@@ -34,10 +34,6 @@ public interface AccessBotApi {
     TelegramResponse<ChatMember> getChatMember(GetChatMemberRequest request);
 
     @POST
-    @Path("/banChatMember")
-    TelegramResponse<Boolean> banChatMember(BanChatMemberRequest request);
-
-    @POST
     @Path("/unbanChatMember")
     TelegramResponse<Boolean> unbanChatMember(UnbanChatMemberRequest request);
 }

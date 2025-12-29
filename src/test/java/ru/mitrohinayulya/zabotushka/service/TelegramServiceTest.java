@@ -303,36 +303,32 @@ class TelegramServiceTest {
     @Test
     void testRemoveMemberFromChat_Success() {
         // Given: успешное удаление пользователя
-        var banResponse = new TelegramResponse<Boolean>(true, true, null);
         var unbanResponse = new TelegramResponse<Boolean>(true, true, null);
         var messageResponse = new TelegramResponse<>(true, null, null);
 
-        when(accessBotApi.banChatMember(any(BanChatMemberRequest.class))).thenReturn(banResponse);
         when(accessBotApi.unbanChatMember(any(UnbanChatMemberRequest.class))).thenReturn(unbanResponse);
         when(messageBotApi.sendMessage(any(SendMessageRequest.class))).thenReturn(messageResponse);
 
         // When: удаляем пользователя
         telegramService.removeMemberFromChat(-1001968543887L, 12345L);
 
-        // Then: вызваны все методы
-        verify(accessBotApi, times(1)).banChatMember(any(BanChatMemberRequest.class));
+        // Then: вызваны unban и отправка сообщения
         verify(accessBotApi, times(1)).unbanChatMember(any(UnbanChatMemberRequest.class));
         verify(messageBotApi, times(1)).sendMessage(any(SendMessageRequest.class));
     }
 
     @Test
-    void testRemoveMemberFromChat_BanFailed() {
-        // Given: неудачный бан пользователя
-        var banResponse = new TelegramResponse<Boolean>(false, null, "Error");
+    void testRemoveMemberFromChat_UnbanFailed() {
+        // Given: неудачный unban пользователя
+        var unbanResponse = new TelegramResponse<Boolean>(false, null, "Error");
 
-        when(accessBotApi.banChatMember(any(BanChatMemberRequest.class))).thenReturn(banResponse);
+        when(accessBotApi.unbanChatMember(any(UnbanChatMemberRequest.class))).thenReturn(unbanResponse);
 
         // When: удаляем пользователя
         telegramService.removeMemberFromChat(-1001968543887L, 12345L);
 
-        // Then: unban и сообщение не вызваны
-        verify(accessBotApi, times(1)).banChatMember(any(BanChatMemberRequest.class));
-        verify(accessBotApi, never()).unbanChatMember(any());
+        // Then: сообщение не отправлено
+        verify(accessBotApi, times(1)).unbanChatMember(any(UnbanChatMemberRequest.class));
         verify(messageBotApi, never()).sendMessage(any());
     }
 
@@ -348,7 +344,7 @@ class TelegramServiceTest {
 
         // Then: не обращаемся к Greenway API и не удаляем
         verify(greenwayService, never()).getPartnerList(anyLong(), anyInt());
-        verify(accessBotApi, never()).banChatMember(any());
+        verify(accessBotApi, never()).unbanChatMember(any());
     }
 
     @Test
@@ -372,11 +368,9 @@ class TelegramServiceTest {
         when(greenwayService.findPartnerById(previousResponse, 999888L))
                 .thenReturn(Optional.of(previousPartner));
 
-        var banResponse = new TelegramResponse<Boolean>(true, true, null);
         var unbanResponse = new TelegramResponse<Boolean>(true, true, null);
         var messageResponse = new TelegramResponse<>(true, null, null);
 
-        when(accessBotApi.banChatMember(any(BanChatMemberRequest.class))).thenReturn(banResponse);
         when(accessBotApi.unbanChatMember(any(UnbanChatMemberRequest.class))).thenReturn(unbanResponse);
         when(messageBotApi.sendMessage(any(SendMessageRequest.class))).thenReturn(messageResponse);
 
@@ -384,7 +378,6 @@ class TelegramServiceTest {
         telegramService.checkAndRemoveIfNotQualified(-1001968543887L, 12345L, 999888L);
 
         // Then: пользователь удален
-        verify(accessBotApi, times(1)).banChatMember(any(BanChatMemberRequest.class));
         verify(accessBotApi, times(1)).unbanChatMember(any(UnbanChatMemberRequest.class));
         verify(messageBotApi, atLeastOnce()).sendMessage(any(SendMessageRequest.class));
     }
@@ -414,7 +407,6 @@ class TelegramServiceTest {
         telegramService.checkAndRemoveIfNotQualified(-1001968543887L, 12345L, 999888L);
 
         // Then: пользователь НЕ удален
-        verify(accessBotApi, never()).banChatMember(any());
         verify(accessBotApi, never()).unbanChatMember(any());
     }
 
@@ -430,7 +422,7 @@ class TelegramServiceTest {
 
         // Then: не обращаемся к Greenway API и не удаляем
         verify(greenwayService, never()).getPartnerList(anyLong(), anyInt());
-        verify(accessBotApi, never()).banChatMember(any());
+        verify(accessBotApi, never()).unbanChatMember(any());
     }
 
     // Helper methods

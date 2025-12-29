@@ -8,9 +8,6 @@ quarkus:
     password: ${PG_PASSWORD}
     jdbc:
       url: jdbc:postgresql://localhost:5432/${PG_DB_NAME}
-  hibernate-orm:
-    log:
-      sql: true
   flyway:
     migrate-at-start: true
     baseline-on-migrate: true

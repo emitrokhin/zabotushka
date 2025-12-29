@@ -281,37 +281,24 @@ public class TelegramService {
 
     /**
      * Удаляет пользователя из группы и отправляет ему уведомление
-     * Использует метод unbanChatMember согласно требованиям
+     * Использует только метод unbanChatMember для удаления
      */
     public void removeMemberFromChat(Long chatId, Long userId) {
         try {
-            // Сначала баним пользователя
-            var banRequest = BanChatMemberRequest.of(chatId, userId);
-            var banResponse = accessBotApi.banChatMember(banRequest);
+            var unbanRequest = UnbanChatMemberRequest.of(chatId, userId);
+            var unbanResponse = accessBotApi.unbanChatMember(unbanRequest);
 
-            if (Boolean.TRUE.equals(banResponse.ok())) {
-                log.info("User banned from chat: chatId={}, userId={}", chatId, userId);
+            if (Boolean.TRUE.equals(unbanResponse.ok())) {
+                log.info("User removed from chat: chatId={}, userId={}", chatId, userId);
+                var chatName = getChatGroupName(chatId);
+                var message = String.format("Вы были удалены из «%s», так как не соответствуете требованиям по квалификации", chatName);
+                sendMessage(userId, message);
 
-                // Затем разбаниваем, чтобы пользователь мог вернуться
-                var unbanRequest = UnbanChatMemberRequest.of(chatId, userId);
-                var unbanResponse = accessBotApi.unbanChatMember(unbanRequest);
-
-                if (Boolean.TRUE.equals(unbanResponse.ok())) {
-                    log.info("User unbanned successfully (removed without permanent ban): chatId={}, userId={}",
-                            chatId, userId);
-                    var chatName = getChatGroupName(chatId);
-                    var message = String.format("Вы были удалены из «%s», так как не соответствуете требованиям по квалификации", chatName);
-                    sendMessage(userId, message);
-
-                    // Удаляем информацию о членстве из БД
-                    removeMembershipFromDb(chatId, userId);
-                } else {
-                    log.error("Failed to unban user: chatId={}, userId={}, description={}",
-                            chatId, userId, unbanResponse.description());
-                }
+                // Удаляем информацию о членстве из БД
+                removeMembershipFromDb(chatId, userId);
             } else {
-                log.error("Failed to ban user: chatId={}, userId={}, description={}",
-                        chatId, userId, banResponse.description());
+                log.error("Failed to remove user from chat: chatId={}, userId={}, description={}",
+                        chatId, userId, unbanResponse.description());
             }
         } catch (Exception e) {
             log.error("Error removing user from chat: chatId={}, userId={}", chatId, userId, e);
