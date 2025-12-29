@@ -27,7 +27,6 @@ import java.time.LocalDateTime;
 public class TelegramService {
 
     private static final Logger log = LoggerFactory.getLogger(TelegramService.class);
-    private static final String APPROVED_MESSAGE = "Ваш запрос на вступление одобрен";
 
     @Inject
     @RestClient
@@ -185,7 +184,9 @@ public class TelegramService {
 
             if (Boolean.TRUE.equals(response.ok())) {
                 log.info("Join request approved successfully: chatId={}, userId={}", chatId, userId);
-                sendMessage(userId, APPROVED_MESSAGE);
+                var chatName = getChatGroupName(chatId);
+                var message = String.format("Ваш запрос на вступление в «%s» одобрен", chatName);
+                sendMessage(userId, message);
 
                 // Сохраняем информацию о членстве в БД
                 saveMembership(chatId, userId);
