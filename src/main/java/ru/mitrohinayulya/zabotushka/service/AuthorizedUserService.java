@@ -3,6 +3,7 @@ package ru.mitrohinayulya.zabotushka.service;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import ru.mitrohinayulya.zabotushka.entity.AuthorizedUser;
+import ru.mitrohinayulya.zabotushka.exception.GreenwayIdAlreadyExistsException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,9 +23,17 @@ public class AuthorizedUserService {
 
     /**
      * Сохраняет нового авторизованного пользователя
+     * Проверяет уникальность greenwayId перед сохранением
+     *
+     * @throws GreenwayIdAlreadyExistsException если greenwayId уже используется
      */
     @Transactional
     public AuthorizedUser saveAuthorizedUser(Long telegramId, Long greenwayId, String regDate) {
+        // Проверяем уникальность greenwayId
+        if (existsByGreenwayId(greenwayId)) {
+            throw new GreenwayIdAlreadyExistsException(greenwayId);
+        }
+
         var user = new AuthorizedUser();
         user.telegramId = telegramId;
         user.greenwayId = greenwayId;

@@ -12,8 +12,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "authorized_users",
        uniqueConstraints = {
-           @UniqueConstraint(name = "uk_telegram_id", columnNames = "telegram_id"),
-           @UniqueConstraint(name = "uk_greenway_id", columnNames = "greenway_id")
+           @UniqueConstraint(name = "uk_telegram_id", columnNames = "telegram_id")
        })
 public class AuthorizedUser extends PanacheEntityBase {
 

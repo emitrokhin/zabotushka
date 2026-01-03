@@ -6,6 +6,7 @@ import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import ru.mitrohinayulya.zabotushka.entity.AuthorizedUser;
+import ru.mitrohinayulya.zabotushka.exception.GreenwayIdAlreadyExistsException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -72,9 +73,9 @@ class AuthorizedUserServiceTest {
         // Then: возвращается один пользователь
         assertNotNull(users);
         assertEquals(1, users.size());
-        assertEquals(12345L, users.get(0).telegramId);
-        assertEquals(999888L, users.get(0).greenwayId);
-        assertEquals("2023-01-15", users.get(0).regDate);
+        assertEquals(12345L, users.getFirst().telegramId);
+        assertEquals(999888L, users.getFirst().greenwayId);
+        assertEquals("2023-01-15", users.getFirst().regDate);
     }
 
     @Test
@@ -93,7 +94,7 @@ class AuthorizedUserServiceTest {
         // И появляется в списке всех пользователей
         var allUsers = authorizedUserService.findAll();
         assertEquals(1, allUsers.size());
-        assertEquals(savedUser.telegramId, allUsers.get(0).telegramId);
+        assertEquals(savedUser.telegramId, allUsers.getFirst().telegramId);
     }
 
     @Test
@@ -112,7 +113,7 @@ class AuthorizedUserServiceTest {
         // И он присутствует в списке всех пользователей
         var allUsers = authorizedUserService.findAll();
         assertEquals(1, allUsers.size());
-        assertEquals(foundUser.telegramId, allUsers.get(0).telegramId);
+        assertEquals(foundUser.telegramId, allUsers.getFirst().telegramId);
     }
 
     @Test
@@ -145,5 +146,38 @@ class AuthorizedUserServiceTest {
         // Then: данные совпадают/не совпадают корректно
         assertTrue(matches);
         assertFalse(notMatches);
+    }
+
+    @Test
+    @Transactional
+    void testSaveAuthorizedUser_ThrowsException_WhenGreenwayIdAlreadyExists() {
+        // Given: создаем пользователя с greenwayId 999888
+        authorizedUserService.saveAuthorizedUser(12345L, 999888L, "2023-01-15");
+
+        // When/Then: попытка создать другого пользователя с тем же greenwayId выбрасывает исключение
+        var exception = assertThrows(
+                GreenwayIdAlreadyExistsException.class,
+                () -> authorizedUserService.saveAuthorizedUser(67890L, 999888L, "2023-02-20")
+        );
+
+        // Проверяем сообщение об ошибке
+        assertTrue(exception.getMessage().contains("999888"));
+        assertTrue(exception.getMessage().contains("already associated"));
+
+        // Проверяем, что в БД остался только первый пользователь
+        var allUsers = authorizedUserService.findAll();
+        assertEquals(1, allUsers.size());
+        assertEquals(12345L, allUsers.getFirst().telegramId);
+    }
+
+    @Test
+    @Transactional
+    void testExistsByGreenwayId() {
+        // Given: создаем пользователя
+        authorizedUserService.saveAuthorizedUser(12345L, 999888L, "2023-01-15");
+
+        // When/Then: проверяем существование по greenwayId
+        assertTrue(authorizedUserService.existsByGreenwayId(999888L));
+        assertFalse(authorizedUserService.existsByGreenwayId(777777L));
     }
 }
