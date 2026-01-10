@@ -1,4 +1,11 @@
 quarkus:
+  log:
+    file:
+      path: logs/zabotushka.log
+      rotation:
+        max-file-size: 10M
+        max-backup-index: 7
+        file-suffix: .yyyy-MM-dd
   http:
     auth:
       basic: true
