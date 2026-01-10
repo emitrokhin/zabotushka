@@ -2,6 +2,13 @@ quarkus:
   http:
     auth:
       basic: true
+  otel:
+    logs:
+      enabled: false
+    traces:
+      enabled: false
+    metrics:
+      enabled: false
   datasource:
     db-kind: postgresql
     username: ${PG_LOGIN}
@@ -46,6 +53,18 @@ app:
     password: ${BASIC_AUTH_PASSWORD:admin}
 
 "%prod":
+  quarkus:
+    otel:
+      logs:
+        enabled: true
+        level: WARN
+      exporter:
+        otlp:
+          logs:
+            endpoint: ${OTLP_URL}
+            headers: "Authorization=Basic ${OTLP_TOKEN}"
+      resource:
+        attributes: "service.name=zabotushka,deployment.environment=prod"
   rest-client:
     access-bot-api:
       url: "https://api.telegram.org/bot${app.telegram.access-bot-token}"
