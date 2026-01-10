@@ -67,6 +67,7 @@ app:
         level: WARN
       exporter:
         otlp:
+          protocol: http/protobuf
           logs:
             endpoint: ${OTLP_URL}
             headers: "Authorization=Basic ${OTLP_TOKEN}"
