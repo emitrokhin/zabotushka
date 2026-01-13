@@ -1,5 +1,6 @@
 package ru.mitrohinayulya.zabotushka.client;
 
+import io.quarkiverse.bucket4j.runtime.RateLimited;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -15,6 +16,7 @@ import ru.mitrohinayulya.zabotushka.dto.telegram.*;
 @RegisterRestClient(configKey = "access-bot-api")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@RateLimited(bucket = "telegram")
 public interface AccessBotApi {
 
     @POST

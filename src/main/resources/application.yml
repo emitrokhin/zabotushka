@@ -1,4 +1,10 @@
 quarkus:
+  rate-limiter:
+    buckets:
+      telegram:
+        limits:
+          - permitted-uses: ${TELEGRAM_RATE_LIMIT:25}
+            period: 1S
   log:
     file:
       path: logs/zabotushka.log
@@ -49,9 +55,6 @@ app:
       path: /telegram/webhook
       secret: ${TELEGRAM_ACCESS_BOT_WEBHOOK_SECRET}
       enabled: ${TELEGRAM_ACCESS_BOT_WEBHOOK_ENABLED:true}
-    rate-limit:
-      # Telegram API позволяет max 30 msg/sec, используем 25 для безопасности
-      messages-per-second: ${TELEGRAM_RATE_LIMIT:25}
   greenway:
     id: ${GREENWAY_ID:}
     password: ${GREENWAY_PASSWORD:}

@@ -42,9 +42,6 @@ public class TelegramService {
     @Inject
     AuthorizedUserService authorizedUserService;
 
-    @Inject
-    TelegramRateLimiter rateLimiter;
-
     @ConfigProperty(name = "app.host")
     String hostUrl;
 
@@ -78,7 +75,7 @@ public class TelegramService {
             log.info("Registering Telegram webhook: url={}", fullWebhookUrl);
 
             var request = SetWebhookRequest.forChatJoinRequests(fullWebhookUrl, webhookSecret);
-            var response = rateLimiter.execute(() -> accessBotApi.setWebhook(request));
+            var response = accessBotApi.setWebhook(request);
 
             if (Boolean.TRUE.equals(response.ok())) {
                 log.info("Telegram webhook registered successfully");
@@ -183,7 +180,7 @@ public class TelegramService {
     private void approveJoinRequest(Long chatId, Long userId) {
         try {
             var request = ApproveChatJoinRequest.of(chatId, userId);
-            var response = rateLimiter.execute(() -> accessBotApi.approveChatJoinRequest(request));
+            var response = accessBotApi.approveChatJoinRequest(request);
 
             if (Boolean.TRUE.equals(response.ok())) {
                 log.info("Join request approved successfully: chatId={}, userId={}", chatId, userId);
@@ -229,7 +226,7 @@ public class TelegramService {
     private void declineJoinRequest(Long chatId, Long userId) {
         try {
             var request = DeclineChatJoinRequest.of(chatId, userId);
-            var response = rateLimiter.execute(() -> accessBotApi.declineChatJoinRequest(request));
+            var response = accessBotApi.declineChatJoinRequest(request);
 
             if (Boolean.TRUE.equals(response.ok())) {
                 log.info("Join request declined successfully: chatId={}, userId={}", chatId, userId);
@@ -251,7 +248,7 @@ public class TelegramService {
     private void sendMessage(Long chatId, String text) {
         try {
             var request = SendMessageRequest.of(chatId, text);
-            var response = rateLimiter.execute(() -> messageBotApi.sendMessage(request));
+            var response = messageBotApi.sendMessage(request);
 
             if (Boolean.TRUE.equals(response.ok())) {
                 log.info("Message sent successfully: chatId={}", chatId);
@@ -270,7 +267,7 @@ public class TelegramService {
     public boolean isMemberOfChat(Long chatId, Long userId) {
         try {
             var request = GetChatMemberRequest.of(chatId, userId);
-            var response = rateLimiter.execute(() -> accessBotApi.getChatMember(request));
+            var response = accessBotApi.getChatMember(request);
 
             if (Boolean.TRUE.equals(response.ok()) && response.result() != null) {
                 return response.result().isMember();
@@ -289,7 +286,7 @@ public class TelegramService {
     public void removeMemberFromChat(Long chatId, Long userId) {
         try {
             var unbanRequest = UnbanChatMemberRequest.of(chatId, userId);
-            var unbanResponse = rateLimiter.execute(() -> accessBotApi.unbanChatMember(unbanRequest));
+            var unbanResponse = accessBotApi.unbanChatMember(unbanRequest);
 
             if (Boolean.TRUE.equals(unbanResponse.ok())) {
                 log.info("User removed from chat: chatId={}, userId={}", chatId, userId);
