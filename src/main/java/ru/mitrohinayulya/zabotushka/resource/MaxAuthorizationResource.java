@@ -27,28 +27,6 @@ public class MaxAuthorizationResource {
 
     @POST
     public Response authorize(@Valid AuthorizeMaxRequest request) {
-        var ops = new GreenwayAuthorizationService.PlatformUserOps() {
-            @Override
-            public boolean existsByPlatformId(Long platformId) {
-                return maxUserService.existsByMaxId(platformId);
-            }
-
-            @Override
-            public boolean matchesStoredData(Long platformId, Long greenwayId, String regDate) {
-                return maxUserService.matchesStoredData(platformId, greenwayId, regDate);
-            }
-
-            @Override
-            public void saveUser(Long platformId, Long greenwayId, String regDate) {
-                maxUserService.saveAuthorizedUser(platformId, greenwayId, regDate);
-            }
-
-            @Override
-            public boolean existsByGreenwayId(Long greenwayId) {
-                return maxUserService.existsByGreenwayIdAcrossPlatforms(greenwayId);
-            }
-        };
-
-        return authorizationService.authorize(ops, request.maxId(), request.greenwayId(), request.regDate(), "max");
+        return authorizationService.authorize(maxUserService, request.maxId(), request.greenwayId(), request.regDate(), "max");
     }
 }

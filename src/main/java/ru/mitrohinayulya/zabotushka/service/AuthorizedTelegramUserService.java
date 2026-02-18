@@ -2,7 +2,6 @@ package ru.mitrohinayulya.zabotushka.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
-import ru.mitrohinayulya.zabotushka.entity.AuthorizedMaxUser;
 import ru.mitrohinayulya.zabotushka.entity.AuthorizedTelegramUser;
 import ru.mitrohinayulya.zabotushka.exception.GreenwayIdAlreadyExistsException;
 
@@ -13,7 +12,17 @@ import java.util.List;
  * Сервис для работы с авторизованными Telegram пользователями
  */
 @ApplicationScoped
-public class AuthorizedTelegramUserService {
+public class AuthorizedTelegramUserService implements PlatformAuthorizationService {
+
+    @Override
+    public boolean existsByPlatformId(Long platformId) {
+        return existsByTelegramId(platformId);
+    }
+
+    @Override
+    public void saveUser(Long platformId, Long greenwayId, String regDate) {
+        saveAuthorizedUser(platformId, greenwayId, regDate);
+    }
 
     /**
      * Проверяет существование пользователя по telegramId
@@ -30,7 +39,7 @@ public class AuthorizedTelegramUserService {
      */
     @Transactional
     public AuthorizedTelegramUser saveAuthorizedUser(Long telegramId, Long greenwayId, String regDate) {
-        if (existsByGreenwayIdAcrossPlatforms(greenwayId)) {
+        if (existsByGreenwayId(greenwayId)) {
             throw new GreenwayIdAlreadyExistsException(greenwayId);
         }
 
@@ -74,13 +83,5 @@ public class AuthorizedTelegramUserService {
      */
     public boolean existsByGreenwayId(Long greenwayId) {
         return AuthorizedTelegramUser.existsByGreenwayId(greenwayId);
-    }
-
-    /**
-     * Проверка существования greenwayId across both Telegram and Max tables
-     */
-    public boolean existsByGreenwayIdAcrossPlatforms(Long greenwayId) {
-        return AuthorizedTelegramUser.existsByGreenwayId(greenwayId)
-                || AuthorizedMaxUser.existsByGreenwayId(greenwayId);
     }
 }

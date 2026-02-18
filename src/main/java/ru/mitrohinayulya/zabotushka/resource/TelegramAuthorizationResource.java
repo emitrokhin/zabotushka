@@ -27,28 +27,6 @@ public class TelegramAuthorizationResource {
 
     @POST
     public Response authorize(@Valid AuthorizeTelegramRequest request) {
-        var ops = new GreenwayAuthorizationService.PlatformUserOps() {
-            @Override
-            public boolean existsByPlatformId(Long platformId) {
-                return telegramUserService.existsByTelegramId(platformId);
-            }
-
-            @Override
-            public boolean matchesStoredData(Long platformId, Long greenwayId, String regDate) {
-                return telegramUserService.matchesStoredData(platformId, greenwayId, regDate);
-            }
-
-            @Override
-            public void saveUser(Long platformId, Long greenwayId, String regDate) {
-                telegramUserService.saveAuthorizedUser(platformId, greenwayId, regDate);
-            }
-
-            @Override
-            public boolean existsByGreenwayId(Long greenwayId) {
-                return telegramUserService.existsByGreenwayIdAcrossPlatforms(greenwayId);
-            }
-        };
-
-        return authorizationService.authorize(ops, request.telegramId(), request.greenwayId(), request.regDate(), "telegram");
+        return authorizationService.authorize(telegramUserService, request.telegramId(), request.greenwayId(), request.regDate(), "telegram");
     }
 }

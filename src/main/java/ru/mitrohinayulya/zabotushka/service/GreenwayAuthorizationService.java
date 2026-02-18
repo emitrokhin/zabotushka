@@ -29,16 +29,6 @@ public class GreenwayAuthorizationService {
     GreenwayService greenwayService;
 
     /**
-     * Интерфейс для платформо-зависимых операций с пользователями
-     */
-    public interface PlatformUserOps {
-        boolean existsByPlatformId(Long platformId);
-        boolean matchesStoredData(Long platformId, Long greenwayId, String regDate);
-        void saveUser(Long platformId, Long greenwayId, String regDate);
-        boolean existsByGreenwayId(Long greenwayId);
-    }
-
-    /**
      * Выполняет авторизацию пользователя через Greenway API
      *
      * @param ops        платформо-зависимые операции
@@ -48,7 +38,7 @@ public class GreenwayAuthorizationService {
      * @param platformName название платформы для логирования
      * @return HTTP ответ
      */
-    public Response authorize(PlatformUserOps ops, Long platformId, Long greenwayId, String regDate, String platformName) {
+    public Response authorize(PlatformAuthorizationService ops, Long platformId, Long greenwayId, String regDate, String platformName) {
         log.info("Authorizing partner with {}Id={}, greenwayId={}, regDate={}",
                 platformName, platformId, greenwayId, regDate);
 
@@ -103,7 +93,7 @@ public class GreenwayAuthorizationService {
         }
     }
 
-    private Response authorizePartner(Partner partner, PlatformUserOps ops,
+    private Response authorizePartner(Partner partner, PlatformAuthorizationService ops,
                                       Long platformId, Long greenwayId, String regDate, String platformName) {
         boolean isAuthorized = compareDates(partner.regDate(), regDate);
 

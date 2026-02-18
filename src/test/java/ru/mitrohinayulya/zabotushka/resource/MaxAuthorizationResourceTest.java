@@ -37,8 +37,8 @@ class MaxAuthorizationResourceTest {
         var partner = createPartner(123456);
         var partnerListResponse = new PartnerListResponse(null, List.of(partner), null, null);
 
-        when(authorizedMaxUserService.existsByMaxId(2001L)).thenReturn(false);
-        when(authorizedMaxUserService.existsByGreenwayIdAcrossPlatforms(123456L)).thenReturn(false);
+        when(authorizedMaxUserService.existsByPlatformId(2001L)).thenReturn(false);
+        when(authorizedMaxUserService.existsByGreenwayId(123456L)).thenReturn(false);
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(partnerListResponse);
 
         given()
@@ -57,12 +57,12 @@ class MaxAuthorizationResourceTest {
             .statusCode(200)
             .body("authorized", is("authorized"));
 
-        verify(authorizedMaxUserService, times(1)).saveAuthorizedUser(2001L, 123456L, "15.01.2023");
+        verify(authorizedMaxUserService, times(1)).saveUser(2001L, 123456L, "15.01.2023");
     }
 
     @Test
     void testAuthorize_Success_ReauthorizationWithMatchingData() {
-        when(authorizedMaxUserService.existsByMaxId(2002L)).thenReturn(true);
+        when(authorizedMaxUserService.existsByPlatformId(2002L)).thenReturn(true);
         when(authorizedMaxUserService.matchesStoredData(2002L, 123456L, "15.01.2023")).thenReturn(true);
 
         given()
@@ -82,12 +82,12 @@ class MaxAuthorizationResourceTest {
             .body("authorized", is("authorized"));
 
         verify(greenwayService, never()).getPartnerList(anyLong(), anyInt());
-        verify(authorizedMaxUserService, never()).saveAuthorizedUser(anyLong(), anyLong(), anyString());
+        verify(authorizedMaxUserService, never()).saveUser(anyLong(), anyLong(), anyString());
     }
 
     @Test
     void testAuthorize_Forbidden_ReauthorizationWithMismatchedData() {
-        when(authorizedMaxUserService.existsByMaxId(2003L)).thenReturn(true);
+        when(authorizedMaxUserService.existsByPlatformId(2003L)).thenReturn(true);
         when(authorizedMaxUserService.matchesStoredData(2003L, 123456L, "20.01.2023")).thenReturn(false);
 
         given()
@@ -111,8 +111,8 @@ class MaxAuthorizationResourceTest {
 
     @Test
     void testAuthorize_Conflict_GreenwayIdAlreadyUsed() {
-        when(authorizedMaxUserService.existsByMaxId(9999L)).thenReturn(false);
-        when(authorizedMaxUserService.existsByGreenwayIdAcrossPlatforms(123456L)).thenReturn(true);
+        when(authorizedMaxUserService.existsByPlatformId(9999L)).thenReturn(false);
+        when(authorizedMaxUserService.existsByGreenwayId(123456L)).thenReturn(true);
 
         given()
             .auth().basic("admin", "admin")
@@ -131,7 +131,7 @@ class MaxAuthorizationResourceTest {
             .body("error", is("This Greenway ID is already associated with another account"));
 
         verify(greenwayService, never()).getPartnerList(anyLong(), anyInt());
-        verify(authorizedMaxUserService, never()).saveAuthorizedUser(anyLong(), anyLong(), anyString());
+        verify(authorizedMaxUserService, never()).saveUser(anyLong(), anyLong(), anyString());
     }
 
     @Test
@@ -156,8 +156,7 @@ class MaxAuthorizationResourceTest {
         var partner = createPartner(123456);
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
-        when(authorizedMaxUserService.existsByMaxId(2006L)).thenReturn(false);
-        when(authorizedMaxUserService.existsByGreenwayIdAcrossPlatforms(123456L)).thenReturn(false);
+        when(authorizedMaxUserService.existsByPlatformId(2006L)).thenReturn(false);
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
 
         given()
@@ -181,8 +180,7 @@ class MaxAuthorizationResourceTest {
     void testAuthorize_EmptyPartnerList() {
         var response = new PartnerListResponse(null, List.of(), null, null);
 
-        when(authorizedMaxUserService.existsByMaxId(2008L)).thenReturn(false);
-        when(authorizedMaxUserService.existsByGreenwayIdAcrossPlatforms(123456L)).thenReturn(false);
+        when(authorizedMaxUserService.existsByPlatformId(2008L)).thenReturn(false);
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
 
         given()
@@ -204,8 +202,7 @@ class MaxAuthorizationResourceTest {
 
     @Test
     void testAuthorize_ApiException() {
-        when(authorizedMaxUserService.existsByMaxId(2009L)).thenReturn(false);
-        when(authorizedMaxUserService.existsByGreenwayIdAcrossPlatforms(123456L)).thenReturn(false);
+        when(authorizedMaxUserService.existsByPlatformId(2009L)).thenReturn(false);
         when(greenwayService.getPartnerList(anyLong(), anyInt()))
             .thenThrow(new GreenwayApiException("API Error", "ERROR_CODE", "Error details"));
 

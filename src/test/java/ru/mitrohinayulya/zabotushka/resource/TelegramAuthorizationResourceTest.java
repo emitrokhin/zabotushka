@@ -37,8 +37,7 @@ class TelegramAuthorizationResourceTest {
         var partner = createPartner(123456);
         var partnerListResponse = new PartnerListResponse(null, List.of(partner), null, null);
 
-        when(authorizedTelegramUserService.existsByTelegramId(1001L)).thenReturn(false);
-        when(authorizedTelegramUserService.existsByGreenwayIdAcrossPlatforms(123456L)).thenReturn(false);
+        when(authorizedTelegramUserService.existsByPlatformId(1001L)).thenReturn(false);
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(partnerListResponse);
 
         given()
@@ -57,12 +56,12 @@ class TelegramAuthorizationResourceTest {
             .statusCode(200)
             .body("authorized", is("authorized"));
 
-        verify(authorizedTelegramUserService, times(1)).saveAuthorizedUser(1001L, 123456L, "15.01.2023");
+        verify(authorizedTelegramUserService, times(1)).saveUser(1001L, 123456L, "15.01.2023");
     }
 
     @Test
     void testAuthorize_Success_ReauthorizationWithMatchingData() {
-        when(authorizedTelegramUserService.existsByTelegramId(1002L)).thenReturn(true);
+        when(authorizedTelegramUserService.existsByPlatformId(1002L)).thenReturn(true);
         when(authorizedTelegramUserService.matchesStoredData(1002L, 123456L, "15.01.2023")).thenReturn(true);
 
         given()
@@ -82,12 +81,12 @@ class TelegramAuthorizationResourceTest {
             .body("authorized", is("authorized"));
 
         verify(greenwayService, never()).getPartnerList(anyLong(), anyInt());
-        verify(authorizedTelegramUserService, never()).saveAuthorizedUser(anyLong(), anyLong(), anyString());
+        verify(authorizedTelegramUserService, never()).saveUser(anyLong(), anyLong(), anyString());
     }
 
     @Test
     void testAuthorize_Forbidden_ReauthorizationWithMismatchedData() {
-        when(authorizedTelegramUserService.existsByTelegramId(1003L)).thenReturn(true);
+        when(authorizedTelegramUserService.existsByPlatformId(1003L)).thenReturn(true);
         when(authorizedTelegramUserService.matchesStoredData(1003L, 123456L, "20.01.2023")).thenReturn(false);
 
         given()
@@ -111,8 +110,8 @@ class TelegramAuthorizationResourceTest {
 
     @Test
     void testAuthorize_Conflict_GreenwayIdAlreadyUsed() {
-        when(authorizedTelegramUserService.existsByTelegramId(9999L)).thenReturn(false);
-        when(authorizedTelegramUserService.existsByGreenwayIdAcrossPlatforms(123456L)).thenReturn(true);
+        when(authorizedTelegramUserService.existsByPlatformId(9999L)).thenReturn(false);
+        when(authorizedTelegramUserService.existsByGreenwayId(123456L)).thenReturn(true);
 
         given()
             .auth().basic("admin", "admin")
@@ -131,7 +130,7 @@ class TelegramAuthorizationResourceTest {
             .body("error", is("This Greenway ID is already associated with another account"));
 
         verify(greenwayService, never()).getPartnerList(anyLong(), anyInt());
-        verify(authorizedTelegramUserService, never()).saveAuthorizedUser(anyLong(), anyLong(), anyString());
+        verify(authorizedTelegramUserService, never()).saveUser(anyLong(), anyLong(), anyString());
     }
 
     @Test
@@ -174,8 +173,7 @@ class TelegramAuthorizationResourceTest {
         var partner = createPartner(123456);
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
-        when(authorizedTelegramUserService.existsByTelegramId(1006L)).thenReturn(false);
-        when(authorizedTelegramUserService.existsByGreenwayIdAcrossPlatforms(123456L)).thenReturn(false);
+        when(authorizedTelegramUserService.existsByPlatformId(1006L)).thenReturn(false);
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
 
         given()
@@ -200,8 +198,7 @@ class TelegramAuthorizationResourceTest {
         var otherPartner = createPartner(999999);
         var response = new PartnerListResponse(null, List.of(otherPartner), null, null);
 
-        when(authorizedTelegramUserService.existsByTelegramId(1007L)).thenReturn(false);
-        when(authorizedTelegramUserService.existsByGreenwayIdAcrossPlatforms(123456L)).thenReturn(false);
+        when(authorizedTelegramUserService.existsByPlatformId(1007L)).thenReturn(false);
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
 
         given()
@@ -225,8 +222,7 @@ class TelegramAuthorizationResourceTest {
     void testAuthorize_EmptyPartnerList() {
         var response = new PartnerListResponse(null, List.of(), null, null);
 
-        when(authorizedTelegramUserService.existsByTelegramId(1008L)).thenReturn(false);
-        when(authorizedTelegramUserService.existsByGreenwayIdAcrossPlatforms(123456L)).thenReturn(false);
+        when(authorizedTelegramUserService.existsByPlatformId(1008L)).thenReturn(false);
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
 
         given()
@@ -248,8 +244,7 @@ class TelegramAuthorizationResourceTest {
 
     @Test
     void testAuthorize_ApiException() {
-        when(authorizedTelegramUserService.existsByTelegramId(1009L)).thenReturn(false);
-        when(authorizedTelegramUserService.existsByGreenwayIdAcrossPlatforms(123456L)).thenReturn(false);
+        when(authorizedTelegramUserService.existsByPlatformId(1009L)).thenReturn(false);
         when(greenwayService.getPartnerList(anyLong(), anyInt()))
             .thenThrow(new GreenwayApiException("API Error", "ERROR_CODE", "Error details"));
 
