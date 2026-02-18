@@ -40,7 +40,7 @@ public class TelegramService {
     GreenwayService greenwayService;
 
     @Inject
-    AuthorizedUserService authorizedUserService;
+    AuthorizedTelegramUserService authorizedUserService;
 
     @ConfigProperty(name = "app.host")
     String hostUrl;

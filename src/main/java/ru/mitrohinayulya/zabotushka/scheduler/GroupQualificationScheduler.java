@@ -7,9 +7,9 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mitrohinayulya.zabotushka.config.ChatGroupRequirements;
-import ru.mitrohinayulya.zabotushka.entity.AuthorizedUser;
+import ru.mitrohinayulya.zabotushka.entity.AuthorizedTelegramUser;
 import ru.mitrohinayulya.zabotushka.entity.UserGroupMembership;
-import ru.mitrohinayulya.zabotushka.service.AuthorizedUserService;
+import ru.mitrohinayulya.zabotushka.service.AuthorizedTelegramUserService;
 import ru.mitrohinayulya.zabotushka.service.TelegramService;
 
 import java.time.LocalDateTime;
@@ -24,7 +24,7 @@ public class GroupQualificationScheduler {
     private static final Logger log = LoggerFactory.getLogger(GroupQualificationScheduler.class);
 
     @Inject
-    AuthorizedUserService authorizedUserService;
+    AuthorizedTelegramUserService authorizedTelegramUserService;
 
     @Inject
     TelegramService telegramService;
@@ -56,7 +56,7 @@ public class GroupQualificationScheduler {
                     totalChecked++;
 
                     // Получаем данные авторизованного пользователя
-                    var user = authorizedUserService.findByTelegramId(membership.telegramId);
+                    var user = authorizedTelegramUserService.findByTelegramId(membership.telegramId);
 
                     if (user == null) {
                         log.warn("User not found in authorized users, removing orphaned membership: telegramId={}, chatId={}",
@@ -93,7 +93,7 @@ public class GroupQualificationScheduler {
      * Проверяет квалификацию пользователя в группе и удаляет если не соответствует
      * @return true если пользователь был удален, false в противном случае
      */
-    private boolean checkUserQualificationInGroup(AuthorizedUser user, ChatGroupRequirements group) {
+    private boolean checkUserQualificationInGroup(AuthorizedTelegramUser user, ChatGroupRequirements group) {
         try {
             // Вызываем метод проверки и удаления из TelegramService
             // Запись о членстве уже существует в БД, поэтому не нужна дополнительная проверка isMemberOfChat

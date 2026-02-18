@@ -7,14 +7,14 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
- * Entity для хранения авторизованных пользователей
+ * Entity для хранения авторизованных Telegram пользователей
  */
 @Entity
-@Table(name = "authorized_users",
+@Table(name = "authorized_telegram_users",
        uniqueConstraints = {
            @UniqueConstraint(name = "uk_telegram_id", columnNames = "telegram_id")
        })
-public class AuthorizedUser extends PanacheEntityBase {
+public class AuthorizedTelegramUser extends PanacheEntityBase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -36,7 +36,7 @@ public class AuthorizedUser extends PanacheEntityBase {
     /**
      * Поиск пользователя по telegramId
      */
-    public static AuthorizedUser findByTelegramId(Long telegramId) {
+    public static AuthorizedTelegramUser findByTelegramId(Long telegramId) {
         return find("telegramId", telegramId).firstResult();
     }
 

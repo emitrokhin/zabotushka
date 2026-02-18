@@ -11,7 +11,7 @@ import ru.mitrohinayulya.zabotushka.client.MessageBotApi;
 import ru.mitrohinayulya.zabotushka.dto.greenway.Partner;
 import ru.mitrohinayulya.zabotushka.dto.greenway.PartnerListResponse;
 import ru.mitrohinayulya.zabotushka.dto.telegram.*;
-import ru.mitrohinayulya.zabotushka.entity.AuthorizedUser;
+import ru.mitrohinayulya.zabotushka.entity.AuthorizedTelegramUser;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,13 +37,13 @@ class TelegramServiceTest {
     GreenwayService greenwayService;
 
     @Mock
-    AuthorizedUserService authorizedUserService;
+    AuthorizedTelegramUserService authorizedUserService;
 
     @InjectMocks
     TelegramService telegramService;
 
     private ChatJoinRequest chatJoinRequest;
-    private AuthorizedUser authorizedUser;
+    private AuthorizedTelegramUser authorizedUser;
 
     @BeforeEach
     void setUp() {
@@ -53,7 +53,7 @@ class TelegramServiceTest {
         chatJoinRequest = new ChatJoinRequest(chat, user, 12345L, 1234567890L, "Test bio", null);
 
         // Создаем авторизованного пользователя
-        authorizedUser = new AuthorizedUser();
+        authorizedUser = new AuthorizedTelegramUser();
         authorizedUser.telegramId = 12345L;
         authorizedUser.greenwayId = 999888L;
         authorizedUser.regDate = "2023-01-15";

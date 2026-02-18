@@ -5,16 +5,16 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 /**
- * Запрос на авторизацию партнера MyGreenway
+ * Запрос на авторизацию партнера MyGreenway через Max
  *
- * @param telegramId ID пользователя в Telegram
+ * @param maxId      ID пользователя в Max
  * @param greenwayId ID партнера в системе Greenway
  * @param regDate    Дата регистрации партнера в формате DD.MM.YYYY
  */
-public record AuthorizeRequest(
-    @NotNull(message = "telegramId is required")
-    @JsonProperty("telegramId")
-    Long telegramId,
+public record AuthorizeMaxRequest(
+    @NotNull(message = "maxId is required")
+    @JsonProperty("maxId")
+    Long maxId,
 
     @NotNull(message = "greenwayId is required")
     @JsonProperty("greenwayId")

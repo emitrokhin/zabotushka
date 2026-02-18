@@ -7,6 +7,6 @@ package ru.mitrohinayulya.zabotushka.exception;
 public class GreenwayIdAlreadyExistsException extends RuntimeException {
 
     public GreenwayIdAlreadyExistsException(Long greenwayId) {
-        super("Greenway ID " + greenwayId + " is already associated with another Telegram account");
+        super("Greenway ID " + greenwayId + " is already associated with another account");
     }
 }

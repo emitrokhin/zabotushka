@@ -3,13 +3,10 @@ package ru.mitrohinayulya.zabotushka.resource;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
-import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 import ru.mitrohinayulya.zabotushka.GreenwayServiceTestProfile;
 import ru.mitrohinayulya.zabotushka.dto.greenway.Partner;
 import ru.mitrohinayulya.zabotushka.dto.greenway.PartnerListResponse;
-import ru.mitrohinayulya.zabotushka.exception.GreenwayApiException;
-import ru.mitrohinayulya.zabotushka.service.AuthorizedUserService;
 import ru.mitrohinayulya.zabotushka.service.GreenwayService;
 
 import java.util.List;
@@ -20,7 +17,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Тесты для GreenwayResource
+ * Тесты для GreenwayResource (без authorize — вынесено в platform-specific ресурсы)
  */
 @QuarkusTest
 @TestProfile(GreenwayServiceTestProfile.class)
@@ -28,266 +25,6 @@ class GreenwayResourceTest {
 
     @InjectMock
     GreenwayService greenwayService;
-
-    @InjectMock
-    AuthorizedUserService authorizedUserService;
-
-    @Test
-    void testAuthorize_Success_FirstTime() {
-        // Given: новый пользователь (не существует в БД), партнер существует и дата регистрации совпадает
-        var partner = createPartner(123456);
-        var partnerListResponse = new PartnerListResponse(null, List.of(partner), null, null);
-
-        when(authorizedUserService.existsByTelegramId(1001L)).thenReturn(false);
-        when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(partnerListResponse);
-
-        // When & Then: авторизация успешна и пользователь сохранен в БД
-        given()
-            .auth().basic("admin", "admin")
-            .contentType(ContentType.JSON)
-            .body("""
-                {
-                    "telegramId": 1001,
-                    "greenwayId": 123456,
-                    "regDate": "15.01.2023"
-                }
-                """)
-            .when()
-            .post("/greenway/authorize")
-            .then()
-            .statusCode(200)
-            .body("authorized", is("authorized"));
-
-        // Проверяем что пользователь был сохранен
-        verify(authorizedUserService, times(1)).saveAuthorizedUser(1001L, 123456L, "15.01.2023");
-    }
-
-    @Test
-    void testAuthorize_Success_ReauthorizationWithMatchingData() {
-        // Given: пользователь уже существует в БД с такими же данными (повторная авторизация)
-        when(authorizedUserService.existsByTelegramId(1002L)).thenReturn(true);
-        when(authorizedUserService.matchesStoredData(1002L, 123456L, "15.01.2023")).thenReturn(true);
-
-        // When & Then: авторизация успешна БЕЗ обращения к Greenway API
-        given()
-            .auth().basic("admin", "admin")
-            .contentType(ContentType.JSON)
-            .body("""
-                {
-                    "telegramId": 1002,
-                    "greenwayId": 123456,
-                    "regDate": "15.01.2023"
-                }
-                """)
-            .when()
-            .post("/greenway/authorize")
-            .then()
-            .statusCode(200)
-            .body("authorized", is("authorized"));
-
-        // Проверяем что к Greenway API НЕ обращались
-        verify(greenwayService, never()).getPartnerList(anyLong(), anyInt());
-        // Проверяем что пользователь НЕ был сохранен повторно
-        verify(authorizedUserService, never()).saveAuthorizedUser(anyLong(), anyLong(), anyString());
-    }
-
-    @Test
-    void testAuthorize_Forbidden_ReauthorizationWithMismatchedData() {
-        // Given: пользователь существует в БД, но данные не совпадают
-        when(authorizedUserService.existsByTelegramId(1003L)).thenReturn(true);
-        when(authorizedUserService.matchesStoredData(1003L, 123456L, "20.01.2023")).thenReturn(false);
-
-        // When & Then: возвращается 403 Forbidden
-        given()
-            .auth().basic("admin", "admin")
-            .contentType(ContentType.JSON)
-            .body("""
-                {
-                    "telegramId": 1003,
-                    "greenwayId": 123456,
-                    "regDate": "20.01.2023"
-                }
-                """)
-            .when()
-            .post("/greenway/authorize")
-            .then()
-            .statusCode(403)
-            .body("error", is("Authorization data does not match stored credentials"));
-
-        // Проверяем что к Greenway API НЕ обращались
-        verify(greenwayService, never()).getPartnerList(anyLong(), anyInt());
-    }
-
-    @Test
-    void testAuthorize_Conflict_GreenwayIdAlreadyUsed() {
-        // Given: новый пользователь (другой telegram_id), но greenway_id уже используется другим пользователем
-        when(authorizedUserService.existsByTelegramId(9999L)).thenReturn(false);
-        when(authorizedUserService.existsByGreenwayId(123456L)).thenReturn(true);
-
-        // When & Then: возвращается 409 Conflict
-        given()
-            .auth().basic("admin", "admin")
-            .contentType(ContentType.JSON)
-            .body("""
-                {
-                    "telegramId": 9999,
-                    "greenwayId": 123456,
-                    "regDate": "15.01.2023"
-                }
-                """)
-            .when()
-            .post("/greenway/authorize")
-            .then()
-            .statusCode(409)
-            .body("error", is("This Greenway ID is already associated with another Telegram account"));
-
-        // Проверяем что к Greenway API НЕ обращались
-        verify(greenwayService, never()).getPartnerList(anyLong(), anyInt());
-        // Проверяем что пользователь НЕ был сохранен
-        verify(authorizedUserService, never()).saveAuthorizedUser(anyLong(), anyLong(), anyString());
-    }
-
-    @Test
-    void testAuthorize_Unauthorized_NoBasicAuth() {
-        // When & Then: без Basic Auth доступ запрещен
-        given()
-            .contentType(ContentType.JSON)
-            .body("""
-                {
-                    "telegramId": 1004,
-                    "greenwayId": 123456,
-                    "regDate": "15.01.2023"
-                }
-                """)
-            .when()
-            .post("/greenway/authorize")
-            .then()
-            .statusCode(401);
-    }
-
-    @Test
-    void testAuthorize_Unauthorized_WrongCredentials() {
-        // When & Then: с неправильными учетными данными доступ запрещен
-        given()
-            .auth().basic("wrong", "wrong")
-            .contentType(ContentType.JSON)
-            .body("""
-                {
-                    "telegramId": 1005,
-                    "greenwayId": 123456,
-                    "regDate": "15.01.2023"
-                }
-                """)
-            .when()
-            .post("/greenway/authorize")
-            .then()
-            .statusCode(401);
-    }
-
-    @Test
-    void testAuthorize_DateMismatch() {
-        // Given: новый пользователь, партнер существует, но дата регистрации не совпадает
-        var partner = createPartner(123456);
-        var response = new PartnerListResponse(null, List.of(partner), null, null);
-
-        when(authorizedUserService.existsByTelegramId(1006L)).thenReturn(false);
-        when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
-
-        // When & Then: авторизация не удалась (неправильная дата)
-        given()
-            .auth().basic("admin", "admin")
-            .contentType(ContentType.JSON)
-            .body("""
-                {
-                    "telegramId": 1006,
-                    "greenwayId": 123456,
-                    "regDate": "20.01.2023"
-                }
-                """)
-            .when()
-            .post("/greenway/authorize")
-            .then()
-            .statusCode(401)
-            .body("authorized", is("not_authorized"));
-    }
-
-    @Test
-    void testAuthorize_PartnerNotFound() {
-        // Given: новый пользователь, партнер не найден в списке
-        var otherPartner = createPartner(999999);
-        var response = new PartnerListResponse(null, List.of(otherPartner), null, null);
-
-        when(authorizedUserService.existsByTelegramId(1007L)).thenReturn(false);
-        when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
-
-        // When & Then: партнер не найден
-        given()
-            .auth().basic("admin", "admin")
-            .contentType(ContentType.JSON)
-            .body("""
-                {
-                    "telegramId": 1007,
-                    "greenwayId": 123456,
-                    "regDate": "15.01.2023"
-                }
-                """)
-            .when()
-            .post("/greenway/authorize")
-            .then()
-            .statusCode(404)
-            .body("authorized", is("not_authorized"));
-    }
-
-    @Test
-    void testAuthorize_EmptyPartnerList() {
-        // Given: новый пользователь, список партнеров пустой
-        var response = new PartnerListResponse(null, List.of(), null, null);
-
-        when(authorizedUserService.existsByTelegramId(1008L)).thenReturn(false);
-        when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
-
-        // When & Then: список пуст
-        given()
-            .auth().basic("admin", "admin")
-            .contentType(ContentType.JSON)
-            .body("""
-                {
-                    "telegramId": 1008,
-                    "greenwayId": 123456,
-                    "regDate": "15.01.2023"
-                }
-                """)
-            .when()
-            .post("/greenway/authorize")
-            .then()
-            .statusCode(404)
-            .body("authorized", is("not_authorized"));
-    }
-
-    @Test
-    void testAuthorize_ApiException() {
-        // Given: новый пользователь, API выбрасывает исключение
-        when(authorizedUserService.existsByTelegramId(1009L)).thenReturn(false);
-        when(greenwayService.getPartnerList(anyLong(), anyInt()))
-            .thenThrow(new GreenwayApiException("API Error", "ERROR_CODE", "Error details"));
-
-        // When & Then: возвращается 500
-        given()
-            .auth().basic("admin", "admin")
-            .contentType(ContentType.JSON)
-            .body("""
-                {
-                    "telegramId": 1009,
-                    "greenwayId": 123456,
-                    "regDate": "15.01.2023"
-                }
-                """)
-            .when()
-            .post("/greenway/authorize")
-            .then()
-            .statusCode(500)
-            .body("authorized", is("not_authorized"));
-    }
 
     // ==================== CheckUserId Tests ====================
 
@@ -601,9 +338,6 @@ class GreenwayResourceTest {
 
     // ==================== Helper Methods ====================
 
-    /**
-     * Вспомогательный метод для создания тестового партнера
-     */
     private Partner createPartner(int number) {
         return new Partner(
             number,           // id

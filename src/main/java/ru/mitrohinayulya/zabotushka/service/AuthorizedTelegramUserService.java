@@ -2,39 +2,39 @@ package ru.mitrohinayulya.zabotushka.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
-import ru.mitrohinayulya.zabotushka.entity.AuthorizedUser;
+import ru.mitrohinayulya.zabotushka.entity.AuthorizedMaxUser;
+import ru.mitrohinayulya.zabotushka.entity.AuthorizedTelegramUser;
 import ru.mitrohinayulya.zabotushka.exception.GreenwayIdAlreadyExistsException;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Сервис для работы с авторизованными пользователями
+ * Сервис для работы с авторизованными Telegram пользователями
  */
 @ApplicationScoped
-public class AuthorizedUserService {
+public class AuthorizedTelegramUserService {
 
     /**
      * Проверяет существование пользователя по telegramId
      */
     public boolean existsByTelegramId(Long telegramId) {
-        return AuthorizedUser.existsByTelegramId(telegramId);
+        return AuthorizedTelegramUser.existsByTelegramId(telegramId);
     }
 
     /**
      * Сохраняет нового авторизованного пользователя
-     * Проверяет уникальность greenwayId перед сохранением
+     * Проверяет уникальность greenwayId перед сохранением (across both platforms)
      *
      * @throws GreenwayIdAlreadyExistsException если greenwayId уже используется
      */
     @Transactional
-    public AuthorizedUser saveAuthorizedUser(Long telegramId, Long greenwayId, String regDate) {
-        // Проверяем уникальность greenwayId
-        if (existsByGreenwayId(greenwayId)) {
+    public AuthorizedTelegramUser saveAuthorizedUser(Long telegramId, Long greenwayId, String regDate) {
+        if (existsByGreenwayIdAcrossPlatforms(greenwayId)) {
             throw new GreenwayIdAlreadyExistsException(greenwayId);
         }
 
-        var user = new AuthorizedUser();
+        var user = new AuthorizedTelegramUser();
         user.telegramId = telegramId;
         user.greenwayId = greenwayId;
         user.regDate = regDate;
@@ -58,21 +58,29 @@ public class AuthorizedUserService {
     /**
      * Поиск пользователя по telegramId
      */
-    public AuthorizedUser findByTelegramId(Long telegramId) {
-        return AuthorizedUser.findByTelegramId(telegramId);
+    public AuthorizedTelegramUser findByTelegramId(Long telegramId) {
+        return AuthorizedTelegramUser.findByTelegramId(telegramId);
     }
 
     /**
      * Получает всех авторизованных пользователей
      */
-    public List<AuthorizedUser> findAll() {
-        return AuthorizedUser.listAll();
+    public List<AuthorizedTelegramUser> findAll() {
+        return AuthorizedTelegramUser.listAll();
     }
 
     /**
-     * Проверка существования пользователя по greenwayId
+     * Проверка существования пользователя по greenwayId в таблице Telegram
      */
     public boolean existsByGreenwayId(Long greenwayId) {
-        return AuthorizedUser.existsByGreenwayId(greenwayId);
+        return AuthorizedTelegramUser.existsByGreenwayId(greenwayId);
+    }
+
+    /**
+     * Проверка существования greenwayId across both Telegram and Max tables
+     */
+    public boolean existsByGreenwayIdAcrossPlatforms(Long greenwayId) {
+        return AuthorizedTelegramUser.existsByGreenwayId(greenwayId)
+                || AuthorizedMaxUser.existsByGreenwayId(greenwayId);
     }
 }

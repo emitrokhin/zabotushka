@@ -2,7 +2,6 @@ package ru.mitrohinayulya.zabotushka.resource;
 
 import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
-import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -10,13 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mitrohinayulya.zabotushka.dto.greenway.*;
 import ru.mitrohinayulya.zabotushka.exception.GreenwayApiException;
-import ru.mitrohinayulya.zabotushka.service.AuthorizedUserService;
 import ru.mitrohinayulya.zabotushka.service.GreenwayService;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -32,159 +26,6 @@ public class GreenwayResource {
 
     @Inject
     GreenwayService greenwayService;
-
-    @Inject
-    AuthorizedUserService authorizedUserService;
-
-    /**
-     * Метод для авторизации партнера MyGreenway
-     * <p>
-     * Проверяет существование пользователя в БД по telegramId.
-     * Если пользователь существует и данные совпадают - возвращает "authorized" (повторная авторизация).
-     * Если пользователь существует, но данные не совпадают - возвращает ошибку 403.
-     * Если пользователя нет - проверяет через Greenway API и сохраняет в БД при успехе.
-     *
-     * @param request Запрос с telegramId, greenwayId и датой регистрации
-     * @return Ответ со статусом авторизации или ошибка
-     */
-    @POST
-    @Path("/authorize")
-    public Response authorize(@Valid AuthorizeRequest request) {
-        log.info("Authorizing partner with telegramId={}, greenwayId={}, regDate={}",
-                request.telegramId(), request.greenwayId(), request.regDate());
-
-        // Проверяем существование пользователя по telegramId
-        if (authorizedUserService.existsByTelegramId(request.telegramId())) {
-            // Пользователь существует - проверяем совпадение данных
-            if (authorizedUserService.matchesStoredData(
-                    request.telegramId(),
-                    request.greenwayId(),
-                    request.regDate())) {
-                // Данные совпадают - это повторная авторизация
-                log.info("Re-authorization successful for telegramId={}", request.telegramId());
-                return Response.ok(AuthorizeResponse.createAuthorized()).build();
-            } else {
-                // Данные не совпадают - отклоняем
-                log.warn("Authorization rejected: data mismatch for telegramId={}", request.telegramId());
-                return Response.status(Response.Status.FORBIDDEN)
-                        .entity(ErrorResponse.of("Authorization data does not match stored credentials"))
-                        .build();
-            }
-        }
-
-        // Проверяем, не используется ли этот greenwayId другим пользователем
-        if (authorizedUserService.existsByGreenwayId(request.greenwayId())) {
-            log.warn("Authorization rejected: greenwayId={} is already associated with another Telegram account",
-                    request.greenwayId());
-            return Response.status(Response.Status.CONFLICT)
-                    .entity(ErrorResponse.of("This Greenway ID is already associated with another Telegram account"))
-                    .build();
-        }
-
-        // Пользователя нет в БД - выполняем обычную авторизацию через Greenway API
-        try {
-            var partnerListResponse = greenwayService.getPartnerList(request.greenwayId(), 0);
-
-            if (partnerListResponse == null
-                    || partnerListResponse.partners() == null
-                    || partnerListResponse.partners().isEmpty()) {
-                log.warn("Partner list is empty for greenwayId={}", request.greenwayId());
-                return buildNotAuthorizedResponse(Response.Status.NOT_FOUND);
-            }
-
-            // Ищем партнера и проверяем дату регистрации
-            return findPartnerById(partnerListResponse.partners(), request.greenwayId())
-                    .map(partner -> authorizePartner(partner, request))
-                    .orElseGet(() -> {
-                        log.warn("Partner not found with greenwayId={}", request.greenwayId());
-                        return buildNotAuthorizedResponse(Response.Status.NOT_FOUND);
-                    });
-
-        } catch (GreenwayApiException e) {
-            log.error("Greenway API error during authorization: greenwayId={}",
-                    request.greenwayId(), e);
-            return buildNotAuthorizedResponse(Response.Status.INTERNAL_SERVER_ERROR);
-        } catch (Exception e) {
-            log.error("Unexpected error during authorization: greenwayId={}",
-                    request.greenwayId(), e);
-            return buildNotAuthorizedResponse(Response.Status.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    /**
-     * Проверяет авторизацию партнера по дате регистрации
-     * и сохраняет пользователя в БД при успешной авторизации
-     */
-    private Response authorizePartner(Partner partner, AuthorizeRequest request) {
-        boolean isAuthorized = compareDates(partner.regDate(), request.regDate());
-
-        if (isAuthorized) {
-            // Сохраняем авторизованного пользователя в БД
-            authorizedUserService.saveAuthorizedUser(
-                    request.telegramId(),
-                    request.greenwayId(),
-                    request.regDate());
-            log.info("Partner authorized successfully and saved to DB: telegramId={}, greenwayId={}",
-                    request.telegramId(), request.greenwayId());
-            return Response.ok(AuthorizeResponse.createAuthorized()).build();
-        }
-
-        log.warn("Partner authorization failed: greenwayId={}, expected regDate={}, actual regDate={}",
-                request.greenwayId(), request.regDate(), partner.regDate());
-        return buildNotAuthorizedResponse(Response.Status.UNAUTHORIZED);
-    }
-
-    /**
-     * Сравнивает две даты, парсинг обе в LocalDate для корректного сравнения.
-     * Это предотвращает проблемы с разными форматами строк.
-     * Ожидаемый формат: DD.MM.YYYY (например, 29.12.2025)
-     *
-     * @param date1 первая дата (из API)
-     * @param date2 вторая дата (из запроса)
-     * @return true если даты равны
-     */
-    private boolean compareDates(String date1, String date2) {
-        if (date1 == null || date2 == null) {
-            return false;
-        }
-
-        // Если строки идентичны, сразу возвращаем true
-        if (date1.equals(date2)) {
-            return true;
-        }
-
-        try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-            LocalDate localDate1 = LocalDate.parse(date1, formatter);
-            LocalDate localDate2 = LocalDate.parse(date2, formatter);
-            return localDate1.equals(localDate2);
-        } catch (DateTimeParseException e) {
-            log.warn("Failed to parse dates for comparison: date1={}, date2={}", date1, date2, e);
-            // Fallback to string comparison if parsing fails
-            return false;
-        }
-    }
-
-    /**
-     * Поиск партнера по ID в списке партнеров
-     */
-    private Optional<Partner> findPartnerById(List<Partner> partners, Long greenwayId) {
-        if (partners == null || partners.isEmpty() || greenwayId == null) {
-            return Optional.empty();
-        }
-
-        return partners.stream()
-                .filter(partner -> partner.number() != null)
-                .filter(partner -> partner.number().longValue() == greenwayId)
-                .findFirst();
-    }
-
-    /**
-     * Создает ответ с not_authorized и нужным статусом
-     */
-    private Response buildNotAuthorizedResponse(Response.Status status) {
-        return Response.status(status).entity(AuthorizeResponse.createNotAuthorized()).build();
-    }
 
     /**
      * Проверяет существование партнера по ID
