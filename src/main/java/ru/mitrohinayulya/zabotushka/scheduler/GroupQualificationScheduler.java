@@ -6,8 +6,9 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.mitrohinayulya.zabotushka.config.ChatGroupRequirements;
+import ru.mitrohinayulya.zabotushka.config.TelegramChatGroupRequirements;
 import ru.mitrohinayulya.zabotushka.entity.AuthorizedTelegramUser;
+import ru.mitrohinayulya.zabotushka.entity.Platform;
 import ru.mitrohinayulya.zabotushka.entity.UserGroupMembership;
 import ru.mitrohinayulya.zabotushka.service.AuthorizedTelegramUserService;
 import ru.mitrohinayulya.zabotushka.service.TelegramService;
@@ -44,11 +45,12 @@ public class GroupQualificationScheduler {
             int totalRemoved = 0;
 
             // Проходим по всем группам
-            for (var group : ChatGroupRequirements.values()) {
+            for (var group : TelegramChatGroupRequirements.values()) {
                 log.info("Checking group: chatId={}", group.getChatId());
 
                 // Получаем всех членов группы из БД
-                var memberships = UserGroupMembership.findByChatId(group.getChatId());
+                // TODO: в будущем добавить аналогичную проверку для Max групп
+                var memberships = UserGroupMembership.findByChatIdAndPlatform(group.getChatId(), Platform.TELEGRAM);
                 log.info("Found {} members in group: chatId={}", memberships.size(), group.getChatId());
 
                 // Проверяем каждого члена группы
@@ -56,11 +58,11 @@ public class GroupQualificationScheduler {
                     totalChecked++;
 
                     // Получаем данные авторизованного пользователя
-                    var user = authorizedTelegramUserService.findByTelegramId(membership.telegramId);
+                    var user = authorizedTelegramUserService.findByTelegramId(membership.platformUserId);
 
                     if (user == null) {
                         log.warn("User not found in authorized users, removing orphaned membership: telegramId={}, chatId={}",
-                                membership.telegramId, group.getChatId());
+                                membership.platformUserId, group.getChatId());
                         handleOrphanedMembership(membership, group.getChatId());
                         totalRemoved++;
                         continue;
@@ -93,7 +95,7 @@ public class GroupQualificationScheduler {
      * Проверяет квалификацию пользователя в группе и удаляет если не соответствует
      * @return true если пользователь был удален, false в противном случае
      */
-    private boolean checkUserQualificationInGroup(AuthorizedTelegramUser user, ChatGroupRequirements group) {
+    private boolean checkUserQualificationInGroup(AuthorizedTelegramUser user, TelegramChatGroupRequirements group) {
         try {
             // Вызываем метод проверки и удаления из TelegramService
             // Запись о членстве уже существует в БД, поэтому не нужна дополнительная проверка isMemberOfChat
@@ -104,7 +106,7 @@ public class GroupQualificationScheduler {
             );
 
             // Проверяем, была ли удалена запись о членстве (это означает, что пользователь был удален)
-            return !UserGroupMembership.exists(user.telegramId, group.getChatId());
+            return !UserGroupMembership.exists(user.telegramId, group.getChatId(), Platform.TELEGRAM);
         } catch (Exception e) {
             log.error("Error checking user in group: telegramId={}, chatId={}",
                      user.telegramId, group.getChatId(), e);
@@ -117,10 +119,10 @@ public class GroupQualificationScheduler {
      */
     private void handleOrphanedMembership(UserGroupMembership membership, Long chatId) {
         try {
-            telegramService.removeMemberFromChat(chatId, membership.telegramId);
+            telegramService.removeMemberFromChat(chatId, membership.platformUserId);
         } catch (Exception e) {
             log.error("Failed to remove user from chat: telegramId={}, chatId={}",
-                    membership.telegramId, chatId, e);
+                    membership.platformUserId, chatId, e);
         }
 
         // Удаляем запись о членстве из БД даже если не удалось удалить из группы

@@ -9,12 +9,13 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.mitrohinayulya.zabotushka.client.AccessBotApi;
-import ru.mitrohinayulya.zabotushka.client.MessageBotApi;
-import ru.mitrohinayulya.zabotushka.config.ChatGroupRequirements;
+import ru.mitrohinayulya.zabotushka.client.TelegramAccessBotApi;
+import ru.mitrohinayulya.zabotushka.client.TelegramMessageBotApi;
+import ru.mitrohinayulya.zabotushka.config.TelegramChatGroupRequirements;
 import ru.mitrohinayulya.zabotushka.dto.greenway.Partner;
 import ru.mitrohinayulya.zabotushka.dto.greenway.QualificationLevel;
 import ru.mitrohinayulya.zabotushka.dto.telegram.*;
+import ru.mitrohinayulya.zabotushka.entity.Platform;
 import ru.mitrohinayulya.zabotushka.entity.UserGroupMembership;
 
 import java.time.LocalDateTime;
@@ -30,11 +31,11 @@ public class TelegramService {
 
     @Inject
     @RestClient
-    AccessBotApi accessBotApi;
+    TelegramAccessBotApi telegramAccessBotApi;
 
     @Inject
     @RestClient
-    MessageBotApi messageBotApi;
+    TelegramMessageBotApi telegramMessageBotApi;
 
     @Inject
     GreenwayService greenwayService;
@@ -75,7 +76,7 @@ public class TelegramService {
             log.info("Registering Telegram webhook: url={}", fullWebhookUrl);
 
             var request = SetWebhookRequest.forChatJoinRequests(fullWebhookUrl, webhookSecret);
-            var response = accessBotApi.setWebhook(request);
+            var response = telegramAccessBotApi.setWebhook(request);
 
             if (Boolean.TRUE.equals(response.ok())) {
                 log.info("Telegram webhook registered successfully");
@@ -100,7 +101,7 @@ public class TelegramService {
                 chatId, userId, username);
 
         // Находим требования для группы
-        var groupRequirements = ChatGroupRequirements.findByChatId(chatId);
+        var groupRequirements = TelegramChatGroupRequirements.findByChatId(chatId);
         if (groupRequirements.isEmpty()) {
             log.warn("No requirements found for chatId={}, declining by default", chatId);
             declineJoinRequest(chatId, userId);
@@ -110,7 +111,7 @@ public class TelegramService {
         // Проверяем, авторизован ли пользователь
         var authorizedUser = authorizedUserService.findByTelegramId(userId);
         if (authorizedUser == null) {
-            log.warn("User not authorized: userId={}, declining join request", userId);
+            log.warn("Telegram user not authorized: userId={}, declining join request", userId);
             declineJoinRequest(chatId, userId);
             return;
         }
@@ -119,7 +120,7 @@ public class TelegramService {
         var greenwayId = authorizedUser.greenwayId;
         var qualification = getBestQualification(greenwayId);
 
-        log.info("User qualification: userId={}, greenwayId={}, qualification={}",
+        log.info("Telegram user qualification: userId={}, greenwayId={}, qualification={}",
                 userId, greenwayId, qualification);
 
         // Проверяем соответствие квалификации требованиям группы
@@ -180,7 +181,7 @@ public class TelegramService {
     private void approveJoinRequest(Long chatId, Long userId) {
         try {
             var request = ApproveChatJoinRequest.of(chatId, userId);
-            var response = accessBotApi.approveChatJoinRequest(request);
+            var response = telegramAccessBotApi.approveChatJoinRequest(request);
 
             if (Boolean.TRUE.equals(response.ok())) {
                 log.info("Join request approved successfully: chatId={}, userId={}", chatId, userId);
@@ -204,16 +205,17 @@ public class TelegramService {
      */
     private void saveMembership(Long chatId, Long userId) {
         try {
-            if (!UserGroupMembership.exists(userId, chatId)) {
+            if (!UserGroupMembership.exists(userId, chatId, Platform.TELEGRAM)) {
                 var membership = new UserGroupMembership();
-                membership.telegramId = userId;
+                membership.platformUserId = userId;
                 membership.chatId = chatId;
+                membership.platform = Platform.TELEGRAM;
                 membership.joinedAt = LocalDateTime.now();
                 membership.persist();
 
-                log.info("Membership saved: chatId={}, userId={}", chatId, userId);
+                log.info("Telegram membership saved: chatId={}, userId={}", chatId, userId);
             } else {
-                log.debug("Membership already exists: chatId={}, userId={}", chatId, userId);
+                log.debug("Telegram membership already exists: chatId={}, userId={}", chatId, userId);
             }
         } catch (Exception e) {
             log.error("Error saving membership: chatId={}, userId={}", chatId, userId, e);
@@ -226,7 +228,7 @@ public class TelegramService {
     private void declineJoinRequest(Long chatId, Long userId) {
         try {
             var request = DeclineChatJoinRequest.of(chatId, userId);
-            var response = accessBotApi.declineChatJoinRequest(request);
+            var response = telegramAccessBotApi.declineChatJoinRequest(request);
 
             if (Boolean.TRUE.equals(response.ok())) {
                 log.info("Join request declined successfully: chatId={}, userId={}", chatId, userId);
@@ -248,7 +250,7 @@ public class TelegramService {
     private void sendMessage(Long chatId, String text) {
         try {
             var request = SendMessageRequest.of(chatId, text);
-            var response = messageBotApi.sendMessage(request);
+            var response = telegramMessageBotApi.sendMessage(request);
 
             if (Boolean.TRUE.equals(response.ok())) {
                 log.info("Message sent successfully: chatId={}", chatId);
@@ -267,7 +269,7 @@ public class TelegramService {
     public boolean isMemberOfChat(Long chatId, Long userId) {
         try {
             var request = GetChatMemberRequest.of(chatId, userId);
-            var response = accessBotApi.getChatMember(request);
+            var response = telegramAccessBotApi.getChatMember(request);
 
             if (Boolean.TRUE.equals(response.ok()) && response.result() != null) {
                 return response.result().isMember();
@@ -286,10 +288,10 @@ public class TelegramService {
     public void removeMemberFromChat(Long chatId, Long userId) {
         try {
             var unbanRequest = UnbanChatMemberRequest.of(chatId, userId);
-            var unbanResponse = accessBotApi.unbanChatMember(unbanRequest);
+            var unbanResponse = telegramAccessBotApi.unbanChatMember(unbanRequest);
 
             if (Boolean.TRUE.equals(unbanResponse.ok())) {
-                log.info("User removed from chat: chatId={}, userId={}", chatId, userId);
+                log.info("MaxUser removed from chat: chatId={}, userId={}", chatId, userId);
                 var chatName = getChatGroupName(chatId);
                 var message = String.format("Вы были удалены из «%s», так как не соответствуете требованиям по квалификации", chatName);
                 sendMessage(userId, message);
@@ -297,11 +299,11 @@ public class TelegramService {
                 // Удаляем информацию о членстве из БД
                 removeMembershipFromDb(chatId, userId);
             } else {
-                log.error("Failed to remove user from chat: chatId={}, userId={}, description={}",
+                log.error("Failed to remove maxUser from chat: chatId={}, userId={}, description={}",
                         chatId, userId, unbanResponse.description());
             }
         } catch (Exception e) {
-            log.error("Error removing user from chat: chatId={}, userId={}", chatId, userId, e);
+            log.error("Error removing maxUser from chat: chatId={}, userId={}", chatId, userId, e);
         }
     }
 
@@ -310,7 +312,7 @@ public class TelegramService {
      */
     private void removeMembershipFromDb(Long chatId, Long userId) {
         try {
-            boolean removed = UserGroupMembership.removeMembership(userId, chatId);
+            boolean removed = UserGroupMembership.removeMembership(userId, chatId, Platform.TELEGRAM);
             if (removed) {
                 log.info("Membership removed from DB: chatId={}, userId={}", chatId, userId);
             } else {
@@ -326,19 +328,19 @@ public class TelegramService {
      * и удаляет его, если квалификация не соответствует
      */
     public void checkAndRemoveIfNotQualified(Long chatId, Long userId, Long greenwayId) {
-        log.info("Checking qualification for user: chatId={}, userId={}, greenwayId={}",
+        log.info("Checking qualification for maxUser: chatId={}, userId={}, greenwayId={}",
                 chatId, userId, greenwayId);
 
         // Проверяем, является ли пользователь участником группы
         if (!isMemberOfChat(chatId, userId)) {
-            log.info("User is not a member of chat (left by themselves): chatId={}, userId={}", chatId, userId);
+            log.info("MaxUser is not a member of chat (left by themselves): chatId={}, userId={}", chatId, userId);
             // Пользователь покинул группу сам - удаляем запись из БД
             removeMembershipFromDb(chatId, userId);
             return;
         }
 
         // Находим требования для группы
-        var groupRequirements = ChatGroupRequirements.findByChatId(chatId);
+        var groupRequirements = TelegramChatGroupRequirements.findByChatId(chatId);
         if (groupRequirements.isEmpty()) {
             log.warn("No requirements found for chatId={}", chatId);
             return;
@@ -347,12 +349,12 @@ public class TelegramService {
         // Получаем лучшую квалификацию пользователя
         var qualification = getBestQualification(greenwayId);
 
-        log.info("User qualification check: chatId={}, userId={}, greenwayId={}, qualification={}",
+        log.info("MaxUser qualification check: chatId={}, userId={}, greenwayId={}, qualification={}",
                 chatId, userId, greenwayId, qualification);
 
         // Проверяем соответствие квалификации требованиям группы
         if (!groupRequirements.get().isQualificationAllowed(qualification)) {
-            log.info("Qualification does not meet requirements, removing user: chatId={}, userId={}, qualification={}",
+            log.info("Qualification does not meet requirements, removing maxUser: chatId={}, userId={}, qualification={}",
                     chatId, userId, qualification);
             removeMemberFromChat(chatId, userId);
         } else {

@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.mitrohinayulya.zabotushka.entity.AuthorizedTelegramUser;
+import ru.mitrohinayulya.zabotushka.entity.Platform;
 import ru.mitrohinayulya.zabotushka.entity.UserGroupMembership;
 import ru.mitrohinayulya.zabotushka.service.AuthorizedTelegramUserService;
 import ru.mitrohinayulya.zabotushka.service.TelegramService;
@@ -59,18 +60,18 @@ class GroupQualificationSchedulerTest {
         var membership2 = createMembership(54321L, chatId1);
         var membership3 = createMembership(11111L, chatId2);
 
-        membershipMock.when(() -> UserGroupMembership.findByChatId(chatId1))
+        membershipMock.when(() -> UserGroupMembership.findByChatIdAndPlatform(chatId1, Platform.TELEGRAM))
                 .thenReturn(Arrays.asList(membership1, membership2));
-        membershipMock.when(() -> UserGroupMembership.findByChatId(chatId2))
+        membershipMock.when(() -> UserGroupMembership.findByChatIdAndPlatform(chatId2, Platform.TELEGRAM))
                 .thenReturn(Collections.singletonList(membership3));
-        membershipMock.when(() -> UserGroupMembership.findByChatId(-1001835476759L))
+        membershipMock.when(() -> UserGroupMembership.findByChatIdAndPlatform(-1001835476759L, Platform.TELEGRAM))
                 .thenReturn(Collections.emptyList());
-        membershipMock.when(() -> UserGroupMembership.findByChatId(-1001811106801L))
+        membershipMock.when(() -> UserGroupMembership.findByChatIdAndPlatform(-1001811106801L, Platform.TELEGRAM))
                 .thenReturn(Collections.emptyList());
-        membershipMock.when(() -> UserGroupMembership.findByChatId(-1001929076200L))
+        membershipMock.when(() -> UserGroupMembership.findByChatIdAndPlatform(-1001929076200L, Platform.TELEGRAM))
                 .thenReturn(Collections.emptyList());
 
-        membershipMock.when(() -> UserGroupMembership.exists(anyLong(), anyLong()))
+        membershipMock.when(() -> UserGroupMembership.exists(anyLong(), anyLong(), any(Platform.class)))
                 .thenReturn(true);
 
         var user1 = createUser(12345L, 999888L);
@@ -94,7 +95,7 @@ class GroupQualificationSchedulerTest {
 
     @Test
     void testCheckGroupQualifications_NoMembers() {
-        membershipMock.when(() -> UserGroupMembership.findByChatId(anyLong()))
+        membershipMock.when(() -> UserGroupMembership.findByChatIdAndPlatform(anyLong(), any(Platform.class)))
                 .thenReturn(Collections.emptyList());
 
         scheduler.checkGroupQualifications();
@@ -112,15 +113,15 @@ class GroupQualificationSchedulerTest {
         var chatId5 = -1001929076200L;
         var membership = createMembership(12345L, chatId1);
 
-        membershipMock.when(() -> UserGroupMembership.findByChatId(chatId1))
+        membershipMock.when(() -> UserGroupMembership.findByChatIdAndPlatform(chatId1, Platform.TELEGRAM))
                 .thenReturn(Collections.singletonList(membership));
-        membershipMock.when(() -> UserGroupMembership.findByChatId(chatId2))
+        membershipMock.when(() -> UserGroupMembership.findByChatIdAndPlatform(chatId2, Platform.TELEGRAM))
                 .thenReturn(Collections.emptyList());
-        membershipMock.when(() -> UserGroupMembership.findByChatId(chatId3))
+        membershipMock.when(() -> UserGroupMembership.findByChatIdAndPlatform(chatId3, Platform.TELEGRAM))
                 .thenReturn(Collections.emptyList());
-        membershipMock.when(() -> UserGroupMembership.findByChatId(chatId4))
+        membershipMock.when(() -> UserGroupMembership.findByChatIdAndPlatform(chatId4, Platform.TELEGRAM))
                 .thenReturn(Collections.emptyList());
-        membershipMock.when(() -> UserGroupMembership.findByChatId(chatId5))
+        membershipMock.when(() -> UserGroupMembership.findByChatIdAndPlatform(chatId5, Platform.TELEGRAM))
                 .thenReturn(Collections.emptyList());
 
         when(authorizedTelegramUserService.findByTelegramId(12345L)).thenReturn(null);
@@ -143,18 +144,18 @@ class GroupQualificationSchedulerTest {
         var membership = createMembership(12345L, chatId1);
         var user = createUser(12345L, 999888L);
 
-        membershipMock.when(() -> UserGroupMembership.findByChatId(chatId1))
+        membershipMock.when(() -> UserGroupMembership.findByChatIdAndPlatform(chatId1, Platform.TELEGRAM))
                 .thenReturn(Collections.singletonList(membership));
-        membershipMock.when(() -> UserGroupMembership.findByChatId(chatId2))
+        membershipMock.when(() -> UserGroupMembership.findByChatIdAndPlatform(chatId2, Platform.TELEGRAM))
                 .thenReturn(Collections.emptyList());
-        membershipMock.when(() -> UserGroupMembership.findByChatId(chatId3))
+        membershipMock.when(() -> UserGroupMembership.findByChatIdAndPlatform(chatId3, Platform.TELEGRAM))
                 .thenReturn(Collections.emptyList());
-        membershipMock.when(() -> UserGroupMembership.findByChatId(chatId4))
+        membershipMock.when(() -> UserGroupMembership.findByChatIdAndPlatform(chatId4, Platform.TELEGRAM))
                 .thenReturn(Collections.emptyList());
-        membershipMock.when(() -> UserGroupMembership.findByChatId(chatId5))
+        membershipMock.when(() -> UserGroupMembership.findByChatIdAndPlatform(chatId5, Platform.TELEGRAM))
                 .thenReturn(Collections.emptyList());
 
-        membershipMock.when(() -> UserGroupMembership.exists(12345L, chatId1))
+        membershipMock.when(() -> UserGroupMembership.exists(12345L, chatId1, Platform.TELEGRAM))
                 .thenReturn(false);
 
         when(authorizedTelegramUserService.findByTelegramId(12345L)).thenReturn(user);
@@ -175,17 +176,17 @@ class GroupQualificationSchedulerTest {
         var membership = createMembership(12345L, chatId1);
         var user = createUser(12345L, 999888L);
 
-        membershipMock.when(() -> UserGroupMembership.findByChatId(chatId1))
+        membershipMock.when(() -> UserGroupMembership.findByChatIdAndPlatform(chatId1, Platform.TELEGRAM))
                 .thenReturn(Collections.singletonList(membership));
-        membershipMock.when(() -> UserGroupMembership.findByChatId(chatId2))
+        membershipMock.when(() -> UserGroupMembership.findByChatIdAndPlatform(chatId2, Platform.TELEGRAM))
                 .thenReturn(Collections.emptyList());
-        membershipMock.when(() -> UserGroupMembership.findByChatId(chatId3))
+        membershipMock.when(() -> UserGroupMembership.findByChatIdAndPlatform(chatId3, Platform.TELEGRAM))
                 .thenReturn(Collections.emptyList());
-        membershipMock.when(() -> UserGroupMembership.findByChatId(chatId4))
+        membershipMock.when(() -> UserGroupMembership.findByChatIdAndPlatform(chatId4, Platform.TELEGRAM))
                 .thenReturn(Collections.emptyList());
-        membershipMock.when(() -> UserGroupMembership.findByChatId(chatId5))
+        membershipMock.when(() -> UserGroupMembership.findByChatIdAndPlatform(chatId5, Platform.TELEGRAM))
                 .thenReturn(Collections.emptyList());
-        membershipMock.when(() -> UserGroupMembership.exists(anyLong(), anyLong()))
+        membershipMock.when(() -> UserGroupMembership.exists(anyLong(), anyLong(), any(Platform.class)))
                 .thenThrow(new RuntimeException("Database error"));
 
         when(authorizedTelegramUserService.findByTelegramId(12345L)).thenReturn(user);
@@ -207,9 +208,9 @@ class GroupQualificationSchedulerTest {
         return user;
     }
 
-    private UserGroupMembership createMembership(Long telegramId, Long chatId) {
+    private UserGroupMembership createMembership(Long platformUserId, Long chatId) {
         var membership = mock(UserGroupMembership.class);
-        membership.telegramId = telegramId;
+        membership.platformUserId = platformUserId;
         membership.chatId = chatId;
         membership.joinedAt = LocalDateTime.now();
         return membership;

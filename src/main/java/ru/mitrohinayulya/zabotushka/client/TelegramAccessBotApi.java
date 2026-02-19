@@ -13,11 +13,11 @@ import ru.mitrohinayulya.zabotushka.dto.telegram.*;
  * REST client for Telegram Bot API - Access Bot
  * Handles webhook registration and access control operations
  */
-@RegisterRestClient(configKey = "access-bot-api")
+@RegisterRestClient(configKey = "telegram-access-bot-api")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @RateLimited(bucket = "telegram")
-public interface AccessBotApi {
+public interface TelegramAccessBotApi {
 
     @POST
     @Path("/setWebhook")

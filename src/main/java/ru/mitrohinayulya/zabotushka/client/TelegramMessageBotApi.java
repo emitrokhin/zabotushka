@@ -14,11 +14,11 @@ import ru.mitrohinayulya.zabotushka.dto.telegram.TelegramResponse;
  * REST client for Telegram Bot API - Message Bot
  * Handles sending messages to users
  */
-@RegisterRestClient(configKey = "message-bot-api")
+@RegisterRestClient(configKey = "telegram-message-bot-api")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @RateLimited(bucket = "telegram")
-public interface MessageBotApi {
+public interface TelegramMessageBotApi {
 
     @POST
     @Path("/sendMessage")

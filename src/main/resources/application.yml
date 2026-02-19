@@ -36,10 +36,14 @@ quarkus:
     logging:
       scope: request-response
       body-limit: 2000
-    access-bot-api:
+    telegram-access-bot-api:
       url: https://api.telegram.org/bot${app.telegram.access-bot-token}
-    message-bot-api:
+    telegram-message-bot-api:
       url: https://api.telegram.org/bot${app.telegram.message-bot-token}
+    max-bot-api:
+      url: https://platform-api.max.ru
+      headers:
+        Authorization: Bearer ${app.max.bot-token}
     "ru.mitrohinayulya.zabotushka.client.MyGreenwayLoginApi":
       url: https://greenwaystart.com
       follow-redirects: true
@@ -55,6 +59,12 @@ app:
       path: /telegram/webhook
       secret: ${TELEGRAM_ACCESS_BOT_WEBHOOK_SECRET}
       enabled: ${TELEGRAM_ACCESS_BOT_WEBHOOK_ENABLED:true}
+  max:
+    bot-token: ${MAX_BOT_TOKEN}
+    webhook:
+      path: /max/webhook
+      secret: ${MAX_BOT_WEBHOOK_SECRET}
+      enabled: ${MAX_BOT_WEBHOOK_ENABLED:true}
   greenway:
     id: ${GREENWAY_ID:}
     password: ${GREENWAY_PASSWORD:}

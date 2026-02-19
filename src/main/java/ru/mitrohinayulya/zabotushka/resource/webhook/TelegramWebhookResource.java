@@ -1,4 +1,4 @@
-package ru.mitrohinayulya.zabotushka.resource;
+package ru.mitrohinayulya.zabotushka.resource.webhook;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;

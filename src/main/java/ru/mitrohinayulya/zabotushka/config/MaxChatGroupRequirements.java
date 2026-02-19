@@ -9,7 +9,7 @@ import java.util.Optional;
 /**
  * Требования по квалификации для групп
  */
-public enum ChatGroupRequirements {
+public enum MaxChatGroupRequirements {
     GROUP_1(-1001968543887L, List.of(QualificationLevel.M, QualificationLevel.GM)),
     GROUP_2(-1001891048040L, List.of(QualificationLevel.L, QualificationLevel.M, QualificationLevel.GM)),
     GROUP_3(-1001835476759L, List.of(QualificationLevel.S, QualificationLevel.L, QualificationLevel.M, QualificationLevel.GM)),
@@ -19,7 +19,7 @@ public enum ChatGroupRequirements {
     private final Long chatId;
     private final List<QualificationLevel> allowedQualifications;
 
-    ChatGroupRequirements(Long chatId, List<QualificationLevel> allowedQualifications) {
+    MaxChatGroupRequirements(Long chatId, List<QualificationLevel> allowedQualifications) {
         this.chatId = chatId;
         this.allowedQualifications = allowedQualifications;
     }
@@ -42,7 +42,7 @@ public enum ChatGroupRequirements {
     /**
      * Находит требования для группы по её ID
      */
-    public static Optional<ChatGroupRequirements> findByChatId(Long chatId) {
+    public static Optional<MaxChatGroupRequirements> findByChatId(Long chatId) {
         return Arrays.stream(values())
                 .filter(group -> group.getChatId().equals(chatId))
                 .findFirst();
