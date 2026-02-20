@@ -17,7 +17,7 @@ import ru.mitrohinayulya.zabotushka.service.max.MaxService;
 public class MaxWebhookResource {
 
     private static final Logger log = LoggerFactory.getLogger(MaxWebhookResource.class);
-    private static final String MAX_SECRET_HEADER = "X-Max-Bot-Api-Secret-Token";
+    private static final String MAX_SECRET_HEADER = "X-Max-Bot-Api-Secret";
     private static final String USER_ADDED_UPDATE_TYPE = "user_added";
 
     @Inject

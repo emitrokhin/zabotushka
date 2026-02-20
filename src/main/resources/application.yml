@@ -43,7 +43,7 @@ quarkus:
     max-bot-api:
       url: https://platform-api.max.ru
       headers:
-        Authorization: Bearer ${app.max.bot-token}
+        Authorization: ${app.max.bot-token}
     "ru.mitrohinayulya.zabotushka.client.MyGreenwayLoginApi":
       url: https://greenwaystart.com
       follow-redirects: true
