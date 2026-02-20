@@ -9,8 +9,8 @@ import ru.mitrohinayulya.zabotushka.GreenwayServiceTestProfile;
 import ru.mitrohinayulya.zabotushka.dto.greenway.Partner;
 import ru.mitrohinayulya.zabotushka.dto.greenway.PartnerListResponse;
 import ru.mitrohinayulya.zabotushka.exception.GreenwayApiException;
-import ru.mitrohinayulya.zabotushka.service.AuthorizedTelegramUserService;
-import ru.mitrohinayulya.zabotushka.service.GreenwayService;
+import ru.mitrohinayulya.zabotushka.service.telegram.AuthorizedTelegramUserService;
+import ru.mitrohinayulya.zabotushka.service.greenway.GreenwayService;
 
 import java.util.List;
 

@@ -1,22 +1,23 @@
-package ru.mitrohinayulya.zabotushka.service;
+package ru.mitrohinayulya.zabotushka.service.max;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
-import ru.mitrohinayulya.zabotushka.entity.AuthorizedTelegramUser;
+import ru.mitrohinayulya.zabotushka.entity.AuthorizedMaxUser;
 import ru.mitrohinayulya.zabotushka.exception.GreenwayIdAlreadyExistsException;
+import ru.mitrohinayulya.zabotushka.service.platform.PlatformAuthorizationService;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Сервис для работы с авторизованными Telegram пользователями
+ * Сервис для работы с авторизованными Max пользователями
  */
 @ApplicationScoped
-public class AuthorizedTelegramUserService implements PlatformAuthorizationService {
+public class AuthorizedMaxUserService implements PlatformAuthorizationService {
 
     @Override
     public boolean existsByPlatformId(Long platformId) {
-        return existsByTelegramId(platformId);
+        return existsByMaxId(platformId);
     }
 
     @Override
@@ -25,26 +26,26 @@ public class AuthorizedTelegramUserService implements PlatformAuthorizationServi
     }
 
     /**
-     * Проверяет существование пользователя по telegramId
+     * Проверяет существование пользователя по maxId
      */
-    public boolean existsByTelegramId(Long telegramId) {
-        return AuthorizedTelegramUser.existsByTelegramId(telegramId);
+    public boolean existsByMaxId(Long maxId) {
+        return AuthorizedMaxUser.existsByMaxId(maxId);
     }
 
     /**
      * Сохраняет нового авторизованного пользователя
-     * Проверяет уникальность greenwayId перед сохранением (across both platforms)
+     * Проверяет уникальность greenwayId перед сохранением в таблице Max
      *
      * @throws GreenwayIdAlreadyExistsException если greenwayId уже используется
      */
     @Transactional
-    public AuthorizedTelegramUser saveAuthorizedUser(Long telegramId, Long greenwayId, String regDate) {
+    public AuthorizedMaxUser saveAuthorizedUser(Long maxId, Long greenwayId, String regDate) {
         if (existsByGreenwayId(greenwayId)) {
             throw new GreenwayIdAlreadyExistsException(greenwayId);
         }
 
-        var user = new AuthorizedTelegramUser();
-        user.telegramId = telegramId;
+        var user = new AuthorizedMaxUser();
+        user.maxId = maxId;
         user.greenwayId = greenwayId;
         user.regDate = regDate;
         user.creationDate = LocalDateTime.now();
@@ -56,8 +57,8 @@ public class AuthorizedTelegramUserService implements PlatformAuthorizationServi
      * Проверяет совпадение данных пользователя с сохраненными в БД
      * @return true если greenwayId и regDate совпадают
      */
-    public boolean matchesStoredData(Long telegramId, Long greenwayId, String regDate) {
-        var user = findByTelegramId(telegramId);
+    public boolean matchesStoredData(Long maxId, Long greenwayId, String regDate) {
+        var user = findByMaxId(maxId);
         if (user == null) {
             return false;
         }
@@ -65,23 +66,23 @@ public class AuthorizedTelegramUserService implements PlatformAuthorizationServi
     }
 
     /**
-     * Поиск пользователя по telegramId
+     * Поиск пользователя по maxId
      */
-    public AuthorizedTelegramUser findByTelegramId(Long telegramId) {
-        return AuthorizedTelegramUser.findByTelegramId(telegramId);
+    public AuthorizedMaxUser findByMaxId(Long maxId) {
+        return AuthorizedMaxUser.findByMaxId(maxId);
     }
 
     /**
      * Получает всех авторизованных пользователей
      */
-    public List<AuthorizedTelegramUser> findAll() {
-        return AuthorizedTelegramUser.listAll();
+    public List<AuthorizedMaxUser> findAll() {
+        return AuthorizedMaxUser.listAll();
     }
 
     /**
-     * Проверка существования пользователя по greenwayId в таблице Telegram
+     * Проверка существования пользователя по greenwayId в таблице Max
      */
     public boolean existsByGreenwayId(Long greenwayId) {
-        return AuthorizedTelegramUser.existsByGreenwayId(greenwayId);
+        return AuthorizedMaxUser.existsByGreenwayId(greenwayId);
     }
 }

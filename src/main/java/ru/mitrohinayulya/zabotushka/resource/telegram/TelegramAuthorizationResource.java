@@ -1,4 +1,4 @@
-package ru.mitrohinayulya.zabotushka.resource;
+package ru.mitrohinayulya.zabotushka.resource.telegram;
 
 import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
@@ -7,8 +7,8 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import ru.mitrohinayulya.zabotushka.dto.greenway.AuthorizeTelegramRequest;
-import ru.mitrohinayulya.zabotushka.service.AuthorizedTelegramUserService;
-import ru.mitrohinayulya.zabotushka.service.GreenwayAuthorizationService;
+import ru.mitrohinayulya.zabotushka.service.telegram.AuthorizedTelegramUserService;
+import ru.mitrohinayulya.zabotushka.service.greenway.GreenwayAuthorizationService;
 
 /**
  * REST ресурс для авторизации партнеров MyGreenway через Telegram

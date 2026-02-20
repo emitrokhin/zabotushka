@@ -1,4 +1,4 @@
-package ru.mitrohinayulya.zabotushka.resource;
+package ru.mitrohinayulya.zabotushka.resource.max;
 
 import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
@@ -7,8 +7,8 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import ru.mitrohinayulya.zabotushka.dto.greenway.AuthorizeMaxRequest;
-import ru.mitrohinayulya.zabotushka.service.AuthorizedMaxUserService;
-import ru.mitrohinayulya.zabotushka.service.GreenwayAuthorizationService;
+import ru.mitrohinayulya.zabotushka.service.max.AuthorizedMaxUserService;
+import ru.mitrohinayulya.zabotushka.service.greenway.GreenwayAuthorizationService;
 
 /**
  * REST ресурс для авторизации партнеров MyGreenway через Max

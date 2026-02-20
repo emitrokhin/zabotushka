@@ -5,41 +5,41 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.mitrohinayulya.zabotushka.dto.telegram.ChatJoinRequest;
-import ru.mitrohinayulya.zabotushka.service.telegram.TelegramJoinRequestService;
-import ru.mitrohinayulya.zabotushka.service.telegram.TelegramGroupAccessService;
-import ru.mitrohinayulya.zabotushka.service.telegram.TelegramService;
+import ru.mitrohinayulya.zabotushka.dto.max.MaxUpdate;
+import ru.mitrohinayulya.zabotushka.service.max.MaxJoinRequestService;
+import ru.mitrohinayulya.zabotushka.service.max.MaxGroupAccessService;
+import ru.mitrohinayulya.zabotushka.service.max.MaxService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class TelegramServiceTest {
+class MaxServiceTest {
 
     @Mock
-    TelegramJoinRequestService joinRequestService;
+    MaxJoinRequestService joinRequestService;
 
     @Mock
-    TelegramGroupAccessService moderationService;
+    MaxGroupAccessService moderationService;
 
     @InjectMocks
-    TelegramService telegramService;
+    MaxService maxService;
 
     @Test
-    void testProcessChatJoinRequest_DelegatesToJoinService() {
-        var request = org.mockito.Mockito.mock(ChatJoinRequest.class);
+    void testProcessUserAddedUpdate_DelegatesToJoinService() {
+        var update = org.mockito.Mockito.mock(MaxUpdate.class);
 
-        telegramService.processChatJoinRequest(request);
+        maxService.processUserAddedUpdate(update);
 
-        verify(joinRequestService).processChatJoinRequest(request);
+        verify(joinRequestService).processUserAddedUpdate(update);
     }
 
     @Test
     void testIsMemberOfChat_DelegatesToModerationService() {
         when(moderationService.isMemberOfChat(10L, 20L)).thenReturn(true);
 
-        var result = telegramService.isMemberOfChat(10L, 20L);
+        var result = maxService.isMemberOfChat(10L, 20L);
 
         assertThat(result).isTrue();
         verify(moderationService).isMemberOfChat(10L, 20L);
@@ -47,14 +47,14 @@ class TelegramServiceTest {
 
     @Test
     void testRemoveMemberFromChat_DelegatesToModerationService() {
-        telegramService.removeMemberFromChat(10L, 20L);
+        maxService.removeMemberFromChat(10L, 20L);
 
         verify(moderationService).removeMemberFromChat(10L, 20L);
     }
 
     @Test
     void testCheckAndRemoveIfNotQualified_DelegatesToModerationService() {
-        telegramService.checkAndRemoveIfNotQualified(10L, 20L, 30L);
+        maxService.checkAndRemoveIfNotQualified(10L, 20L, 30L);
 
         verify(moderationService).checkAndRemoveIfNotQualified(10L, 20L, 30L);
     }

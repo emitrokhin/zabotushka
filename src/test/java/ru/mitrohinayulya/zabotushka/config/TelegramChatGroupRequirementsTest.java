@@ -12,8 +12,8 @@ class TelegramChatGroupRequirementsTest {
 
     @Test
     void testGroup1Requirements() {
-        // Given: GROUP_1 требует M или GM
-        var group1 = TelegramChatGroupRequirements.GROUP_1;
+        // Given: GOLD_CLUB требует M или GM
+        var group1 = TelegramChatGroupRequirements.GOLD_CLUB;
 
         // When & Then: проверяем допустимые квалификации
         assertTrue(group1.isQualificationAllowed(QualificationLevel.M));
@@ -27,8 +27,8 @@ class TelegramChatGroupRequirementsTest {
 
     @Test
     void testGroup2Requirements() {
-        // Given: GROUP_2 требует L, M или GM
-        var group2 = TelegramChatGroupRequirements.GROUP_2;
+        // Given: SILVER_CLUB требует L, M или GM
+        var group2 = TelegramChatGroupRequirements.SILVER_CLUB;
 
         // When & Then: проверяем допустимые квалификации
         assertTrue(group2.isQualificationAllowed(QualificationLevel.L));
@@ -42,8 +42,8 @@ class TelegramChatGroupRequirementsTest {
 
     @Test
     void testGroup3Requirements() {
-        // Given: GROUP_3 требует S, L, M или GM
-        var group3 = TelegramChatGroupRequirements.GROUP_3;
+        // Given: BRONZE_CLUB требует S, L, M или GM
+        var group3 = TelegramChatGroupRequirements.BRONZE_CLUB;
 
         // When & Then: проверяем допустимые квалификации
         assertTrue(group3.isQualificationAllowed(QualificationLevel.S));
@@ -57,8 +57,8 @@ class TelegramChatGroupRequirementsTest {
 
     @Test
     void testGroup4Requirements() {
-        // Given: GROUP_4 требует S, L, M или GM
-        var group4 = TelegramChatGroupRequirements.GROUP_4;
+        // Given: CAN_AFFORD требует S, L, M или GM
+        var group4 = TelegramChatGroupRequirements.CAN_AFFORD;
 
         // When & Then: проверяем допустимые квалификации
         assertTrue(group4.isQualificationAllowed(QualificationLevel.S));
@@ -72,8 +72,8 @@ class TelegramChatGroupRequirementsTest {
 
     @Test
     void testGroup5Requirements() {
-        // Given: GROUP_5 требует S, L, M или GM
-        var group5 = TelegramChatGroupRequirements.GROUP_5;
+        // Given: CAN_AFFORD_CHAT требует S, L, M или GM
+        var group5 = TelegramChatGroupRequirements.CAN_AFFORD_CHAT;
 
         // When & Then: проверяем допустимые квалификации
         assertTrue(group5.isQualificationAllowed(QualificationLevel.S));
@@ -87,12 +87,12 @@ class TelegramChatGroupRequirementsTest {
 
     @Test
     void testFindByChatId_Found() {
-        // When: ищем GROUP_1 по её chatId
+        // When: ищем GOLD_CLUB по её chatId
         var result = TelegramChatGroupRequirements.findByChatId(-1001968543887L);
 
         // Then: группа найдена
         assertTrue(result.isPresent());
-        assertEquals(TelegramChatGroupRequirements.GROUP_1, result.get());
+        assertEquals(TelegramChatGroupRequirements.GOLD_CLUB, result.get());
         assertEquals(-1001968543887L, result.get().getChatId());
     }
 
@@ -115,7 +115,7 @@ class TelegramChatGroupRequirementsTest {
                 .map(TelegramChatGroupRequirements::getChatId)
                 .toList();
 
-        // Then: все chatId уникальны (кроме GROUP_4, который дублируется в требованиях)
+        // Then: все chatId уникальны (кроме CAN_AFFORD, который дублируется в требованиях)
         var uniqueChatIds = new java.util.HashSet<>(chatIds);
 
         // У нас 5 групп, но chatId может быть меньше из-за дубликата в требованиях
@@ -125,17 +125,17 @@ class TelegramChatGroupRequirementsTest {
     @Test
     void testGetChatId() {
         // When & Then: проверяем chatId всех групп
-        assertEquals(-1001968543887L, TelegramChatGroupRequirements.GROUP_1.getChatId());
-        assertEquals(-1001891048040L, TelegramChatGroupRequirements.GROUP_2.getChatId());
-        assertEquals(-1001835476759L, TelegramChatGroupRequirements.GROUP_3.getChatId());
-        assertEquals(-1001811106801L, TelegramChatGroupRequirements.GROUP_4.getChatId());
-        assertEquals(-1001929076200L, TelegramChatGroupRequirements.GROUP_5.getChatId());
+        assertEquals(-1001968543887L, TelegramChatGroupRequirements.GOLD_CLUB.getChatId());
+        assertEquals(-1001891048040L, TelegramChatGroupRequirements.SILVER_CLUB.getChatId());
+        assertEquals(-1001835476759L, TelegramChatGroupRequirements.BRONZE_CLUB.getChatId());
+        assertEquals(-1001811106801L, TelegramChatGroupRequirements.CAN_AFFORD.getChatId());
+        assertEquals(-1001929076200L, TelegramChatGroupRequirements.CAN_AFFORD_CHAT.getChatId());
     }
 
     @Test
     void testGetAllowedQualifications() {
-        // When: получаем список допустимых квалификаций для GROUP_1
-        var allowedQuals = TelegramChatGroupRequirements.GROUP_1.getAllowedQualifications();
+        // When: получаем список допустимых квалификаций для GOLD_CLUB
+        var allowedQuals = TelegramChatGroupRequirements.GOLD_CLUB.getAllowedQualifications();
 
         // Then: список содержит M и GM
         assertEquals(2, allowedQuals.size());

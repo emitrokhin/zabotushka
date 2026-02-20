@@ -4,13 +4,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-public record MaxSubscriptionRequest(
+public record MaxSetSubscriptionRequest(
         String url,
         @JsonProperty("update_types") List<String> updateTypes,
         String secret
 ) {
-    public static MaxSubscriptionRequest forAllUpdateTypes(String webhookUrl, String secretToken) {
-        return new MaxSubscriptionRequest(
+    public static MaxSetSubscriptionRequest forAllUpdateTypes(String webhookUrl, String secretToken) {
+        return new MaxSetSubscriptionRequest(
                 webhookUrl,
                 List.of(
                         "user_added",

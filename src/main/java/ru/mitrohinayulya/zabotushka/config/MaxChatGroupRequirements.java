@@ -6,45 +6,47 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Требования по квалификации для групп
- */
+/// Требования по квалификации для Max-групп с привязкой к ID чатов платформы.
 public enum MaxChatGroupRequirements {
-    GROUP_1(-1001968543887L, List.of(QualificationLevel.M, QualificationLevel.GM)),
-    GROUP_2(-1001891048040L, List.of(QualificationLevel.L, QualificationLevel.M, QualificationLevel.GM)),
-    GROUP_3(-1001835476759L, List.of(QualificationLevel.S, QualificationLevel.L, QualificationLevel.M, QualificationLevel.GM)),
-    GROUP_4(-1001811106801L, List.of(QualificationLevel.S, QualificationLevel.L, QualificationLevel.M, QualificationLevel.GM)),
-    GROUP_5(-1001929076200L, List.of(QualificationLevel.S, QualificationLevel.L, QualificationLevel.M, QualificationLevel.GM));
+    GOLD_CLUB(-71062621438079L, ChatGroupRequirements.GOLD_CLUB);
 
     private final Long chatId;
-    private final List<QualificationLevel> allowedQualifications;
+    private final ChatGroupRequirements requirements;
 
-    MaxChatGroupRequirements(Long chatId, List<QualificationLevel> allowedQualifications) {
+    MaxChatGroupRequirements(Long chatId, ChatGroupRequirements requirements) {
         this.chatId = chatId;
-        this.allowedQualifications = allowedQualifications;
+        this.requirements = requirements;
     }
 
     public Long getChatId() {
         return chatId;
     }
 
+    public String getGroupName() {
+        return requirements.getGroupName();
+    }
+
     public List<QualificationLevel> getAllowedQualifications() {
-        return allowedQualifications;
+        return requirements.getAllowedQualifications();
     }
 
-    /**
-     * Проверяет, соответствует ли квалификация требованиям группы
-     */
     public boolean isQualificationAllowed(QualificationLevel qualification) {
-        return allowedQualifications.contains(qualification);
+        return requirements.isQualificationAllowed(qualification);
     }
 
-    /**
-     * Находит требования для группы по её ID
-     */
+    public ChatGroupRequirements getRequirements() {
+        return requirements;
+    }
+
     public static Optional<MaxChatGroupRequirements> findByChatId(Long chatId) {
         return Arrays.stream(values())
                 .filter(group -> group.getChatId().equals(chatId))
                 .findFirst();
+    }
+
+    public static String resolveGroupName(Long chatId) {
+        return findByChatId(chatId)
+                .map(MaxChatGroupRequirements::getGroupName)
+                .orElse("клуб");
     }
 }

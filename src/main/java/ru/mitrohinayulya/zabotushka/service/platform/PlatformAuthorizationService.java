@@ -1,4 +1,4 @@
-package ru.mitrohinayulya.zabotushka.service;
+package ru.mitrohinayulya.zabotushka.service.platform;
 
 /**
  * Интерфейс для платформо-зависимых операций с пользователями

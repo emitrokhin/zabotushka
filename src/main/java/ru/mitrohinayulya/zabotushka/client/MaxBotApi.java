@@ -19,7 +19,13 @@ public interface MaxBotApi {
     /// После вызова этого метода бот будет получать уведомления о новых событиях в чатах на указанный URL.
     @POST
     @Path("/subscriptions")
-    Response setSubscription(MaxSubscriptionRequest request);
+    Response setSubscription(MaxSetSubscriptionRequest request);
+
+    /// Подписывает бота на получение обновлений через WebHook.
+    /// После вызова этого метода бот будет получать уведомления о новых событиях в чатах на указанный URL.
+    @POST
+    @Path("/subscriptions")
+    MaxDeleteSubscriptionResponse deleteSubscription(@QueryParam("url") String url);
 
     /// Отправляет сообщение пользователю
     @POST

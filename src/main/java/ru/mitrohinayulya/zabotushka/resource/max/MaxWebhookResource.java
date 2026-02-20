@@ -1,4 +1,4 @@
-package ru.mitrohinayulya.zabotushka.resource.webhook;
+package ru.mitrohinayulya.zabotushka.resource.max;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -8,7 +8,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mitrohinayulya.zabotushka.dto.max.MaxUpdate;
-import ru.mitrohinayulya.zabotushka.service.MaxService;
+import ru.mitrohinayulya.zabotushka.service.max.MaxService;
 
 /// REST ресурс для обработки Max webhook
 @Path("/max/webhook")

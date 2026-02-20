@@ -36,6 +36,11 @@ app:
     webhook:
       secret: test-secret
       enabled: false
+  max:
+    bot-token: test-max-token
+    webhook:
+      secret: test-max-secret
+      enabled: false
   greenway:
     id: test-id
     password: test-password

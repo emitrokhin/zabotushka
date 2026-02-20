@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import ru.mitrohinayulya.zabotushka.GreenwayServiceTestProfile;
 import ru.mitrohinayulya.zabotushka.dto.greenway.Partner;
 import ru.mitrohinayulya.zabotushka.dto.greenway.PartnerListResponse;
-import ru.mitrohinayulya.zabotushka.service.GreenwayService;
+import ru.mitrohinayulya.zabotushka.service.greenway.GreenwayService;
 
 import java.util.List;
 

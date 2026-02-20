@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mitrohinayulya.zabotushka.dto.greenway.*;
 import ru.mitrohinayulya.zabotushka.exception.GreenwayApiException;
-import ru.mitrohinayulya.zabotushka.service.GreenwayService;
+import ru.mitrohinayulya.zabotushka.service.greenway.GreenwayService;
 
 import java.util.Optional;
 

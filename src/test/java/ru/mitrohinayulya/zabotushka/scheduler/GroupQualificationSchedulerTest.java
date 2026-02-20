@@ -11,8 +11,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.mitrohinayulya.zabotushka.entity.AuthorizedTelegramUser;
 import ru.mitrohinayulya.zabotushka.entity.Platform;
 import ru.mitrohinayulya.zabotushka.entity.UserGroupMembership;
-import ru.mitrohinayulya.zabotushka.service.AuthorizedTelegramUserService;
-import ru.mitrohinayulya.zabotushka.service.TelegramService;
+import ru.mitrohinayulya.zabotushka.service.telegram.AuthorizedTelegramUserService;
+import ru.mitrohinayulya.zabotushka.service.telegram.TelegramService;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;

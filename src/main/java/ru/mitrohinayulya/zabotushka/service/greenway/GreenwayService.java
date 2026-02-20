@@ -1,4 +1,4 @@
-package ru.mitrohinayulya.zabotushka.service;
+package ru.mitrohinayulya.zabotushka.service.greenway;
 
 import io.quarkus.runtime.Startup;
 import jakarta.annotation.PostConstruct;
@@ -16,6 +16,7 @@ import ru.mitrohinayulya.zabotushka.config.GreenwayConfig;
 import ru.mitrohinayulya.zabotushka.dto.greenway.PartnerListResponse;
 import ru.mitrohinayulya.zabotushka.exception.GreenwayApiException;
 import ru.mitrohinayulya.zabotushka.exception.GreenwayAuthenticationException;
+import ru.mitrohinayulya.zabotushka.service.PeriodCalculator;
 
 import java.util.concurrent.atomic.AtomicReference;
 

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import ru.mitrohinayulya.zabotushka.entity.AuthorizedTelegramUser;
 import ru.mitrohinayulya.zabotushka.exception.GreenwayIdAlreadyExistsException;
+import ru.mitrohinayulya.zabotushka.service.telegram.AuthorizedTelegramUserService;
 
 import static org.junit.jupiter.api.Assertions.*;
 

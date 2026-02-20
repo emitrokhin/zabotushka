@@ -1,4 +1,4 @@
-package ru.mitrohinayulya.zabotushka.service;
+package ru.mitrohinayulya.zabotushka.service.greenway;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -9,6 +9,7 @@ import ru.mitrohinayulya.zabotushka.dto.greenway.AuthorizeResponse;
 import ru.mitrohinayulya.zabotushka.dto.greenway.ErrorResponse;
 import ru.mitrohinayulya.zabotushka.dto.greenway.Partner;
 import ru.mitrohinayulya.zabotushka.exception.GreenwayApiException;
+import ru.mitrohinayulya.zabotushka.service.platform.PlatformAuthorizationService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
