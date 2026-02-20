@@ -1,145 +1,128 @@
 package ru.mitrohinayulya.zabotushka.config;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.mitrohinayulya.zabotushka.dto.greenway.QualificationLevel;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Тесты для TelegramChatGroupRequirements
- */
 class TelegramChatGroupRequirementsTest {
 
     @Test
-    void testGroup1Requirements() {
-        // Given: GOLD_CLUB требует M или GM
-        var group1 = TelegramChatGroupRequirements.GOLD_CLUB;
+    @DisplayName("GOLD_CLUB allows M and GM qualifications only")
+    void isQualificationAllowed_ShouldAllowMAndGM_WhenGoldClub() {
+        var goldClub = TelegramChatGroupRequirements.GOLD_CLUB;
 
-        // When & Then: проверяем допустимые квалификации
-        assertTrue(group1.isQualificationAllowed(QualificationLevel.M));
-        assertTrue(group1.isQualificationAllowed(QualificationLevel.GM));
-
-        // Недопустимые квалификации
-        assertFalse(group1.isQualificationAllowed(QualificationLevel.L));
-        assertFalse(group1.isQualificationAllowed(QualificationLevel.S));
-        assertFalse(group1.isQualificationAllowed(QualificationLevel.NO));
+        assertThat(goldClub.isQualificationAllowed(QualificationLevel.M)).as("M should be allowed in GOLD_CLUB").isTrue();
+        assertThat(goldClub.isQualificationAllowed(QualificationLevel.GM)).as("GM should be allowed in GOLD_CLUB").isTrue();
+        assertThat(goldClub.isQualificationAllowed(QualificationLevel.L)).as("L should not be allowed in GOLD_CLUB").isFalse();
+        assertThat(goldClub.isQualificationAllowed(QualificationLevel.S)).as("S should not be allowed in GOLD_CLUB").isFalse();
+        assertThat(goldClub.isQualificationAllowed(QualificationLevel.NO)).as("NO should not be allowed in GOLD_CLUB").isFalse();
     }
 
     @Test
-    void testGroup2Requirements() {
-        // Given: SILVER_CLUB требует L, M или GM
-        var group2 = TelegramChatGroupRequirements.SILVER_CLUB;
+    @DisplayName("SILVER_CLUB allows L, M and GM qualifications only")
+    void isQualificationAllowed_ShouldAllowLMAndGM_WhenSilverClub() {
+        var silverClub = TelegramChatGroupRequirements.SILVER_CLUB;
 
-        // When & Then: проверяем допустимые квалификации
-        assertTrue(group2.isQualificationAllowed(QualificationLevel.L));
-        assertTrue(group2.isQualificationAllowed(QualificationLevel.M));
-        assertTrue(group2.isQualificationAllowed(QualificationLevel.GM));
-
-        // Недопустимые квалификации
-        assertFalse(group2.isQualificationAllowed(QualificationLevel.S));
-        assertFalse(group2.isQualificationAllowed(QualificationLevel.NO));
+        assertThat(silverClub.isQualificationAllowed(QualificationLevel.L)).as("L should be allowed in SILVER_CLUB").isTrue();
+        assertThat(silverClub.isQualificationAllowed(QualificationLevel.M)).as("M should be allowed in SILVER_CLUB").isTrue();
+        assertThat(silverClub.isQualificationAllowed(QualificationLevel.GM)).as("GM should be allowed in SILVER_CLUB").isTrue();
+        assertThat(silverClub.isQualificationAllowed(QualificationLevel.S)).as("S should not be allowed in SILVER_CLUB").isFalse();
+        assertThat(silverClub.isQualificationAllowed(QualificationLevel.NO)).as("NO should not be allowed in SILVER_CLUB").isFalse();
     }
 
     @Test
-    void testGroup3Requirements() {
-        // Given: BRONZE_CLUB требует S, L, M или GM
-        var group3 = TelegramChatGroupRequirements.BRONZE_CLUB;
+    @DisplayName("BRONZE_CLUB allows S, L, M and GM qualifications only")
+    void isQualificationAllowed_ShouldAllowSLMAndGM_WhenBronzeClub() {
+        var bronzeClub = TelegramChatGroupRequirements.BRONZE_CLUB;
 
-        // When & Then: проверяем допустимые квалификации
-        assertTrue(group3.isQualificationAllowed(QualificationLevel.S));
-        assertTrue(group3.isQualificationAllowed(QualificationLevel.L));
-        assertTrue(group3.isQualificationAllowed(QualificationLevel.M));
-        assertTrue(group3.isQualificationAllowed(QualificationLevel.GM));
-
-        // Недопустимые квалификации
-        assertFalse(group3.isQualificationAllowed(QualificationLevel.NO));
+        assertThat(bronzeClub.isQualificationAllowed(QualificationLevel.S)).as("S should be allowed in BRONZE_CLUB").isTrue();
+        assertThat(bronzeClub.isQualificationAllowed(QualificationLevel.L)).as("L should be allowed in BRONZE_CLUB").isTrue();
+        assertThat(bronzeClub.isQualificationAllowed(QualificationLevel.M)).as("M should be allowed in BRONZE_CLUB").isTrue();
+        assertThat(bronzeClub.isQualificationAllowed(QualificationLevel.GM)).as("GM should be allowed in BRONZE_CLUB").isTrue();
+        assertThat(bronzeClub.isQualificationAllowed(QualificationLevel.NO)).as("NO should not be allowed in BRONZE_CLUB").isFalse();
     }
 
     @Test
-    void testGroup4Requirements() {
-        // Given: CAN_AFFORD требует S, L, M или GM
-        var group4 = TelegramChatGroupRequirements.CAN_AFFORD;
+    @DisplayName("CAN_AFFORD allows S, L, M and GM qualifications only")
+    void isQualificationAllowed_ShouldAllowSLMAndGM_WhenCanAfford() {
+        var canAfford = TelegramChatGroupRequirements.CAN_AFFORD;
 
-        // When & Then: проверяем допустимые квалификации
-        assertTrue(group4.isQualificationAllowed(QualificationLevel.S));
-        assertTrue(group4.isQualificationAllowed(QualificationLevel.L));
-        assertTrue(group4.isQualificationAllowed(QualificationLevel.M));
-        assertTrue(group4.isQualificationAllowed(QualificationLevel.GM));
-
-        // Недопустимые квалификации
-        assertFalse(group4.isQualificationAllowed(QualificationLevel.NO));
+        assertThat(canAfford.isQualificationAllowed(QualificationLevel.S)).as("S should be allowed in CAN_AFFORD").isTrue();
+        assertThat(canAfford.isQualificationAllowed(QualificationLevel.L)).as("L should be allowed in CAN_AFFORD").isTrue();
+        assertThat(canAfford.isQualificationAllowed(QualificationLevel.M)).as("M should be allowed in CAN_AFFORD").isTrue();
+        assertThat(canAfford.isQualificationAllowed(QualificationLevel.GM)).as("GM should be allowed in CAN_AFFORD").isTrue();
+        assertThat(canAfford.isQualificationAllowed(QualificationLevel.NO)).as("NO should not be allowed in CAN_AFFORD").isFalse();
     }
 
     @Test
-    void testGroup5Requirements() {
-        // Given: CAN_AFFORD_CHAT требует S, L, M или GM
-        var group5 = TelegramChatGroupRequirements.CAN_AFFORD_CHAT;
+    @DisplayName("CAN_AFFORD_CHAT allows S, L, M and GM qualifications only")
+    void isQualificationAllowed_ShouldAllowSLMAndGM_WhenCanAffordChat() {
+        var canAffordChat = TelegramChatGroupRequirements.CAN_AFFORD_CHAT;
 
-        // When & Then: проверяем допустимые квалификации
-        assertTrue(group5.isQualificationAllowed(QualificationLevel.S));
-        assertTrue(group5.isQualificationAllowed(QualificationLevel.L));
-        assertTrue(group5.isQualificationAllowed(QualificationLevel.M));
-        assertTrue(group5.isQualificationAllowed(QualificationLevel.GM));
-
-        // Недопустимые квалификации
-        assertFalse(group5.isQualificationAllowed(QualificationLevel.NO));
+        assertThat(canAffordChat.isQualificationAllowed(QualificationLevel.S)).as("S should be allowed in CAN_AFFORD_CHAT").isTrue();
+        assertThat(canAffordChat.isQualificationAllowed(QualificationLevel.L)).as("L should be allowed in CAN_AFFORD_CHAT").isTrue();
+        assertThat(canAffordChat.isQualificationAllowed(QualificationLevel.M)).as("M should be allowed in CAN_AFFORD_CHAT").isTrue();
+        assertThat(canAffordChat.isQualificationAllowed(QualificationLevel.GM)).as("GM should be allowed in CAN_AFFORD_CHAT").isTrue();
+        assertThat(canAffordChat.isQualificationAllowed(QualificationLevel.NO)).as("NO should not be allowed in CAN_AFFORD_CHAT").isFalse();
     }
 
     @Test
-    void testFindByChatId_Found() {
-        // When: ищем GOLD_CLUB по её chatId
+    @DisplayName("findByChatId returns the matching group when chat ID exists")
+    void findByChatId_ShouldReturnGroup_WhenChatIdExists() {
         var result = TelegramChatGroupRequirements.findByChatId(-1001968543887L);
 
-        // Then: группа найдена
-        assertTrue(result.isPresent());
-        assertEquals(TelegramChatGroupRequirements.GOLD_CLUB, result.get());
-        assertEquals(-1001968543887L, result.get().getChatId());
+        assertThat(result)
+                .as("Result should be present for known chat ID")
+                .isPresent()
+                .as("Should return GOLD_CLUB for the known chat ID")
+                .contains(TelegramChatGroupRequirements.GOLD_CLUB);
+        assertThat(result.get().getChatId()).as("Chat ID should match the requested one").isEqualTo(-1001968543887L);
     }
 
     @Test
-    void testFindByChatId_NotFound() {
-        // When: ищем группу с несуществующим chatId
+    @DisplayName("findByChatId returns empty when chat ID does not exist")
+    void findByChatId_ShouldReturnEmpty_WhenChatIdNotFound() {
         var result = TelegramChatGroupRequirements.findByChatId(-9999999999L);
 
-        // Then: группа не найдена
-        assertTrue(result.isEmpty());
+        assertThat(result).as("Result should be empty for unknown chat ID").isEmpty();
     }
 
     @Test
-    void testAllGroupsHaveUniqueChatIds() {
-        // Given: все группы
+    @DisplayName("All groups have a valid number of unique chat IDs")
+    void getChatIds_ShouldNotExceedGroupCount() {
         var groups = TelegramChatGroupRequirements.values();
-
-        // When: собираем все chatId
         var chatIds = java.util.Arrays.stream(groups)
                 .map(TelegramChatGroupRequirements::getChatId)
                 .toList();
-
-        // Then: все chatId уникальны (кроме CAN_AFFORD, который дублируется в требованиях)
         var uniqueChatIds = new java.util.HashSet<>(chatIds);
 
-        // У нас 5 групп, но chatId может быть меньше из-за дубликата в требованиях
-        assertTrue(uniqueChatIds.size() <= groups.length);
+        assertThat(uniqueChatIds)
+                .as("Number of unique chat IDs should not exceed group count")
+                .hasSizeLessThanOrEqualTo(groups.length);
     }
 
     @Test
-    void testGetChatId() {
-        // When & Then: проверяем chatId всех групп
-        assertEquals(-1001968543887L, TelegramChatGroupRequirements.GOLD_CLUB.getChatId());
-        assertEquals(-1001891048040L, TelegramChatGroupRequirements.SILVER_CLUB.getChatId());
-        assertEquals(-1001835476759L, TelegramChatGroupRequirements.BRONZE_CLUB.getChatId());
-        assertEquals(-1001811106801L, TelegramChatGroupRequirements.CAN_AFFORD.getChatId());
-        assertEquals(-1001929076200L, TelegramChatGroupRequirements.CAN_AFFORD_CHAT.getChatId());
+    @DisplayName("getChatId returns correct chat IDs for all groups")
+    void getChatId_ShouldReturnCorrectValues_ForAllGroups() {
+        assertThat(TelegramChatGroupRequirements.GOLD_CLUB.getChatId()).as("GOLD_CLUB chat ID").isEqualTo(-1001968543887L);
+        assertThat(TelegramChatGroupRequirements.SILVER_CLUB.getChatId()).as("SILVER_CLUB chat ID").isEqualTo(-1001891048040L);
+        assertThat(TelegramChatGroupRequirements.BRONZE_CLUB.getChatId()).as("BRONZE_CLUB chat ID").isEqualTo(-1001835476759L);
+        assertThat(TelegramChatGroupRequirements.CAN_AFFORD.getChatId()).as("CAN_AFFORD chat ID").isEqualTo(-1001811106801L);
+        assertThat(TelegramChatGroupRequirements.CAN_AFFORD_CHAT.getChatId()).as("CAN_AFFORD_CHAT chat ID").isEqualTo(-1001929076200L);
     }
 
     @Test
-    void testGetAllowedQualifications() {
-        // When: получаем список допустимых квалификаций для GOLD_CLUB
+    @DisplayName("getAllowedQualifications returns M and GM for GOLD_CLUB")
+    void getAllowedQualifications_ShouldReturnMAndGM_WhenGoldClub() {
         var allowedQuals = TelegramChatGroupRequirements.GOLD_CLUB.getAllowedQualifications();
 
-        // Then: список содержит M и GM
-        assertEquals(2, allowedQuals.size());
-        assertTrue(allowedQuals.contains(QualificationLevel.M));
-        assertTrue(allowedQuals.contains(QualificationLevel.GM));
+        assertThat(allowedQuals).as("GOLD_CLUB should have exactly 2 allowed qualifications")
+                .hasSize(2)
+                .as("GOLD_CLUB allowed qualifications should contain M")
+                .contains(QualificationLevel.M)
+                .as("GOLD_CLUB allowed qualifications should contain GM")
+                .contains(QualificationLevel.GM);
     }
 }

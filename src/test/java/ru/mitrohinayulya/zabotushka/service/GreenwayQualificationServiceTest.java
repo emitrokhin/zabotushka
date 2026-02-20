@@ -1,5 +1,6 @@
 package ru.mitrohinayulya.zabotushka.service;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,7 +15,7 @@ import ru.mitrohinayulya.zabotushka.service.greenway.GreenwayService;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,7 +28,8 @@ class GreenwayQualificationServiceTest {
     GreenwayQualificationService qualificationService;
 
     @Test
-    void getBestQualification_ReturnsBestWhenBothPeriodsHaveQualifications() {
+    @DisplayName("getBestQualification returns the higher level when both periods have qualifications")
+    void getBestQualification_ShouldReturnBestLevel_WhenBothPeriodsHaveQualifications() {
         var greenwayId = 100L;
         var currentPartner = createPartner(100, "M1");
         var previousPartner = createPartner(100, "GM2");
@@ -43,11 +45,12 @@ class GreenwayQualificationServiceTest {
 
         var result = qualificationService.getBestQualification(greenwayId);
 
-        assertEquals(QualificationLevel.GM, result);
+        assertThat(result).as("Should return the higher qualification level GM from previous period").isEqualTo(QualificationLevel.GM);
     }
 
     @Test
-    void getBestQualification_UsesCurrentWhenOnlyCurrentPeriodHasPartner() {
+    @DisplayName("getBestQualification uses current period when only current period has partner")
+    void getBestQualification_ShouldUseCurrentPeriod_WhenOnlyCurrentHasPartner() {
         var greenwayId = 100L;
         var currentPartner = createPartner(100, "L3");
 
@@ -62,11 +65,12 @@ class GreenwayQualificationServiceTest {
 
         var result = qualificationService.getBestQualification(greenwayId);
 
-        assertEquals(QualificationLevel.L, result);
+        assertThat(result).as("Should return current period qualification L when previous is empty").isEqualTo(QualificationLevel.L);
     }
 
     @Test
-    void getBestQualification_UsesPreviousWhenOnlyPreviousPeriodHasPartner() {
+    @DisplayName("getBestQualification uses previous period when only previous period has partner")
+    void getBestQualification_ShouldUsePreviousPeriod_WhenOnlyPreviousHasPartner() {
         var greenwayId = 100L;
         var previousPartner = createPartner(100, "S1");
 
@@ -81,11 +85,12 @@ class GreenwayQualificationServiceTest {
 
         var result = qualificationService.getBestQualification(greenwayId);
 
-        assertEquals(QualificationLevel.S, result);
+        assertThat(result).as("Should return previous period qualification S when current is empty").isEqualTo(QualificationLevel.S);
     }
 
     @Test
-    void getBestQualification_ReturnsNoWhenNeitherPeriodHasPartner() {
+    @DisplayName("getBestQualification returns NO when neither period has partner")
+    void getBestQualification_ShouldReturnNO_WhenNeitherPeriodHasPartner() {
         var greenwayId = 100L;
 
         var currentResponse = new PartnerListResponse(null, List.of(), null, null);
@@ -99,18 +104,19 @@ class GreenwayQualificationServiceTest {
 
         var result = qualificationService.getBestQualification(greenwayId);
 
-        assertEquals(QualificationLevel.NO, result);
+        assertThat(result).as("Should return NO when partner is not found in either period").isEqualTo(QualificationLevel.NO);
     }
 
     @Test
-    void getBestQualification_ReturnsNoOnException() {
+    @DisplayName("getBestQualification returns NO when an exception occurs during API call")
+    void getBestQualification_ShouldReturnNO_WhenExceptionOccurs() {
         var greenwayId = 100L;
 
         when(greenwayService.getPreviousPeriod()).thenThrow(new RuntimeException("API error"));
 
         var result = qualificationService.getBestQualification(greenwayId);
 
-        assertEquals(QualificationLevel.NO, result);
+        assertThat(result).as("Should return NO when API throws exception").isEqualTo(QualificationLevel.NO);
     }
 
     private Partner createPartner(int number, String qualification) {

@@ -1,5 +1,6 @@
 package ru.mitrohinayulya.zabotushka.service;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,7 +28,8 @@ class TelegramServiceTest {
     TelegramService telegramService;
 
     @Test
-    void testProcessChatJoinRequest_DelegatesToJoinService() {
+    @DisplayName("processChatJoinRequest delegates to join request service")
+    void processChatJoinRequest_ShouldDelegateToJoinService() {
         var request = org.mockito.Mockito.mock(ChatJoinRequest.class);
 
         telegramService.processChatJoinRequest(request);
@@ -36,24 +38,27 @@ class TelegramServiceTest {
     }
 
     @Test
-    void testIsMemberOfChat_DelegatesToModerationService() {
+    @DisplayName("isMemberOfChat delegates to moderation service and returns its result")
+    void isMemberOfChat_ShouldDelegateToModerationService() {
         when(moderationService.isMemberOfChat(10L, 20L)).thenReturn(true);
 
         var result = telegramService.isMemberOfChat(10L, 20L);
 
-        assertThat(result).isTrue();
+        assertThat(result).as("Should return the result from moderation service").isTrue();
         verify(moderationService).isMemberOfChat(10L, 20L);
     }
 
     @Test
-    void testRemoveMemberFromChat_DelegatesToModerationService() {
+    @DisplayName("removeMemberFromChat delegates to moderation service")
+    void removeMemberFromChat_ShouldDelegateToModerationService() {
         telegramService.removeMemberFromChat(10L, 20L);
 
         verify(moderationService).removeMemberFromChat(10L, 20L);
     }
 
     @Test
-    void testCheckAndRemoveIfNotQualified_DelegatesToModerationService() {
+    @DisplayName("checkAndRemoveIfNotQualified delegates to moderation service")
+    void checkAndRemoveIfNotQualified_ShouldDelegateToModerationService() {
         telegramService.checkAndRemoveIfNotQualified(10L, 20L, 30L);
 
         verify(moderationService).checkAndRemoveIfNotQualified(10L, 20L, 30L);

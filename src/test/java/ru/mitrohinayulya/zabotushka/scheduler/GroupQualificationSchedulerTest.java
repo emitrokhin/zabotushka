@@ -2,6 +2,7 @@ package ru.mitrohinayulya.zabotushka.scheduler;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,9 +23,6 @@ import java.util.UUID;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-/**
- * Тесты для GroupQualificationScheduler
- */
 @ExtendWith(MockitoExtension.class)
 class GroupQualificationSchedulerTest {
 
@@ -52,9 +50,10 @@ class GroupQualificationSchedulerTest {
     }
 
     @Test
-    void testCheckGroupQualifications_WithMembers() {
-        var chatId1 = -1001968543887L; // GROUP_1
-        var chatId2 = -1001891048040L; // GROUP_2
+    @DisplayName("checkGroupQualifications checks qualification for all members in all chats")
+    void checkGroupQualifications_ShouldCheckAllMembers_WhenMembershipsExist() {
+        var chatId1 = -1001968543887L;
+        var chatId2 = -1001891048040L;
 
         var membership1 = createMembership(12345L, chatId1);
         var membership2 = createMembership(54321L, chatId1);
@@ -70,7 +69,6 @@ class GroupQualificationSchedulerTest {
                 .thenReturn(Collections.emptyList());
         membershipMock.when(() -> UserGroupMembership.findByChatIdAndPlatform(-1001929076200L, Platform.TELEGRAM))
                 .thenReturn(Collections.emptyList());
-
         membershipMock.when(() -> UserGroupMembership.exists(anyLong(), anyLong(), any(Platform.class)))
                 .thenReturn(true);
 
@@ -87,14 +85,14 @@ class GroupQualificationSchedulerTest {
         verify(telegramService, times(1)).checkAndRemoveIfNotQualified(chatId1, 12345L, 999888L);
         verify(telegramService, times(1)).checkAndRemoveIfNotQualified(chatId1, 54321L, 888999L);
         verify(telegramService, times(1)).checkAndRemoveIfNotQualified(chatId2, 11111L, 777666L);
-
         verify(membership1, times(1)).persist();
         verify(membership2, times(1)).persist();
         verify(membership3, times(1)).persist();
     }
 
     @Test
-    void testCheckGroupQualifications_NoMembers() {
+    @DisplayName("checkGroupQualifications skips qualification check when no memberships exist")
+    void checkGroupQualifications_ShouldSkipQualificationCheck_WhenNoMembershipsExist() {
         membershipMock.when(() -> UserGroupMembership.findByChatIdAndPlatform(anyLong(), any(Platform.class)))
                 .thenReturn(Collections.emptyList());
 
@@ -105,7 +103,8 @@ class GroupQualificationSchedulerTest {
     }
 
     @Test
-    void testCheckGroupQualifications_UserNotFound() {
+    @DisplayName("checkGroupQualifications removes member from chat when user is not authorized")
+    void checkGroupQualifications_ShouldRemoveMemberFromChat_WhenUserIsNotAuthorized() {
         var chatId1 = -1001968543887L;
         var chatId2 = -1001891048040L;
         var chatId3 = -1001835476759L;
@@ -135,7 +134,8 @@ class GroupQualificationSchedulerTest {
     }
 
     @Test
-    void testCheckGroupQualifications_UserRemoved() {
+    @DisplayName("checkGroupQualifications does not update timestamp when membership was removed externally")
+    void checkGroupQualifications_ShouldNotUpdateTimestamp_WhenMembershipWasRemoved() {
         var chatId1 = -1001968543887L;
         var chatId2 = -1001891048040L;
         var chatId3 = -1001835476759L;
@@ -154,7 +154,6 @@ class GroupQualificationSchedulerTest {
                 .thenReturn(Collections.emptyList());
         membershipMock.when(() -> UserGroupMembership.findByChatIdAndPlatform(chatId5, Platform.TELEGRAM))
                 .thenReturn(Collections.emptyList());
-
         membershipMock.when(() -> UserGroupMembership.exists(12345L, chatId1, Platform.TELEGRAM))
                 .thenReturn(false);
 
@@ -167,7 +166,8 @@ class GroupQualificationSchedulerTest {
     }
 
     @Test
-    void testCheckGroupQualifications_WithException() {
+    @DisplayName("checkGroupQualifications continues processing when an exception occurs for one member")
+    void checkGroupQualifications_ShouldContinueProcessing_WhenExceptionOccurs() {
         var chatId1 = -1001968543887L;
         var chatId2 = -1001891048040L;
         var chatId3 = -1001835476759L;
@@ -195,8 +195,6 @@ class GroupQualificationSchedulerTest {
 
         verify(telegramService, times(1)).checkAndRemoveIfNotQualified(chatId1, 12345L, 999888L);
     }
-
-    // Helper methods
 
     private AuthorizedTelegramUser createUser(Long telegramId, Long greenwayId) {
         var user = new AuthorizedTelegramUser();

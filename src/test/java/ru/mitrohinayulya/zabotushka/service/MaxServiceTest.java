@@ -1,5 +1,6 @@
 package ru.mitrohinayulya.zabotushka.service;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,7 +28,8 @@ class MaxServiceTest {
     MaxService maxService;
 
     @Test
-    void testProcessUserAddedUpdate_DelegatesToJoinService() {
+    @DisplayName("processUserAddedUpdate delegates to join request service")
+    void processUserAddedUpdate_ShouldDelegateToJoinService() {
         var update = org.mockito.Mockito.mock(MaxUpdate.class);
 
         maxService.processUserAddedUpdate(update);
@@ -36,24 +38,27 @@ class MaxServiceTest {
     }
 
     @Test
-    void testIsMemberOfChat_DelegatesToModerationService() {
+    @DisplayName("isMemberOfChat delegates to moderation service and returns its result")
+    void isMemberOfChat_ShouldDelegateToModerationService() {
         when(moderationService.isMemberOfChat(10L, 20L)).thenReturn(true);
 
         var result = maxService.isMemberOfChat(10L, 20L);
 
-        assertThat(result).isTrue();
+        assertThat(result).as("Should return the result from moderation service").isTrue();
         verify(moderationService).isMemberOfChat(10L, 20L);
     }
 
     @Test
-    void testRemoveMemberFromChat_DelegatesToModerationService() {
+    @DisplayName("removeMemberFromChat delegates to moderation service")
+    void removeMemberFromChat_ShouldDelegateToModerationService() {
         maxService.removeMemberFromChat(10L, 20L);
 
         verify(moderationService).removeMemberFromChat(10L, 20L);
     }
 
     @Test
-    void testCheckAndRemoveIfNotQualified_DelegatesToModerationService() {
+    @DisplayName("checkAndRemoveIfNotQualified delegates to moderation service")
+    void checkAndRemoveIfNotQualified_ShouldDelegateToModerationService() {
         maxService.checkAndRemoveIfNotQualified(10L, 20L, 30L);
 
         verify(moderationService).checkAndRemoveIfNotQualified(10L, 20L, 30L);

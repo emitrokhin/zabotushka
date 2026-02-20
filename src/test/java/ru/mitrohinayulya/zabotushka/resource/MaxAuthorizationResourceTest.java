@@ -4,6 +4,7 @@ import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import io.restassured.http.ContentType;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.mitrohinayulya.zabotushka.GreenwayServiceTestProfile;
 import ru.mitrohinayulya.zabotushka.dto.greenway.Partner;
@@ -19,9 +20,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-/**
- * Тесты для MaxAuthorizationResource
- */
 @QuarkusTest
 @TestProfile(GreenwayServiceTestProfile.class)
 class MaxAuthorizationResourceTest {
@@ -33,7 +31,8 @@ class MaxAuthorizationResourceTest {
     AuthorizedMaxUserService authorizedMaxUserService;
 
     @Test
-    void testAuthorize_Success_FirstTime() {
+    @DisplayName("authorize returns 200 and saves user on first-time authorization")
+    void authorize_ShouldReturn200AndSaveUser_WhenFirstTimeAuthorization() {
         var partner = createPartner(123456);
         var partnerListResponse = new PartnerListResponse(null, List.of(partner), null, null);
 
@@ -61,7 +60,8 @@ class MaxAuthorizationResourceTest {
     }
 
     @Test
-    void testAuthorize_Success_ReauthorizationWithMatchingData() {
+    @DisplayName("authorize returns 200 without calling API on re-authorization with matching data")
+    void authorize_ShouldReturn200WithoutApiCall_WhenReauthorizationWithMatchingData() {
         when(authorizedMaxUserService.existsByPlatformId(2002L)).thenReturn(true);
         when(authorizedMaxUserService.matchesStoredData(2002L, 123456L, "15.01.2023")).thenReturn(true);
 
@@ -86,7 +86,8 @@ class MaxAuthorizationResourceTest {
     }
 
     @Test
-    void testAuthorize_Forbidden_ReauthorizationWithMismatchedData() {
+    @DisplayName("authorize returns 403 when re-authorization data does not match stored credentials")
+    void authorize_ShouldReturn403_WhenReauthorizationDataMismatch() {
         when(authorizedMaxUserService.existsByPlatformId(2003L)).thenReturn(true);
         when(authorizedMaxUserService.matchesStoredData(2003L, 123456L, "20.01.2023")).thenReturn(false);
 
@@ -110,7 +111,8 @@ class MaxAuthorizationResourceTest {
     }
 
     @Test
-    void testAuthorize_Conflict_GreenwayIdAlreadyUsed() {
+    @DisplayName("authorize returns 409 when Greenway ID is already associated with another account")
+    void authorize_ShouldReturn409_WhenGreenwayIdAlreadyUsed() {
         when(authorizedMaxUserService.existsByPlatformId(9999L)).thenReturn(false);
         when(authorizedMaxUserService.existsByGreenwayId(123456L)).thenReturn(true);
 
@@ -135,7 +137,8 @@ class MaxAuthorizationResourceTest {
     }
 
     @Test
-    void testAuthorize_Unauthorized_NoBasicAuth() {
+    @DisplayName("authorize returns 401 when no Basic Auth credentials provided")
+    void authorize_ShouldReturn401_WhenNoBasicAuth() {
         given()
             .contentType(ContentType.JSON)
             .body("""
@@ -152,7 +155,8 @@ class MaxAuthorizationResourceTest {
     }
 
     @Test
-    void testAuthorize_DateMismatch() {
+    @DisplayName("authorize returns 401 when registration date does not match Greenway data")
+    void authorize_ShouldReturn401_WhenRegistrationDateMismatch() {
         var partner = createPartner(123456);
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
@@ -177,7 +181,8 @@ class MaxAuthorizationResourceTest {
     }
 
     @Test
-    void testAuthorize_EmptyPartnerList() {
+    @DisplayName("authorize returns 404 when partner list from Greenway is empty")
+    void authorize_ShouldReturn404_WhenPartnerListIsEmpty() {
         var response = new PartnerListResponse(null, List.of(), null, null);
 
         when(authorizedMaxUserService.existsByPlatformId(2008L)).thenReturn(false);
@@ -201,7 +206,8 @@ class MaxAuthorizationResourceTest {
     }
 
     @Test
-    void testAuthorize_ApiException() {
+    @DisplayName("authorize returns 500 when Greenway API throws an exception")
+    void authorize_ShouldReturn500_WhenGreenwayApiThrowsException() {
         when(authorizedMaxUserService.existsByPlatformId(2009L)).thenReturn(false);
         when(greenwayService.getPartnerList(anyLong(), anyInt()))
             .thenThrow(new GreenwayApiException("API Error", "ERROR_CODE", "Error details"));
@@ -222,8 +228,6 @@ class MaxAuthorizationResourceTest {
             .statusCode(500)
             .body("authorized", is("not_authorized"));
     }
-
-    // ==================== Helper Methods ====================
 
     private Partner createPartner(int number) {
         return new Partner(

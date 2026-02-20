@@ -1,6 +1,7 @@
 package ru.mitrohinayulya.zabotushka.service.telegram;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -9,7 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.mitrohinayulya.zabotushka.client.TelegramMessageBotApi;
 import ru.mitrohinayulya.zabotushka.dto.telegram.TelegramResponse;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -24,26 +25,32 @@ class TelegramMessageServiceTest {
     TelegramMessageService messageService;
 
     @Test
-    void sendMessage_Success() {
+    @DisplayName("sendMessage does not throw when API returns successful response")
+    void sendMessage_ShouldNotThrow_WhenResponseIsOk() {
         when(telegramMessageBotApi.sendMessage(any()))
                 .thenReturn(new TelegramResponse<>(true, null, null));
 
-        assertDoesNotThrow(() -> messageService.sendMessage(123L, "Hello"));
+        assertThatCode(() -> messageService.sendMessage(123L, "Hello"))
+                .as("Should not throw when API returns OK response").doesNotThrowAnyException();
     }
 
     @Test
-    void sendMessage_ResponseNotOk() {
+    @DisplayName("sendMessage does not throw when API returns non-OK response")
+    void sendMessage_ShouldNotThrow_WhenResponseIsNotOk() {
         when(telegramMessageBotApi.sendMessage(any()))
                 .thenReturn(new TelegramResponse<>(false, null, "Bad Request"));
 
-        assertDoesNotThrow(() -> messageService.sendMessage(123L, "Hello"));
+        assertThatCode(() -> messageService.sendMessage(123L, "Hello"))
+                .as("Should not throw when API returns error response").doesNotThrowAnyException();
     }
 
     @Test
-    void sendMessage_Exception() {
+    @DisplayName("sendMessage does not throw when API call throws an exception")
+    void sendMessage_ShouldNotThrow_WhenExceptionOccurs() {
         when(telegramMessageBotApi.sendMessage(any()))
                 .thenThrow(new RuntimeException("Network error"));
 
-        assertDoesNotThrow(() -> messageService.sendMessage(123L, "Hello"));
+        assertThatCode(() -> messageService.sendMessage(123L, "Hello"))
+                .as("Should not throw when API throws exception").doesNotThrowAnyException();
     }
 }

@@ -3,6 +3,7 @@ package ru.mitrohinayulya.zabotushka.resource;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.mitrohinayulya.zabotushka.GreenwayServiceTestProfile;
 import ru.mitrohinayulya.zabotushka.dto.greenway.Partner;
@@ -16,9 +17,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-/**
- * Тесты для GreenwayResource (без authorize — вынесено в platform-specific ресурсы)
- */
 @QuarkusTest
 @TestProfile(GreenwayServiceTestProfile.class)
 class GreenwayResourceTest {
@@ -26,11 +24,9 @@ class GreenwayResourceTest {
     @InjectMock
     GreenwayService greenwayService;
 
-    // ==================== CheckUserId Tests ====================
-
     @Test
-    void testCheckUserId_Success() {
-        // Given: партнер существует
+    @DisplayName("checkUserId returns 200 with user data when partner exists")
+    void checkUserId_ShouldReturn200WithUser_WhenPartnerExists() {
         var partner = createPartner(123456);
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
@@ -38,7 +34,6 @@ class GreenwayResourceTest {
         when(greenwayService.findPartnerById(any(), anyLong()))
                 .thenReturn(java.util.Optional.of(partner));
 
-        // When & Then: партнер найден
         given()
                 .auth().basic("admin", "admin")
                 .when()
@@ -49,15 +44,14 @@ class GreenwayResourceTest {
     }
 
     @Test
-    void testCheckUserId_NotFound() {
-        // Given: партнер не существует
+    @DisplayName("checkUserId returns 404 when partner not found")
+    void checkUserId_ShouldReturn404_WhenPartnerNotFound() {
         var response = new PartnerListResponse(null, List.of(), null, null);
 
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
         when(greenwayService.findPartnerById(any(), anyLong()))
                 .thenReturn(java.util.Optional.empty());
 
-        // When & Then: партнер не найден
         given()
                 .auth().basic("admin", "admin")
                 .when()
@@ -66,11 +60,9 @@ class GreenwayResourceTest {
                 .statusCode(404);
     }
 
-    // ==================== CompareLO Tests ====================
-
     @Test
-    void testCompareLO_Greater() {
-        // Given: у партнера LO больше чем переданное значение
+    @DisplayName("compareLO returns 'greater' when partner LO exceeds the threshold")
+    void compareLO_ShouldReturnGreater_WhenPartnerLOExceedsThreshold() {
         var partner = createPartnerWithLO(150.0);
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
@@ -78,7 +70,6 @@ class GreenwayResourceTest {
         when(greenwayService.findPartnerById(any(), anyLong()))
                 .thenReturn(java.util.Optional.of(partner));
 
-        // When & Then: результат "greater"
         given()
                 .auth().basic("admin", "admin")
                 .when()
@@ -92,8 +83,8 @@ class GreenwayResourceTest {
     }
 
     @Test
-    void testCompareLO_Less() {
-        // Given: у партнера LO меньше чем переданное значение
+    @DisplayName("compareLO returns 'less' when partner LO is below the threshold")
+    void compareLO_ShouldReturnLess_WhenPartnerLOIsBelowThreshold() {
         var partner = createPartnerWithLO(50.0);
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
@@ -101,7 +92,6 @@ class GreenwayResourceTest {
         when(greenwayService.findPartnerById(any(), anyLong()))
                 .thenReturn(java.util.Optional.of(partner));
 
-        // When & Then: результат "less"
         given()
                 .auth().basic("admin", "admin")
                 .when()
@@ -112,8 +102,8 @@ class GreenwayResourceTest {
     }
 
     @Test
-    void testCompareLO_Equal() {
-        // Given: у партнера LO равно переданному значению
+    @DisplayName("compareLO returns 'equal' when partner LO equals the threshold")
+    void compareLO_ShouldReturnEqual_WhenPartnerLOEqualsThreshold() {
         var partner = createPartnerWithLO(100.0);
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
@@ -121,7 +111,6 @@ class GreenwayResourceTest {
         when(greenwayService.findPartnerById(any(), anyLong()))
                 .thenReturn(java.util.Optional.of(partner));
 
-        // When & Then: результат "equal"
         given()
                 .auth().basic("admin", "admin")
                 .when()
@@ -132,8 +121,8 @@ class GreenwayResourceTest {
     }
 
     @Test
-    void testCompareLOPeriod_Success() {
-        // Given: партнер существует в предыдущем периоде
+    @DisplayName("compareLOPeriod returns comparison result with period when partner exists in previous period")
+    void compareLOPeriod_ShouldReturnResultWithPeriod_WhenPartnerExistsInPreviousPeriod() {
         var partner = createPartnerWithLO(200.0);
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
@@ -142,7 +131,6 @@ class GreenwayResourceTest {
         when(greenwayService.findPartnerById(any(), anyLong()))
                 .thenReturn(java.util.Optional.of(partner));
 
-        // When & Then: результат с указанием периода
         given()
                 .auth().basic("admin", "admin")
                 .when()
@@ -153,11 +141,9 @@ class GreenwayResourceTest {
                 .body("period", is(75));
     }
 
-    // ==================== CompareSGO Tests ====================
-
     @Test
-    void testCompareSGO_Greater() {
-        // Given: у партнера SGO больше чем переданное значение
+    @DisplayName("compareSGO returns 'greater' when partner SGO exceeds the threshold")
+    void compareSGO_ShouldReturnGreater_WhenPartnerSGOExceedsThreshold() {
         var partner = createPartnerWithSGO();
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
@@ -165,7 +151,6 @@ class GreenwayResourceTest {
         when(greenwayService.findPartnerById(any(), anyLong()))
                 .thenReturn(java.util.Optional.of(partner));
 
-        // When & Then: результат "greater"
         given()
                 .auth().basic("admin", "admin")
                 .when()
@@ -178,15 +163,14 @@ class GreenwayResourceTest {
     }
 
     @Test
-    void testCompareSGO_NotFound() {
-        // Given: партнер не найден
+    @DisplayName("compareSGO returns 'not-found' when partner does not exist")
+    void compareSGO_ShouldReturnNotFound_WhenPartnerNotFound() {
         var response = new PartnerListResponse(null, List.of(), null, null);
 
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
         when(greenwayService.findPartnerById(any(), anyLong()))
                 .thenReturn(java.util.Optional.empty());
 
-        // When & Then: результат "not-found"
         given()
                 .auth().basic("admin", "admin")
                 .when()
@@ -196,11 +180,9 @@ class GreenwayResourceTest {
                 .body("sgoComparisonResult", is("not-found"));
     }
 
-    // ==================== Qualification Tests ====================
-
     @Test
-    void testGetQualification_Success() {
-        // Given: партнер с квалификацией L2
+    @DisplayName("getQualification returns base qualification letter when partner exists")
+    void getQualification_ShouldReturnBaseQualification_WhenPartnerExists() {
         var partner = createPartnerWithQualification("L2");
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
@@ -208,7 +190,6 @@ class GreenwayResourceTest {
         when(greenwayService.findPartnerById(any(), anyLong()))
                 .thenReturn(java.util.Optional.of(partner));
 
-        // When & Then: возвращается только буква "L"
         given()
                 .auth().basic("admin", "admin")
                 .when()
@@ -219,8 +200,8 @@ class GreenwayResourceTest {
     }
 
     @Test
-    void testGetQualificationExact_Success() {
-        // Given: партнер с квалификацией L2
+    @DisplayName("getQualificationExact returns full qualification string when partner exists")
+    void getQualificationExact_ShouldReturnFullQualification_WhenPartnerExists() {
         var partner = createPartnerWithQualification("L2");
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
@@ -228,7 +209,6 @@ class GreenwayResourceTest {
         when(greenwayService.findPartnerById(any(), anyLong()))
                 .thenReturn(java.util.Optional.of(partner));
 
-        // When & Then: возвращается полная квалификация "L2"
         given()
                 .auth().basic("admin", "admin")
                 .when()
@@ -239,8 +219,8 @@ class GreenwayResourceTest {
     }
 
     @Test
-    void testGetQualificationPeriod_Success() {
-        // Given: партнер с квалификацией M1 в прошлом периоде
+    @DisplayName("getQualificationPeriod returns qualification from previous period")
+    void getQualificationPeriod_ShouldReturnPreviousPeriodQualification_WhenPartnerExists() {
         var partner = createPartnerWithQualification("M1");
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
@@ -249,7 +229,6 @@ class GreenwayResourceTest {
         when(greenwayService.findPartnerById(any(), anyLong()))
                 .thenReturn(java.util.Optional.of(partner));
 
-        // When & Then: возвращается "M"
         given()
                 .auth().basic("admin", "admin")
                 .when()
@@ -260,8 +239,8 @@ class GreenwayResourceTest {
     }
 
     @Test
-    void testGetQualificationBest_CurrentBetter() {
-        // Given: текущая квалификация лучше предыдущей (M > L)
+    @DisplayName("getQualificationBest returns current period qualification when it is higher")
+    void getQualificationBest_ShouldReturnCurrentQualification_WhenCurrentIsBetter() {
         var currentPartner = createPartnerWithQualification("M1");
         var previousPartner = createPartnerWithQualification("L2");
 
@@ -269,16 +248,13 @@ class GreenwayResourceTest {
         var previousResponse = new PartnerListResponse(null, List.of(previousPartner), null, null);
 
         when(greenwayService.getPreviousPeriod()).thenReturn(75);
-        when(greenwayService.getPartnerList(123456L, 0))
-                .thenReturn(currentResponse);
-        when(greenwayService.getPartnerList(123456L, 75))
-                .thenReturn(previousResponse);
+        when(greenwayService.getPartnerList(123456L, 0)).thenReturn(currentResponse);
+        when(greenwayService.getPartnerList(123456L, 75)).thenReturn(previousResponse);
         when(greenwayService.findPartnerById(eq(currentResponse), anyLong()))
                 .thenReturn(java.util.Optional.of(currentPartner));
         when(greenwayService.findPartnerById(eq(previousResponse), anyLong()))
                 .thenReturn(java.util.Optional.of(previousPartner));
 
-        // When & Then: возвращается "M"
         given()
                 .auth().basic("admin", "admin")
                 .when()
@@ -289,8 +265,8 @@ class GreenwayResourceTest {
     }
 
     @Test
-    void testGetQualificationBest_PreviousBetter() {
-        // Given: предыдущая квалификация лучше текущей (GM > S)
+    @DisplayName("getQualificationBest returns previous period qualification when it is higher")
+    void getQualificationBest_ShouldReturnPreviousQualification_WhenPreviousIsBetter() {
         var currentPartner = createPartnerWithQualification("S1");
         var previousPartner = createPartnerWithQualification("GM4");
 
@@ -298,16 +274,13 @@ class GreenwayResourceTest {
         var previousResponse = new PartnerListResponse(null, List.of(previousPartner), null, null);
 
         when(greenwayService.getPreviousPeriod()).thenReturn(75);
-        when(greenwayService.getPartnerList(123456L, 0))
-                .thenReturn(currentResponse);
-        when(greenwayService.getPartnerList(123456L, 75))
-                .thenReturn(previousResponse);
+        when(greenwayService.getPartnerList(123456L, 0)).thenReturn(currentResponse);
+        when(greenwayService.getPartnerList(123456L, 75)).thenReturn(previousResponse);
         when(greenwayService.findPartnerById(eq(currentResponse), anyLong()))
                 .thenReturn(java.util.Optional.of(currentPartner));
         when(greenwayService.findPartnerById(eq(previousResponse), anyLong()))
                 .thenReturn(java.util.Optional.of(previousPartner));
 
-        // When & Then: возвращается "GM"
         given()
                 .auth().basic("admin", "admin")
                 .when()
@@ -318,15 +291,14 @@ class GreenwayResourceTest {
     }
 
     @Test
-    void testGetQualification_NotFound() {
-        // Given: партнер не найден
+    @DisplayName("getQualification returns NO when partner not found")
+    void getQualification_ShouldReturnNO_WhenPartnerNotFound() {
         var response = new PartnerListResponse(null, List.of(), null, null);
 
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
         when(greenwayService.findPartnerById(any(), anyLong()))
                 .thenReturn(java.util.Optional.empty());
 
-        // When & Then: возвращается 200 с NO (типизированный response)
         given()
                 .auth().basic("admin", "admin")
                 .when()
@@ -336,121 +308,47 @@ class GreenwayResourceTest {
                 .body("qualification", is("NO"));
     }
 
-    // ==================== Helper Methods ====================
-
     private Partner createPartner(int number) {
         return new Partner(
-            number,           // id
-            "Иванов",         // lastName
-            "Иван",           // firstName
-            "Иванович",       // patronymic
-            "01.01.1990",     // birthday
-            "test@example.com", // email
-            "+79001234567",   // phone
-            number,           // number
-            "ACTIVE",         // agreementState
-                "15.01.2023",          // regDate
-            "Россия",         // countryName
-            1,                // cityId
-            "Москва",         // cityName
-            null,             // vk
-            null,             // telegram
-            null,             // instagram
-            null,             // whatsapp
-            0.0,              // lo
-            0.0,              // lgo
-            0.0,              // sgo
-            "NO",             // qualification
-            1,                // level
-            false,            // hasChildren
-            "Петров Петр"     // mentorFullName
+            number, "Иванов", "Иван", "Иванович",
+            "01.01.1990", "test@example.com", "+79001234567",
+            number, "ACTIVE", "15.01.2023",
+            "Россия", 1, "Москва",
+            null, null, null, null,
+            0.0, 0.0, 0.0, "NO", 1, false, "Петров Петр"
         );
     }
 
     private Partner createPartnerWithLO(double lo) {
         return new Partner(
-                123456,
-                "Иванов",
-                "Иван",
-                "Иванович",
-                "01.01.1990",
-                "test@example.com",
-                "+79001234567",
-                123456,
-                "ACTIVE",
-                "15.01.2023",
-                "Россия",
-                1,
-                "Москва",
-                null,
-                null,
-                null,
-                null,
-                lo,              // lo
-                0.0,
-                0.0,
-                "NO",
-                1,
-                false,
-                "Петров Петр"
+                123456, "Иванов", "Иван", "Иванович",
+                "01.01.1990", "test@example.com", "+79001234567",
+                123456, "ACTIVE", "15.01.2023",
+                "Россия", 1, "Москва",
+                null, null, null, null,
+                lo, 0.0, 0.0, "NO", 1, false, "Петров Петр"
         );
     }
 
     private Partner createPartnerWithSGO() {
         return new Partner(
-                123456,
-                "Иванов",
-                "Иван",
-                "Иванович",
-                "01.01.1990",
-                "test@example.com",
-                "+79001234567",
-                123456,
-                "ACTIVE",
-                "15.01.2023",
-                "Россия",
-                1,
-                "Москва",
-                null,
-                null,
-                null,
-                null,
-                0.0,
-                0.0,
-                500.0,             // sgo
-                "NO",
-                1,
-                false,
-                "Петров Петр"
+                123456, "Иванов", "Иван", "Иванович",
+                "01.01.1990", "test@example.com", "+79001234567",
+                123456, "ACTIVE", "15.01.2023",
+                "Россия", 1, "Москва",
+                null, null, null, null,
+                0.0, 0.0, 500.0, "NO", 1, false, "Петров Петр"
         );
     }
 
     private Partner createPartnerWithQualification(String qualification) {
         return new Partner(
-                123456,
-                "Иванов",
-                "Иван",
-                "Иванович",
-                "01.01.1990",
-                "test@example.com",
-                "+79001234567",
-                123456,
-                "ACTIVE",
-                "15.01.2023",
-                "Россия",
-                1,
-                "Москва",
-                null,
-                null,
-                null,
-                null,
-                0.0,
-                0.0,
-                0.0,
-                qualification,   // qualification
-                1,
-                false,
-                "Петров Петр"
+                123456, "Иванов", "Иван", "Иванович",
+                "01.01.1990", "test@example.com", "+79001234567",
+                123456, "ACTIVE", "15.01.2023",
+                "Россия", 1, "Москва",
+                null, null, null, null,
+                0.0, 0.0, 0.0, qualification, 1, false, "Петров Петр"
         );
     }
 }

@@ -1,5 +1,6 @@
 package ru.mitrohinayulya.zabotushka.service.max;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -35,7 +36,8 @@ class MaxJoinRequestServiceTest {
     MaxJoinRequestService joinRequestService;
 
     @Test
-    void testProcessUserAddedUpdate_SavesMembershipWhenQualified() {
+    @DisplayName("processUserAddedUpdate saves membership when user is qualified")
+    void processUserAddedUpdate_ShouldSaveMembership_WhenUserIsQualified() {
         var update = new MaxUpdate("user_added", 1L, -71062621438079L,
                 new MaxUser(555L, "Max", "User", "max_user", false, null),
                 null, false);
@@ -54,7 +56,8 @@ class MaxJoinRequestServiceTest {
     }
 
     @Test
-    void testProcessUserAddedUpdate_RemovesUserWhenNotAuthorized() {
+    @DisplayName("processUserAddedUpdate removes user from chat when user is not authorized")
+    void processUserAddedUpdate_ShouldRemoveUser_WhenUserIsNotAuthorized() {
         var update = new MaxUpdate("user_added", 1L, -71062621438079L,
                 new MaxUser(555L, "Max", "User", "max_user", false, null),
                 null, false);

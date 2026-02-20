@@ -1,6 +1,7 @@
 package ru.mitrohinayulya.zabotushka.service.telegram;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -51,7 +52,8 @@ class TelegramJoinRequestServiceTest {
     }
 
     @Test
-    void testProcessChatJoinRequest_ApprovedWhenQualificationMatches() {
+    @DisplayName("processChatJoinRequest approves request when user qualification matches")
+    void processChatJoinRequest_ShouldApproveRequest_WhenQualificationMatches() {
         var authorizedUser = new AuthorizedTelegramUser();
         authorizedUser.telegramId = 12345L;
         authorizedUser.greenwayId = 999888L;
@@ -70,7 +72,8 @@ class TelegramJoinRequestServiceTest {
     }
 
     @Test
-    void testProcessChatJoinRequest_DeclinedWhenUserNotAuthorized() {
+    @DisplayName("processChatJoinRequest declines request when user is not authorized")
+    void processChatJoinRequest_ShouldDeclineRequest_WhenUserIsNotAuthorized() {
         when(authorizedUserService.findByTelegramId(12345L)).thenReturn(null);
         when(telegramAccessBotApi.declineChatJoinRequest(any()))
                 .thenReturn(new TelegramResponse<>(true, true, null));
@@ -84,7 +87,8 @@ class TelegramJoinRequestServiceTest {
     }
 
     @Test
-    void testProcessChatJoinRequest_DeclinedWhenUnknownGroup() {
+    @DisplayName("processChatJoinRequest declines request when group is unknown")
+    void processChatJoinRequest_ShouldDeclineRequest_WhenGroupIsUnknown() {
         var unknownChat = new Chat(-9999999999L, "supergroup", "Unknown Group", null, null, null);
         var unknownRequest = new ChatJoinRequest(unknownChat, chatJoinRequest.from(),
                 12345L, 1234567890L, "Test bio", null);
@@ -99,7 +103,8 @@ class TelegramJoinRequestServiceTest {
     }
 
     @Test
-    void testProcessChatJoinRequest_DeclinedWhenQualificationDoesNotMatch() {
+    @DisplayName("processChatJoinRequest declines request when qualification does not match")
+    void processChatJoinRequest_ShouldDeclineRequest_WhenQualificationDoesNotMatch() {
         var authorizedUser = new AuthorizedTelegramUser();
         authorizedUser.telegramId = 12345L;
         authorizedUser.greenwayId = 999888L;

@@ -3,6 +3,7 @@ package ru.mitrohinayulya.zabotushka.service.max;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,7 +14,7 @@ import ru.mitrohinayulya.zabotushka.dto.max.MaxDeleteSubscriptionResponse;
 
 import java.lang.reflect.Field;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -37,7 +38,8 @@ class MaxWebhookRegistrarTest {
     }
 
     @Test
-    void registerWebhook_Disabled() throws Exception {
+    @DisplayName("registerWebhook skips API call when webhook is disabled")
+    void registerWebhook_ShouldSkip_WhenWebhookIsDisabled() throws Exception {
         setField("webhookEnabled", false);
 
         webhookRegistrar.registerWebhook();
@@ -46,57 +48,65 @@ class MaxWebhookRegistrarTest {
     }
 
     @Test
-    void registerWebhook_Success() {
+    @DisplayName("registerWebhook calls setSubscription API when webhook is enabled")
+    void registerWebhook_ShouldCallApi_WhenEnabled() {
         var response = Response.ok().build();
         when(botApi.setSubscription(any())).thenReturn(response);
 
-        assertDoesNotThrow(() -> webhookRegistrar.registerWebhook());
-
+        assertThatCode(() -> webhookRegistrar.registerWebhook())
+                .as("Should not throw when webhook registration succeeds").doesNotThrowAnyException();
         verify(botApi).setSubscription(any());
     }
 
     @Test
-    void registerWebhook_Failure() {
+    @DisplayName("registerWebhook does not throw when API returns error status")
+    void registerWebhook_ShouldNotThrow_WhenApiReturnsError() {
         var response = Response.status(500).build();
         when(botApi.setSubscription(any())).thenReturn(response);
 
-        assertDoesNotThrow(() -> webhookRegistrar.registerWebhook());
+        assertThatCode(() -> webhookRegistrar.registerWebhook())
+                .as("Should not throw when API returns error status").doesNotThrowAnyException();
     }
 
     @Test
-    void unregisterWebhook_Disabled() throws Exception {
+    @DisplayName("unregisterWebhook skips API call when webhook is disabled")
+    void unregisterWebhook_ShouldSkip_WhenWebhookIsDisabled() throws Exception {
         setField("webhookEnabled", false);
 
-        assertDoesNotThrow(() -> webhookRegistrar.unregisterWebhook());
-
+        assertThatCode(() -> webhookRegistrar.unregisterWebhook())
+                .as("Should not throw when webhook is disabled").doesNotThrowAnyException();
         verify(botApi, never()).deleteSubscription(anyString());
     }
 
     @Test
-    void unregisterWebhook_HostUrlBlank() throws Exception {
+    @DisplayName("unregisterWebhook skips API call when host URL is blank")
+    void unregisterWebhook_ShouldSkip_WhenHostUrlIsBlank() throws Exception {
         setField("hostUrl", "");
 
-        assertDoesNotThrow(() -> webhookRegistrar.unregisterWebhook());
-
+        assertThatCode(() -> webhookRegistrar.unregisterWebhook())
+                .as("Should not throw when host URL is blank").doesNotThrowAnyException();
         verify(botApi, never()).deleteSubscription(anyString());
     }
 
     @Test
-    void unregisterWebhook_Success() {
+    @DisplayName("unregisterWebhook calls deleteSubscription with full URL when enabled")
+    void unregisterWebhook_ShouldCallDeleteApi_WhenEnabled() {
         when(botApi.deleteSubscription(anyString()))
                 .thenReturn(new MaxDeleteSubscriptionResponse(true, null));
 
-        assertDoesNotThrow(() -> webhookRegistrar.unregisterWebhook());
-
+        assertThatCode(() -> webhookRegistrar.unregisterWebhook())
+                .as("Should not throw when unregistration succeeds").doesNotThrowAnyException();
         verify(botApi).deleteSubscription("https://example.com/api/max/webhook");
     }
 
     @Test
-    void unregisterWebhook_Failure() {
+    @DisplayName("unregisterWebhook does not throw when API returns failure response")
+    void unregisterWebhook_ShouldNotThrow_WhenApiReturnsFalse() {
         when(botApi.deleteSubscription(anyString()))
                 .thenReturn(new MaxDeleteSubscriptionResponse(false, "Error"));
 
-        assertDoesNotThrow(() -> webhookRegistrar.unregisterWebhook());
+        assertThatCode(() -> webhookRegistrar.unregisterWebhook())
+                .as("Should not throw when API returns failure response").doesNotThrowAnyException();
     }
 
     private void setField(String fieldName, Object value) throws Exception {

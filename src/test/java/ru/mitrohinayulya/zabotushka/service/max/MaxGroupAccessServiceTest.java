@@ -1,6 +1,7 @@
 package ru.mitrohinayulya.zabotushka.service.max;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -43,7 +44,8 @@ class MaxGroupAccessServiceTest {
     MaxGroupAccessService moderationService;
 
     @Test
-    void testCheckAndRemoveIfNotQualified_RemovesOnlyMembershipWhenUserLeft() {
+    @DisplayName("checkAndRemoveIfNotQualified only removes membership when user has already left the chat")
+    void checkAndRemoveIfNotQualified_ShouldRemoveOnlyMembership_WhenUserHasLeft() {
         when(botApi.getChatMembers(anyLong(), any())).thenReturn(new MaxGetChatMemberResponse(Collections.emptyList()));
 
         moderationService.checkAndRemoveIfNotQualified(-71062621438079L, 123L, 456L);
@@ -54,7 +56,8 @@ class MaxGroupAccessServiceTest {
     }
 
     @Test
-    void testCheckAndRemoveIfNotQualified_RemovesUserWhenQualificationNotAllowed() {
+    @DisplayName("checkAndRemoveIfNotQualified removes user from chat when qualification is not allowed")
+    void checkAndRemoveIfNotQualified_ShouldRemoveUser_WhenQualificationNotAllowed() {
         when(botApi.getChatMembers(anyLong(), any())).thenReturn(new MaxGetChatMemberResponse(
                 java.util.List.of(mock(ru.mitrohinayulya.zabotushka.dto.max.MaxChatMember.class))));
         when(qualificationService.getBestQualification(456L)).thenReturn(QualificationLevel.NO);
@@ -69,7 +72,8 @@ class MaxGroupAccessServiceTest {
     }
 
     @Test
-    void testCheckAndRemoveIfNotQualified_DoesNotRemoveWhenQualificationAllowed() {
+    @DisplayName("checkAndRemoveIfNotQualified does not remove user when qualification is allowed")
+    void checkAndRemoveIfNotQualified_ShouldNotRemoveUser_WhenQualificationAllowed() {
         when(botApi.getChatMembers(anyLong(), any())).thenReturn(new MaxGetChatMemberResponse(
                 java.util.List.of(mock(ru.mitrohinayulya.zabotushka.dto.max.MaxChatMember.class))));
         when(qualificationService.getBestQualification(456L)).thenReturn(QualificationLevel.M);
@@ -81,21 +85,23 @@ class MaxGroupAccessServiceTest {
     }
 
     @Test
-    void isMemberOfChat_ReturnsTrueWhenMemberExists() {
+    @DisplayName("isMemberOfChat returns true when member list is non-empty")
+    void isMemberOfChat_ShouldReturnTrue_WhenMemberExists() {
         when(botApi.getChatMembers(anyLong(), any())).thenReturn(new MaxGetChatMemberResponse(
                 java.util.List.of(mock(ru.mitrohinayulya.zabotushka.dto.max.MaxChatMember.class))));
 
         var result = moderationService.isMemberOfChat(-71062621438079L, 123L);
 
-        assertThat(result).isTrue();
+        assertThat(result).as("Should return true when member list is non-empty").isTrue();
     }
 
     @Test
-    void isMemberOfChat_ReturnsFalseWhenEmpty() {
+    @DisplayName("isMemberOfChat returns false when member list is empty")
+    void isMemberOfChat_ShouldReturnFalse_WhenMemberListIsEmpty() {
         when(botApi.getChatMembers(anyLong(), any())).thenReturn(new MaxGetChatMemberResponse(Collections.emptyList()));
 
         var result = moderationService.isMemberOfChat(-71062621438079L, 123L);
 
-        assertThat(result).isFalse();
+        assertThat(result).as("Should return false when member list is empty").isFalse();
     }
 }

@@ -1,5 +1,6 @@
 package ru.mitrohinayulya.zabotushka.service.telegram;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -38,18 +39,43 @@ class TelegramGroupAccessServiceTest {
     TelegramGroupAccessService moderationService;
 
     @Test
-    void testIsMemberOfChat_ReturnsTrueWhenUserIsMember() {
+    @DisplayName("isMemberOfChat returns true when user has 'member' status")
+    void isMemberOfChat_ShouldReturnTrue_WhenUserIsMember() {
         var member = new ChatMember("member", new User(123L, false, "Test", null, null, null));
         when(telegramAccessBotApi.getChatMember(any()))
                 .thenReturn(new TelegramResponse<>(true, member, null));
 
         var result = moderationService.isMemberOfChat(-1001968543887L, 123L);
 
-        assertThat(result).isTrue();
+        assertThat(result).as("Should return true when user status is 'member'").isTrue();
     }
 
     @Test
-    void testCheckAndRemoveIfNotQualified_RemovesOnlyMembershipWhenUserLeft() {
+    @DisplayName("isMemberOfChat returns false when user has 'left' status")
+    void isMemberOfChat_ShouldReturnFalse_WhenUserHasLeft() {
+        var leftMember = new ChatMember("left", new User(123L, false, "Test", null, null, null));
+        when(telegramAccessBotApi.getChatMember(any()))
+                .thenReturn(new TelegramResponse<>(true, leftMember, null));
+
+        var result = moderationService.isMemberOfChat(-1001968543887L, 123L);
+
+        assertThat(result).as("Should return false when user status is 'left'").isFalse();
+    }
+
+    @Test
+    @DisplayName("isMemberOfChat returns false when API response is not OK")
+    void isMemberOfChat_ShouldReturnFalse_WhenApiResponseIsNotOk() {
+        when(telegramAccessBotApi.getChatMember(any()))
+                .thenReturn(new TelegramResponse<>(false, null, "Not Found"));
+
+        var result = moderationService.isMemberOfChat(-1001968543887L, 123L);
+
+        assertThat(result).as("Should return false when API response is not OK").isFalse();
+    }
+
+    @Test
+    @DisplayName("checkAndRemoveIfNotQualified only removes membership when user has already left")
+    void checkAndRemoveIfNotQualified_ShouldRemoveOnlyMembership_WhenUserHasLeft() {
         var leftMember = new ChatMember("left", new User(123L, false, "Test", null, null, null));
         when(telegramAccessBotApi.getChatMember(any()))
                 .thenReturn(new TelegramResponse<>(true, leftMember, null));
@@ -62,7 +88,8 @@ class TelegramGroupAccessServiceTest {
     }
 
     @Test
-    void testCheckAndRemoveIfNotQualified_RemovesUserWhenQualificationNotAllowed() {
+    @DisplayName("checkAndRemoveIfNotQualified removes user from chat when qualification is not allowed")
+    void checkAndRemoveIfNotQualified_ShouldRemoveUser_WhenQualificationNotAllowed() {
         var member = new ChatMember("member", new User(123L, false, "Test", null, null, null));
         when(telegramAccessBotApi.getChatMember(any()))
                 .thenReturn(new TelegramResponse<>(true, member, null));
@@ -78,7 +105,8 @@ class TelegramGroupAccessServiceTest {
     }
 
     @Test
-    void testCheckAndRemoveIfNotQualified_DoesNotRemoveWhenQualificationAllowed() {
+    @DisplayName("checkAndRemoveIfNotQualified does not remove user when qualification is allowed")
+    void checkAndRemoveIfNotQualified_ShouldNotRemoveUser_WhenQualificationAllowed() {
         var member = new ChatMember("member", new User(123L, false, "Test", null, null, null));
         when(telegramAccessBotApi.getChatMember(any()))
                 .thenReturn(new TelegramResponse<>(true, member, null));
@@ -88,26 +116,5 @@ class TelegramGroupAccessServiceTest {
 
         verify(telegramAccessBotApi, never()).unbanChatMember(any());
         verify(messageService, never()).sendMessage(anyLong(), anyString());
-    }
-
-    @Test
-    void testIsMemberOfChat_ReturnsFalseWhenUserLeft() {
-        var leftMember = new ChatMember("left", new User(123L, false, "Test", null, null, null));
-        when(telegramAccessBotApi.getChatMember(any()))
-                .thenReturn(new TelegramResponse<>(true, leftMember, null));
-
-        var result = moderationService.isMemberOfChat(-1001968543887L, 123L);
-
-        assertThat(result).isFalse();
-    }
-
-    @Test
-    void testIsMemberOfChat_ReturnsFalseWhenResponseNotOk() {
-        when(telegramAccessBotApi.getChatMember(any()))
-                .thenReturn(new TelegramResponse<>(false, null, "Not Found"));
-
-        var result = moderationService.isMemberOfChat(-1001968543887L, 123L);
-
-        assertThat(result).isFalse();
     }
 }
