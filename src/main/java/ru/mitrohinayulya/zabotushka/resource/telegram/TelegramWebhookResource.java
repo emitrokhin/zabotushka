@@ -36,7 +36,7 @@ public class TelegramWebhookResource {
     public Response handleWebhook(
             @HeaderParam(TELEGRAM_SECRET_HEADER) String secretToken,
             Update update) {
-        log.info("Received webhook update: updateId={}", update.updateId());
+        log.debug("Received webhook update: updateId={}", update.updateId());
 
         // Проверка секретного токена
         if (webhookSecret != null && !webhookSecret.equals(secretToken)) {
@@ -50,7 +50,7 @@ public class TelegramWebhookResource {
         }
 
         var chatJoinRequest = update.chatJoinRequest();
-        log.info("Processing chat join request: chat={}, user={}, userId={}, bio={}",
+        log.debug("Processing chat join request: chat={}, user={}, userId={}, bio={}",
                 chatJoinRequest.chat().title(),
                 chatJoinRequest.from().username(),
                 chatJoinRequest.from().id(),

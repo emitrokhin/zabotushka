@@ -31,7 +31,7 @@ public class MaxWebhookResource {
     public Response handleWebhook(
             @HeaderParam(MAX_SECRET_HEADER) String secretToken,
             MaxUpdate update) {
-        log.info("Received webhook update: timestamp={}", update.timestamp());
+        log.debug("Received webhook update: timestamp={}", update.timestamp());
 
         // Проверка секретного токена
         if (webhookSecret != null && !webhookSecret.equals(secretToken)) {
@@ -44,7 +44,7 @@ public class MaxWebhookResource {
             return Response.ok().build();
         }
 
-        log.info("Processing chat join request: chat={}, user={}, userId={}",
+        log.debug("Processing chat join request: chat={}, user={}, userId={}",
                 update.chatId(),
                 update.user().username(),
                 update.user().userId());
