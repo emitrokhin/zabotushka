@@ -44,7 +44,7 @@ public class MaxWebhookRegistrar implements MessengerWebhookRegistrar {
         }
 
         var fullWebhookUrl = hostUrl + webhookPath;
-        var request = MaxSetSubscriptionRequest.forAllUpdateTypes(fullWebhookUrl, webhookSecret);
+        var request = MaxSetSubscriptionRequest.forUserUpdates(fullWebhookUrl, webhookSecret);
 
         try (var response = botApi.setSubscription(request)) {
             log.info("Registering Max webhook: url={}", fullWebhookUrl);

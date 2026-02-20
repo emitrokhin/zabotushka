@@ -26,4 +26,11 @@ public record MaxSetSubscriptionRequest(
                         "user_removed"),
                 secretToken);
     }
+
+    public static MaxSetSubscriptionRequest forUserUpdates(String webhookUrl, String secretToken) {
+        return new MaxSetSubscriptionRequest(
+                webhookUrl,
+                List.of("user_added", "user_removed"),
+                secretToken);
+    }
 }
