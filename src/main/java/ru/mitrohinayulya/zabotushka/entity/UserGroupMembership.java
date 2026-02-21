@@ -24,10 +24,10 @@ public class UserGroupMembership extends PanacheEntityBase {
     public UUID id;
 
     @Column(name = "platform_user_id", nullable = false)
-    public Long platformUserId;
+    public long platformUserId;
 
     @Column(name = "chat_id", nullable = false)
-    public Long chatId;
+    public long chatId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "platform", nullable = false)
@@ -42,21 +42,21 @@ public class UserGroupMembership extends PanacheEntityBase {
     /**
      * Поиск всех членов конкретной группы для указанной платформы
      */
-    public static List<UserGroupMembership> findByChatIdAndPlatform(Long chatId, Platform platform) {
+    public static List<UserGroupMembership> findByChatIdAndPlatform(long chatId, Platform platform) {
         return list("chatId = ?1 and platform = ?2", chatId, platform);
     }
 
     /**
      * Проверка существования записи о членстве
      */
-    public static boolean exists(Long platformUserId, Long chatId, Platform platform) {
+    public static boolean exists(long platformUserId, long chatId, Platform platform) {
         return count(QUERY_BY_PLATFORM_USER_AND_CHAT_AND_PLATFORM, platformUserId, chatId, platform) > 0;
     }
 
     /**
      * Удаление записи о членстве
      */
-    public static boolean removeMembership(Long platformUserId, Long chatId, Platform platform) {
+    public static boolean removeMembership(long platformUserId, long chatId, Platform platform) {
         return delete(QUERY_BY_PLATFORM_USER_AND_CHAT_AND_PLATFORM, platformUserId, chatId, platform) > 0;
     }
 }

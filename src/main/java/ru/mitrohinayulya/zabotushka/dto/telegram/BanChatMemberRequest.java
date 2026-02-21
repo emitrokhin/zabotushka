@@ -6,11 +6,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * Запрос для удаления/бана участника чата
  */
 public record BanChatMemberRequest(
-        @JsonProperty("chat_id") Long chatId,
-        @JsonProperty("user_id") Long userId,
+        @JsonProperty("chat_id") long chatId,
+        @JsonProperty("user_id") long userId,
         @JsonProperty("revoke_messages") Boolean revokeMessages
 ) {
-    public static BanChatMemberRequest of(Long chatId, Long userId) {
+    public static BanChatMemberRequest of(long chatId, long userId) {
         return new BanChatMemberRequest(chatId, userId, false);
     }
 }

@@ -6,13 +6,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * Ответ на сравнение ЛО (Личный Оборот)
  */
 public record CompareLOResponse(
-        Long userId,
+        long userId,
         Double lo,
         @JsonProperty("loComparisonResult")
         ComparisonResult comparisonResult,
         Integer period
 ) {
-    public static CompareLOResponse of(Long userId, Double lo, ComparisonResult result, Integer period) {
+    public static CompareLOResponse of(long userId, Double lo, ComparisonResult result, Integer period) {
         return new CompareLOResponse(userId, lo, result, period);
     }
 

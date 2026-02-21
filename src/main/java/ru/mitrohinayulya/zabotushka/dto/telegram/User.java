@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * Telegram User object
  */
 public record User(
-        Long id,
+        long id,
         @JsonProperty("is_bot") Boolean isBot,
         @JsonProperty("first_name") String firstName,
         @JsonProperty("last_name") String lastName,

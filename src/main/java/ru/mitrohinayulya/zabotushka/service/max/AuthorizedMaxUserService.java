@@ -1,9 +1,11 @@
 package ru.mitrohinayulya.zabotushka.service.max;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import ru.mitrohinayulya.zabotushka.entity.AuthorizedMaxUser;
 import ru.mitrohinayulya.zabotushka.exception.GreenwayIdAlreadyExistsException;
+import ru.mitrohinayulya.zabotushka.mapper.AuthorizedMaxUserMapper;
 import ru.mitrohinayulya.zabotushka.service.platform.PlatformAuthorizationService;
 
 import java.time.LocalDateTime;
@@ -15,20 +17,23 @@ import java.util.List;
 @ApplicationScoped
 public class AuthorizedMaxUserService implements PlatformAuthorizationService {
 
+    @Inject
+    AuthorizedMaxUserMapper userMapper;
+
     @Override
-    public boolean existsByPlatformId(Long platformId) {
+    public boolean existsByPlatformId(long platformId) {
         return existsByMaxId(platformId);
     }
 
     @Override
-    public void saveUser(Long platformId, Long greenwayId, String regDate) {
+    public void saveUser(long platformId, long greenwayId, String regDate) {
         saveAuthorizedUser(platformId, greenwayId, regDate);
     }
 
     /**
      * Проверяет существование пользователя по maxId
      */
-    public boolean existsByMaxId(Long maxId) {
+    public boolean existsByMaxId(long maxId) {
         return AuthorizedMaxUser.existsByMaxId(maxId);
     }
 
@@ -39,16 +44,12 @@ public class AuthorizedMaxUserService implements PlatformAuthorizationService {
      * @throws GreenwayIdAlreadyExistsException если greenwayId уже используется
      */
     @Transactional
-    public AuthorizedMaxUser saveAuthorizedUser(Long maxId, Long greenwayId, String regDate) {
+    public AuthorizedMaxUser saveAuthorizedUser(long maxId, long greenwayId, String regDate) {
         if (existsByGreenwayId(greenwayId)) {
             throw new GreenwayIdAlreadyExistsException(greenwayId);
         }
 
-        var user = new AuthorizedMaxUser();
-        user.maxId = maxId;
-        user.greenwayId = greenwayId;
-        user.regDate = regDate;
-        user.creationDate = LocalDateTime.now();
+        var user = userMapper.toEntity(maxId, greenwayId, regDate, LocalDateTime.now());
         user.persist();
         return user;
     }
@@ -57,18 +58,18 @@ public class AuthorizedMaxUserService implements PlatformAuthorizationService {
      * Проверяет совпадение данных пользователя с сохраненными в БД
      * @return true если greenwayId и regDate совпадают
      */
-    public boolean matchesStoredData(Long maxId, Long greenwayId, String regDate) {
+    public boolean matchesStoredData(long maxId, long greenwayId, String regDate) {
         var user = findByMaxId(maxId);
         if (user == null) {
             return false;
         }
-        return user.greenwayId.equals(greenwayId) && user.regDate.equals(regDate);
+        return user.greenwayId == greenwayId && user.regDate.equals(regDate);
     }
 
     /**
      * Поиск пользователя по maxId
      */
-    public AuthorizedMaxUser findByMaxId(Long maxId) {
+    public AuthorizedMaxUser findByMaxId(long maxId) {
         return AuthorizedMaxUser.findByMaxId(maxId);
     }
 
@@ -82,7 +83,7 @@ public class AuthorizedMaxUserService implements PlatformAuthorizationService {
     /**
      * Проверка существования пользователя по greenwayId в таблице Max
      */
-    public boolean existsByGreenwayId(Long greenwayId) {
+    public boolean existsByGreenwayId(long greenwayId) {
         return AuthorizedMaxUser.existsByGreenwayId(greenwayId);
     }
 }

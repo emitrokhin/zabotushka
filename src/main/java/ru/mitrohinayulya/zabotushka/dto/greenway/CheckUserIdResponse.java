@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public record CheckUserIdResponse(
         Long userId
 ) {
-    public static CheckUserIdResponse of(Long userId) {
+    public static CheckUserIdResponse of(long userId) {
         return new CheckUserIdResponse(userId);
     }
 

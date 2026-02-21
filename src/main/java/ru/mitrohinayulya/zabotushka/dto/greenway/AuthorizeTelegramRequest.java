@@ -12,13 +12,11 @@ import jakarta.validation.constraints.Pattern;
  * @param regDate    Дата регистрации партнера в формате DD.MM.YYYY
  */
 public record AuthorizeTelegramRequest(
-    @NotNull(message = "telegramId is required")
     @JsonProperty("telegramId")
-    Long telegramId,
+    long telegramId,
 
-    @NotNull(message = "greenwayId is required")
     @JsonProperty("greenwayId")
-    Long greenwayId,
+    long greenwayId,
 
     @NotNull(message = "regDate is required")
     @Pattern(

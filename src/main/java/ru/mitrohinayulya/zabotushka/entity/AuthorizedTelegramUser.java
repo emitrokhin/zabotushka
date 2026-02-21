@@ -22,10 +22,10 @@ public class AuthorizedTelegramUser extends PanacheEntityBase {
     public UUID id;
 
     @Column(name = "telegram_id", nullable = false, unique = true)
-    public Long telegramId;
+    public long telegramId;
 
     @Column(name = "greenway_id", nullable = false)
-    public Long greenwayId;
+    public long greenwayId;
 
     @Column(name = "reg_date", nullable = false)
     public String regDate;
@@ -36,21 +36,21 @@ public class AuthorizedTelegramUser extends PanacheEntityBase {
     /**
      * Поиск пользователя по telegramId
      */
-    public static AuthorizedTelegramUser findByTelegramId(Long telegramId) {
+    public static AuthorizedTelegramUser findByTelegramId(long telegramId) {
         return find("telegramId", telegramId).firstResult();
     }
 
     /**
      * Проверка существования пользователя по telegramId
      */
-    public static boolean existsByTelegramId(Long telegramId) {
+    public static boolean existsByTelegramId(long telegramId) {
         return count("telegramId", telegramId) > 0;
     }
 
     /**
      * Проверка существования пользователя по greenwayId
      */
-    public static boolean existsByGreenwayId(Long greenwayId) {
+    public static boolean existsByGreenwayId(long greenwayId) {
         return count("greenwayId", greenwayId) > 0;
     }
 }

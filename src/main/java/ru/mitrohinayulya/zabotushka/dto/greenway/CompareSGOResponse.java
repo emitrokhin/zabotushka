@@ -6,13 +6,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * Ответ на сравнение СГО (Структурный Групповой Оборот)
  */
 public record CompareSGOResponse(
-        Long userId,
+        long userId,
         Double sgo,
         @JsonProperty("sgoComparisonResult")
         ComparisonResult comparisonResult,
         Integer period
 ) {
-    public static CompareSGOResponse of(Long userId, Double sgo, ComparisonResult result, Integer period) {
+    public static CompareSGOResponse of(long userId, Double sgo, ComparisonResult result, Integer period) {
         return new CompareSGOResponse(userId, sgo, result, period);
     }
 

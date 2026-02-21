@@ -33,13 +33,13 @@ public class TelegramGroupAccessService extends AbstractGroupAccessService {
     }
 
     @Override
-    protected Optional<ChatGroupRequirements> findRequirements(Long chatId) {
+    protected Optional<ChatGroupRequirements> findRequirements(long chatId) {
         return TelegramChatGroupRequirements.findByChatId(chatId)
                 .map(TelegramChatGroupRequirements::getRequirements);
     }
 
     @Override
-    public boolean isMemberOfChat(Long chatId, Long userId) {
+    public boolean isMemberOfChat(long chatId, long userId) {
         try {
             var request = GetChatMemberRequest.of(chatId, userId);
             var response = telegramAccessBotApi.getChatMember(request);
@@ -55,7 +55,7 @@ public class TelegramGroupAccessService extends AbstractGroupAccessService {
     }
 
     @Override
-    public void removeMemberFromChat(Long chatId, Long userId) {
+    public void removeMemberFromChat(long chatId, long userId) {
         try {
             var unbanRequest = UnbanChatMemberRequest.of(chatId, userId);
             var unbanResponse = telegramAccessBotApi.unbanChatMember(unbanRequest);

@@ -21,15 +21,15 @@ public class TelegramService {
         joinRequestService.processChatJoinRequest(chatJoinRequest);
     }
 
-    public boolean isMemberOfChat(Long chatId, Long userId) {
+    public boolean isMemberOfChat(long chatId, long userId) {
         return moderationService.isMemberOfChat(chatId, userId);
     }
 
-    public void removeMemberFromChat(Long chatId, Long userId) {
+    public void removeMemberFromChat(long chatId, long userId) {
         moderationService.removeMemberFromChat(chatId, userId);
     }
 
-    public void checkAndRemoveIfNotQualified(Long chatId, Long userId, Long greenwayId) {
+    public void checkAndRemoveIfNotQualified(long chatId, long userId, long greenwayId) {
         moderationService.checkAndRemoveIfNotQualified(chatId, userId, greenwayId);
     }
 }

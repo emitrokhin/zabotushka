@@ -9,8 +9,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public record ChatJoinRequest(
         Chat chat,
         User from,
-        @JsonProperty("user_chat_id") Long userChatId,
-        Long date,
+        @JsonProperty("user_chat_id") long userChatId,
+        long date,
         String bio,
         @JsonProperty("invite_link") InviteLink inviteLink
 ) {

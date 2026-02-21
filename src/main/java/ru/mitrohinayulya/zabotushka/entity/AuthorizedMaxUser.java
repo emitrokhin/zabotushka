@@ -22,10 +22,10 @@ public class AuthorizedMaxUser extends PanacheEntityBase {
     public UUID id;
 
     @Column(name = "max_id", nullable = false, unique = true)
-    public Long maxId;
+    public long maxId;
 
     @Column(name = "greenway_id", nullable = false)
-    public Long greenwayId;
+    public long greenwayId;
 
     @Column(name = "reg_date", nullable = false)
     public String regDate;
@@ -36,21 +36,21 @@ public class AuthorizedMaxUser extends PanacheEntityBase {
     /**
      * Поиск пользователя по maxId
      */
-    public static AuthorizedMaxUser findByMaxId(Long maxId) {
+    public static AuthorizedMaxUser findByMaxId(long maxId) {
         return find("maxId", maxId).firstResult();
     }
 
     /**
      * Проверка существования пользователя по maxId
      */
-    public static boolean existsByMaxId(Long maxId) {
+    public static boolean existsByMaxId(long maxId) {
         return count("maxId", maxId) > 0;
     }
 
     /**
      * Проверка существования пользователя по greenwayId
      */
-    public static boolean existsByGreenwayId(Long greenwayId) {
+    public static boolean existsByGreenwayId(long greenwayId) {
         return count("greenwayId", greenwayId) > 0;
     }
 }

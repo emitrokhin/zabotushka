@@ -39,27 +39,27 @@ public class TelegramQualificationProcessor extends AbstractPlatformQualificatio
     }
 
     @Override
-    protected AuthorizedTelegramUser findAuthorizedUser(Long platformUserId) {
+    protected AuthorizedTelegramUser findAuthorizedUser(long platformUserId) {
         return authorizedTelegramUserService.findByTelegramId(platformUserId);
     }
 
     @Override
-    protected Long getPlatformUserId(AuthorizedTelegramUser user) {
+    protected long getPlatformUserId(AuthorizedTelegramUser user) {
         return user.telegramId;
     }
 
     @Override
-    protected Long getGreenwayId(AuthorizedTelegramUser user) {
+    protected long getGreenwayId(AuthorizedTelegramUser user) {
         return user.greenwayId;
     }
 
     @Override
-    protected void checkAndRemoveIfNotQualified(Long chatId, Long userId, Long greenwayId) {
+    protected void checkAndRemoveIfNotQualified(long chatId, long userId, long greenwayId) {
         telegramService.checkAndRemoveIfNotQualified(chatId, userId, greenwayId);
     }
 
     @Override
-    protected void removeMemberFromChat(Long chatId, Long userId) {
+    protected void removeMemberFromChat(long chatId, long userId) {
         telegramService.removeMemberFromChat(chatId, userId);
     }
 }

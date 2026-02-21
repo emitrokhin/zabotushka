@@ -227,7 +227,7 @@ public class GreenwayService {
      */
     public java.util.Optional<ru.mitrohinayulya.zabotushka.dto.greenway.Partner> findPartnerById(
             ru.mitrohinayulya.zabotushka.dto.greenway.PartnerListResponse response,
-            Long partnerId) {
+            long partnerId) {
 
         if (response == null || response.partners() == null || response.partners().isEmpty()) {
             return java.util.Optional.empty();
@@ -235,7 +235,7 @@ public class GreenwayService {
 
         return response.partners().stream()
                 .filter(partner -> partner.number() != null)
-                .filter(partner -> partner.number().equals(partnerId.intValue()))
+                .filter(partner -> partner.number().longValue() == partnerId)
                 .findFirst();
     }
 }

@@ -1,11 +1,13 @@
 package ru.mitrohinayulya.zabotushka.service.platform;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mitrohinayulya.zabotushka.entity.Platform;
 import ru.mitrohinayulya.zabotushka.entity.UserGroupMembership;
+import ru.mitrohinayulya.zabotushka.mapper.UserGroupMembershipMapper;
 
 import java.time.LocalDateTime;
 
@@ -17,15 +19,14 @@ public class PlatformGroupMembershipService {
 
     private static final Logger log = LoggerFactory.getLogger(PlatformGroupMembershipService.class);
 
+    @Inject
+    UserGroupMembershipMapper membershipMapper;
+
     @Transactional
-    public void saveMembership(Long chatId, Long userId, Platform platform) {
+    public void saveMembership(long chatId, long userId, Platform platform) {
         try {
             if (!UserGroupMembership.exists(userId, chatId, platform)) {
-                var membership = new UserGroupMembership();
-                membership.platformUserId = userId;
-                membership.chatId = chatId;
-                membership.platform = platform;
-                membership.joinedAt = LocalDateTime.now();
+                var membership = membershipMapper.toEntity(userId, chatId, platform, LocalDateTime.now());
                 membership.persist();
 
                 log.info("{} membership saved: chatId={}, userId={}", platform, chatId, userId);
@@ -38,7 +39,7 @@ public class PlatformGroupMembershipService {
     }
 
     @Transactional
-    public boolean removeMembership(Long chatId, Long userId, Platform platform) {
+    public boolean removeMembership(long chatId, long userId, Platform platform) {
         try {
             boolean removed = UserGroupMembership.removeMembership(userId, chatId, platform);
             if (removed) {

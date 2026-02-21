@@ -30,15 +30,15 @@ public interface MaxBotApi {
     /// Отправляет сообщение пользователю
     @POST
     @Path("/messages")
-    Response sendMessage(@QueryParam("user_id") Long userId, MaxSendMessageRequest request);
+    Response sendMessage(@QueryParam("user_id") long userId, MaxSendMessageRequest request);
 
     /// Возвращает список участников чата
     @GET
     @Path("/chats/{chatId}/members")
-    MaxGetChatMemberResponse getChatMembers(@PathParam("chatId") Long chatId, MaxGetChatMemberRequest request);
+    MaxGetChatMemberResponse getChatMembers(@PathParam("chatId") long chatId, MaxGetChatMemberRequest request);
 
     ///Удаляет участника из группового чата.
     @DELETE
     @Path("/chats/{chatId}/members")
-    MaxDeleteChatMemberResponse deleteChatMember(@PathParam("chatId") Long chatId, @QueryParam("user_id") Long userId);
+    MaxDeleteChatMemberResponse deleteChatMember(@PathParam("chatId") long chatId, @QueryParam("user_id") long userId);
 }

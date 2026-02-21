@@ -39,8 +39,8 @@ class MaxJoinRequestServiceTest {
     @DisplayName("processUserAddedUpdate saves membership when user is qualified")
     void processUserAddedUpdate_ShouldSaveMembership_WhenUserIsQualified() {
         var update = new MaxUpdate("user_added", 1L, -71062621438079L,
-                new MaxUser(555L, "Max", "User", "max_user", false, null),
-                null, false);
+                new MaxUser(555L, "Max", "User", "max_user", false, 0L),
+                0L, false);
 
         var authorizedUser = new AuthorizedMaxUser();
         authorizedUser.maxId = 555L;
@@ -59,8 +59,8 @@ class MaxJoinRequestServiceTest {
     @DisplayName("processUserAddedUpdate removes user from chat when user is not authorized")
     void processUserAddedUpdate_ShouldRemoveUser_WhenUserIsNotAuthorized() {
         var update = new MaxUpdate("user_added", 1L, -71062621438079L,
-                new MaxUser(555L, "Max", "User", "max_user", false, null),
-                null, false);
+                new MaxUser(555L, "Max", "User", "max_user", false, 0L),
+                0L, false);
 
         when(authorizedUserService.findByMaxId(555L)).thenReturn(null);
 

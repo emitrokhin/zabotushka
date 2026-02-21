@@ -39,7 +39,7 @@ public class GreenwayAuthorizationService {
      * @param platformName название платформы для логирования
      * @return HTTP ответ
      */
-    public Response authorize(PlatformAuthorizationService ops, Long platformId, Long greenwayId, String regDate, String platformName) {
+    public Response authorize(PlatformAuthorizationService ops, long platformId, long greenwayId, String regDate, String platformName) {
         log.info("Authorizing partner with {}Id={}, greenwayId={}, regDate={}",
                 platformName, platformId, greenwayId, regDate);
 
@@ -95,7 +95,7 @@ public class GreenwayAuthorizationService {
     }
 
     private Response authorizePartner(Partner partner, PlatformAuthorizationService ops,
-                                      Long platformId, Long greenwayId, String regDate, String platformName) {
+                                      long platformId, long greenwayId, String regDate, String platformName) {
         boolean isAuthorized = compareDates(partner.regDate(), regDate);
 
         if (isAuthorized) {
@@ -130,8 +130,8 @@ public class GreenwayAuthorizationService {
         }
     }
 
-    private Optional<Partner> findPartnerById(List<Partner> partners, Long greenwayId) {
-        if (partners == null || partners.isEmpty() || greenwayId == null) {
+    private Optional<Partner> findPartnerById(List<Partner> partners, long greenwayId) {
+        if (partners == null || partners.isEmpty()) {
             return Optional.empty();
         }
 

@@ -25,12 +25,12 @@ public class MaxJoinRequestService extends AbstractJoinRequestService<MaxUpdate,
     }
 
     @Override
-    protected Long extractChatId(MaxUpdate event) {
+    protected long extractChatId(MaxUpdate event) {
         return event.chatId();
     }
 
     @Override
-    protected Long extractUserId(MaxUpdate event) {
+    protected long extractUserId(MaxUpdate event) {
         return event.user().userId();
     }
 
@@ -40,18 +40,18 @@ public class MaxJoinRequestService extends AbstractJoinRequestService<MaxUpdate,
     }
 
     @Override
-    protected Optional<ChatGroupRequirements> findRequirements(Long chatId) {
+    protected Optional<ChatGroupRequirements> findRequirements(long chatId) {
         return MaxChatGroupRequirements.findByChatId(chatId)
                 .map(MaxChatGroupRequirements::getRequirements);
     }
 
     @Override
-    protected AuthorizedMaxUser findAuthorizedUser(Long platformUserId) {
+    protected AuthorizedMaxUser findAuthorizedUser(long platformUserId) {
         return authorizedUserService.findByMaxId(platformUserId);
     }
 
     @Override
-    protected Long getGreenwayId(AuthorizedMaxUser user) {
+    protected long getGreenwayId(AuthorizedMaxUser user) {
         return user.greenwayId;
     }
 

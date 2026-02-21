@@ -21,17 +21,17 @@ public abstract class AbstractJoinRequestService<E, U> {
     @Inject
     protected PlatformGroupMembershipService membershipService;
 
-    protected abstract Long extractChatId(E event);
+    protected abstract long extractChatId(E event);
 
-    protected abstract Long extractUserId(E event);
+    protected abstract long extractUserId(E event);
 
     protected abstract String extractUsername(E event);
 
-    protected abstract Optional<ChatGroupRequirements> findRequirements(Long chatId);
+    protected abstract Optional<ChatGroupRequirements> findRequirements(long chatId);
 
-    protected abstract U findAuthorizedUser(Long platformUserId);
+    protected abstract U findAuthorizedUser(long platformUserId);
 
-    protected abstract Long getGreenwayId(U user);
+    protected abstract long getGreenwayId(U user);
 
     protected abstract void onApproved(E event, U user, ChatGroupRequirements req);
 

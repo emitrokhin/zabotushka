@@ -35,7 +35,7 @@ public class GreenwayResource {
      */
     @GET
     @Path("/check-user/{userId}")
-    public Response checkUserId(@PathParam("userId") Long userId) {
+    public Response checkUserId(@PathParam("userId") long userId) {
         log.info("Checking user existence: userId={}", userId);
 
         try {
@@ -76,7 +76,7 @@ public class GreenwayResource {
      */
     @GET
     @Path("/compare-lo/{userId}/{lo}")
-    public CompareLOResponse compareLO(@PathParam("userId") Long userId, @PathParam("lo") Double lo) {
+    public CompareLOResponse compareLO(@PathParam("userId") long userId, @PathParam("lo") Double lo) {
         log.info("Comparing LO: userId={}, lo={}", userId, lo);
         return compareValue(userId, lo, 0, true);
     }
@@ -90,7 +90,7 @@ public class GreenwayResource {
      */
     @GET
     @Path("/compare-lo/period/{userId}/{lo}")
-    public CompareLOResponse compareLOPeriod(@PathParam("userId") Long userId, @PathParam("lo") Double lo) {
+    public CompareLOResponse compareLOPeriod(@PathParam("userId") long userId, @PathParam("lo") Double lo) {
         var period = greenwayService.getPreviousPeriod();
         log.info("Comparing LO in previous period: userId={}, lo={}, period={}", userId, lo, period);
         return compareValue(userId, lo, period, true);
@@ -105,7 +105,7 @@ public class GreenwayResource {
      */
     @GET
     @Path("/compare-sgo/{userId}/{sgo}")
-    public CompareSGOResponse compareSGO(@PathParam("userId") Long userId, @PathParam("sgo") Double sgo) {
+    public CompareSGOResponse compareSGO(@PathParam("userId") long userId, @PathParam("sgo") Double sgo) {
         log.info("Comparing SGO: userId={}, sgo={}", userId, sgo);
         return compareValue(userId, sgo, 0, false);
     }
@@ -119,7 +119,7 @@ public class GreenwayResource {
      */
     @GET
     @Path("/compare-sgo/period/{userId}/{sgo}")
-    public CompareSGOResponse compareSGOPeriod(@PathParam("userId") Long userId, @PathParam("sgo") Double sgo) {
+    public CompareSGOResponse compareSGOPeriod(@PathParam("userId") long userId, @PathParam("sgo") Double sgo) {
         var period = greenwayService.getPreviousPeriod();
         log.info("Comparing SGO in previous period: userId={}, sgo={}, period={}", userId, sgo, period);
         return compareValue(userId, sgo, period, false);
@@ -130,7 +130,7 @@ public class GreenwayResource {
      * Использует pattern matching и sealed interfaces (Java 25)
      */
     @SuppressWarnings("unchecked")
-    private <T> T compareValue(Long userId, Double value, int period, boolean isLO) {
+    private <T> T compareValue(long userId, Double value, int period, boolean isLO) {
         try {
             var partnerListResponse = greenwayService.getPartnerList(userId, period);
             var partnerOpt = greenwayService.findPartnerById(partnerListResponse, userId);
@@ -171,7 +171,7 @@ public class GreenwayResource {
      */
     @GET
     @Path("/qualification/{userId}")
-    public QualificationResponse getQualification(@PathParam("userId") Long userId) {
+    public QualificationResponse getQualification(@PathParam("userId") long userId) {
         log.info("Getting qualification: userId={}", userId);
         return getQualificationInternal(userId, 0, false);
     }
@@ -184,7 +184,7 @@ public class GreenwayResource {
      */
     @GET
     @Path("/qualification/period/{userId}")
-    public QualificationResponse getQualificationPeriod(@PathParam("userId") Long userId) {
+    public QualificationResponse getQualificationPeriod(@PathParam("userId") long userId) {
         var period = greenwayService.getPreviousPeriod();
         log.info("Getting qualification in previous period: userId={}, period={}", userId, period);
         return getQualificationInternal(userId, period, false);
@@ -198,7 +198,7 @@ public class GreenwayResource {
      */
     @GET
     @Path("/qualification/exact/{userId}")
-    public QualificationResponse getQualificationExact(@PathParam("userId") Long userId) {
+    public QualificationResponse getQualificationExact(@PathParam("userId") long userId) {
         log.info("Getting exact qualification: userId={}", userId);
         return getQualificationInternal(userId, 0, true);
     }
@@ -211,7 +211,7 @@ public class GreenwayResource {
      */
     @GET
     @Path("/qualification/exact/period/{userId}")
-    public QualificationResponse getQualificationExactPeriod(@PathParam("userId") Long userId) {
+    public QualificationResponse getQualificationExactPeriod(@PathParam("userId") long userId) {
         var period = greenwayService.getPreviousPeriod();
         log.info("Getting exact qualification in previous period: userId={}, period={}", userId, period);
         return getQualificationInternal(userId, period, true);
@@ -226,7 +226,7 @@ public class GreenwayResource {
      */
     @GET
     @Path("/qualification/best/{userId}")
-    public QualificationResponse getQualificationBest(@PathParam("userId") Long userId) {
+    public QualificationResponse getQualificationBest(@PathParam("userId") long userId) {
         log.info("Getting best qualification: userId={}", userId);
 
         try {
@@ -262,7 +262,7 @@ public class GreenwayResource {
      * Внутренний метод для получения квалификации
      * Использует switch expression (Java 25) и pattern matching
      */
-    private QualificationResponse getQualificationInternal(Long userId, int period, boolean exact) {
+    private QualificationResponse getQualificationInternal(long userId, int period, boolean exact) {
         try {
             var partnerListResponse = greenwayService.getPartnerList(userId, period);
 

@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mockStatic;
@@ -95,7 +95,7 @@ class TelegramQualificationProcessorTest {
 
         verify(telegramService, times(1)).removeMemberFromChat(chatId, 12345L);
         verify(membership).delete();
-        verify(telegramService, never()).checkAndRemoveIfNotQualified(any(), any(), any());
+        verify(telegramService, never()).checkAndRemoveIfNotQualified(anyLong(), anyLong(), anyLong());
         assertThat(result).as("stats should match").isEqualTo(new QualificationProcessStats(1, 1, 1, 0));
     }
 
@@ -155,7 +155,7 @@ class TelegramQualificationProcessorTest {
         }
     }
 
-    private AuthorizedTelegramUser telegramUser(Long telegramId, Long greenwayId) {
+    private AuthorizedTelegramUser telegramUser(long telegramId, long greenwayId) {
         var user = new AuthorizedTelegramUser();
         user.id = UUID.randomUUID();
         user.telegramId = telegramId;
@@ -165,7 +165,7 @@ class TelegramQualificationProcessorTest {
         return user;
     }
 
-    private UserGroupMembership membership(Long platformUserId, Long chatId) {
+    private UserGroupMembership membership(long platformUserId, long chatId) {
         var membership = new UserGroupMembership();
         membership.id = UUID.randomUUID();
         membership.platformUserId = platformUserId;

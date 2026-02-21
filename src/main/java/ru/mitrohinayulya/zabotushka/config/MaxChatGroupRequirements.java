@@ -10,15 +10,15 @@ import java.util.Optional;
 public enum MaxChatGroupRequirements {
     GOLD_CLUB(-71062621438079L, ChatGroupRequirements.GOLD_CLUB);
 
-    private final Long chatId;
+    private final long chatId;
     private final ChatGroupRequirements requirements;
 
-    MaxChatGroupRequirements(Long chatId, ChatGroupRequirements requirements) {
+    MaxChatGroupRequirements(long chatId, ChatGroupRequirements requirements) {
         this.chatId = chatId;
         this.requirements = requirements;
     }
 
-    public Long getChatId() {
+    public long getChatId() {
         return chatId;
     }
 
@@ -38,13 +38,13 @@ public enum MaxChatGroupRequirements {
         return requirements;
     }
 
-    public static Optional<MaxChatGroupRequirements> findByChatId(Long chatId) {
+    public static Optional<MaxChatGroupRequirements> findByChatId(long chatId) {
         return Arrays.stream(values())
-                .filter(group -> group.getChatId().equals(chatId))
+                .filter(group -> group.getChatId() == chatId)
                 .findFirst();
     }
 
-    public static String resolveGroupName(Long chatId) {
+    public static String resolveGroupName(long chatId) {
         return findByChatId(chatId)
                 .map(MaxChatGroupRequirements::getGroupName)
                 .orElse("клуб");

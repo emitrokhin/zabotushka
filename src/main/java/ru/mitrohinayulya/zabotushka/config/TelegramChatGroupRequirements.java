@@ -16,15 +16,15 @@ public enum TelegramChatGroupRequirements {
     CAN_AFFORD(-1001811106801L, ChatGroupRequirements.CAN_AFFORD),
     CAN_AFFORD_CHAT(-1001929076200L, ChatGroupRequirements.CAN_AFFORD_CHAT);
 
-    private final Long chatId;
+    private final long chatId;
     private final ChatGroupRequirements requirements;
 
-    TelegramChatGroupRequirements(Long chatId, ChatGroupRequirements requirements) {
+    TelegramChatGroupRequirements(long chatId, ChatGroupRequirements requirements) {
         this.chatId = chatId;
         this.requirements = requirements;
     }
 
-    public Long getChatId() {
+    public long getChatId() {
         return chatId;
     }
 
@@ -44,13 +44,13 @@ public enum TelegramChatGroupRequirements {
         return requirements;
     }
 
-    public static Optional<TelegramChatGroupRequirements> findByChatId(Long chatId) {
+    public static Optional<TelegramChatGroupRequirements> findByChatId(long chatId) {
         return Arrays.stream(values())
-                .filter(group -> group.getChatId().equals(chatId))
+                .filter(group -> group.getChatId() == chatId)
                 .findFirst();
     }
 
-    public static String resolveGroupName(Long chatId) {
+    public static String resolveGroupName(long chatId) {
         return findByChatId(chatId)
                 .map(TelegramChatGroupRequirements::getGroupName)
                 .orElse("клуб");

@@ -19,7 +19,7 @@ public class TelegramMessageService implements PlatformMessageService {
     TelegramMessageBotApi telegramMessageBotApi;
 
     @Override
-    public void sendMessage(Long chatId, String text) {
+    public void sendMessage(long chatId, String text) {
         try {
             var request = SendMessageRequest.of(chatId, text);
             var response = telegramMessageBotApi.sendMessage(request);

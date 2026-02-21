@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * Telegram Chat object
  */
 public record Chat(
-        Long id,
+        long id,
         String type,
         String title,
         String username,

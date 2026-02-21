@@ -23,10 +23,10 @@ public abstract class AbstractGroupAccessService implements PlatformGroupAccessS
 
     protected abstract Platform getPlatform();
 
-    protected abstract Optional<ChatGroupRequirements> findRequirements(Long chatId);
+    protected abstract Optional<ChatGroupRequirements> findRequirements(long chatId);
 
     @Override
-    public final void checkAndRemoveIfNotQualified(Long chatId, Long userId, Long greenwayId) {
+    public final void checkAndRemoveIfNotQualified(long chatId, long userId, long greenwayId) {
         log.info("Checking qualification: platform={}, chatId={}, userId={}, greenwayId={}",
                 getPlatform(), chatId, userId, greenwayId);
 

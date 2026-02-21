@@ -39,27 +39,27 @@ public class MaxQualificationProcessor extends AbstractPlatformQualificationProc
     }
 
     @Override
-    protected AuthorizedMaxUser findAuthorizedUser(Long platformUserId) {
+    protected AuthorizedMaxUser findAuthorizedUser(long platformUserId) {
         return authorizedMaxUserService.findByMaxId(platformUserId);
     }
 
     @Override
-    protected Long getPlatformUserId(AuthorizedMaxUser user) {
+    protected long getPlatformUserId(AuthorizedMaxUser user) {
         return user.maxId;
     }
 
     @Override
-    protected Long getGreenwayId(AuthorizedMaxUser user) {
+    protected long getGreenwayId(AuthorizedMaxUser user) {
         return user.greenwayId;
     }
 
     @Override
-    protected void checkAndRemoveIfNotQualified(Long chatId, Long userId, Long greenwayId) {
+    protected void checkAndRemoveIfNotQualified(long chatId, long userId, long greenwayId) {
         maxService.checkAndRemoveIfNotQualified(chatId, userId, greenwayId);
     }
 
     @Override
-    protected void removeMemberFromChat(Long chatId, Long userId) {
+    protected void removeMemberFromChat(long chatId, long userId) {
         maxService.removeMemberFromChat(chatId, userId);
     }
 }

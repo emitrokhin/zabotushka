@@ -6,7 +6,7 @@ package ru.mitrohinayulya.zabotushka.exception;
  */
 public class GreenwayIdAlreadyExistsException extends RuntimeException {
 
-    public GreenwayIdAlreadyExistsException(Long greenwayId) {
+    public GreenwayIdAlreadyExistsException(long greenwayId) {
         super("Greenway ID " + greenwayId + " is already associated with another account");
     }
 }

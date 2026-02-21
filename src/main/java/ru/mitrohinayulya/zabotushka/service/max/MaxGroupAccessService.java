@@ -33,13 +33,13 @@ public class MaxGroupAccessService extends AbstractGroupAccessService {
     }
 
     @Override
-    protected Optional<ChatGroupRequirements> findRequirements(Long chatId) {
+    protected Optional<ChatGroupRequirements> findRequirements(long chatId) {
         return MaxChatGroupRequirements.findByChatId(chatId)
                 .map(MaxChatGroupRequirements::getRequirements);
     }
 
     @Override
-    public boolean isMemberOfChat(Long chatId, Long userId) {
+    public boolean isMemberOfChat(long chatId, long userId) {
         try {
             var request = MaxGetChatMemberRequest.ofMemberList(List.of(userId));
             var response = botApi.getChatMembers(chatId, request);
@@ -51,7 +51,7 @@ public class MaxGroupAccessService extends AbstractGroupAccessService {
     }
 
     @Override
-    public void removeMemberFromChat(Long chatId, Long userId) {
+    public void removeMemberFromChat(long chatId, long userId) {
         try {
             var response = botApi.deleteChatMember(chatId, userId);
 

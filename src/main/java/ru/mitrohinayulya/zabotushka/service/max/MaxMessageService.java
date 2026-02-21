@@ -19,7 +19,7 @@ public class MaxMessageService implements PlatformMessageService {
     MaxBotApi botApi;
 
     @Override
-    public void sendMessage(Long userId, String text) {
+    public void sendMessage(long userId, String text) {
         var request = MaxSendMessageRequest.withText(text);
         try (var response = botApi.sendMessage(userId, request)) {
             if (response.getStatus() == 200) {

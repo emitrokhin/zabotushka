@@ -14,15 +14,15 @@ public abstract class AbstractPlatformQualificationProcessor<U> implements Platf
 
     protected abstract List<Long> chatIds();
 
-    protected abstract U findAuthorizedUser(Long platformUserId);
+    protected abstract U findAuthorizedUser(long platformUserId);
 
-    protected abstract Long getPlatformUserId(U user);
+    protected abstract long getPlatformUserId(U user);
 
-    protected abstract Long getGreenwayId(U user);
+    protected abstract long getGreenwayId(U user);
 
-    protected abstract void checkAndRemoveIfNotQualified(Long chatId, Long userId, Long greenwayId);
+    protected abstract void checkAndRemoveIfNotQualified(long chatId, long userId, long greenwayId);
 
-    protected abstract void removeMemberFromChat(Long chatId, Long userId);
+    protected abstract void removeMemberFromChat(long chatId, long userId);
 
     @Override
     public QualificationProcessStats processQualifications() {
@@ -72,8 +72,8 @@ public abstract class AbstractPlatformQualificationProcessor<U> implements Platf
     }
 
     private void handleOrphanedMembership(UserGroupMembership membership,
-                                          Long chatId,
-                                          Long platformUserId) {
+                                          long chatId,
+                                          long platformUserId) {
         try {
             removeMemberFromChat(chatId, platformUserId);
         } catch (Exception e) {

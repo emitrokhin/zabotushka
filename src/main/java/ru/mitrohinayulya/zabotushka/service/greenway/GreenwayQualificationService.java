@@ -18,7 +18,7 @@ public class GreenwayQualificationService {
     @Inject
     GreenwayService greenwayService;
 
-    public QualificationLevel getBestQualification(Long greenwayId) {
+    public QualificationLevel getBestQualification(long greenwayId) {
         try {
             var previousPeriod = greenwayService.getPreviousPeriod();
 

@@ -37,12 +37,12 @@ public class TelegramJoinRequestService extends AbstractJoinRequestService<ChatJ
     }
 
     @Override
-    protected Long extractChatId(ChatJoinRequest event) {
+    protected long extractChatId(ChatJoinRequest event) {
         return event.chat().id();
     }
 
     @Override
-    protected Long extractUserId(ChatJoinRequest event) {
+    protected long extractUserId(ChatJoinRequest event) {
         return event.from().id();
     }
 
@@ -52,18 +52,18 @@ public class TelegramJoinRequestService extends AbstractJoinRequestService<ChatJ
     }
 
     @Override
-    protected Optional<ChatGroupRequirements> findRequirements(Long chatId) {
+    protected Optional<ChatGroupRequirements> findRequirements(long chatId) {
         return TelegramChatGroupRequirements.findByChatId(chatId)
                 .map(TelegramChatGroupRequirements::getRequirements);
     }
 
     @Override
-    protected AuthorizedTelegramUser findAuthorizedUser(Long platformUserId) {
+    protected AuthorizedTelegramUser findAuthorizedUser(long platformUserId) {
         return authorizedUserService.findByTelegramId(platformUserId);
     }
 
     @Override
-    protected Long getGreenwayId(AuthorizedTelegramUser user) {
+    protected long getGreenwayId(AuthorizedTelegramUser user) {
         return user.greenwayId;
     }
 

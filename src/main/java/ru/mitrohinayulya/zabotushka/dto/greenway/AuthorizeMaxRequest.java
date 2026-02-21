@@ -12,13 +12,11 @@ import jakarta.validation.constraints.Pattern;
  * @param regDate    Дата регистрации партнера в формате DD.MM.YYYY
  */
 public record AuthorizeMaxRequest(
-    @NotNull(message = "maxId is required")
     @JsonProperty("maxId")
-    Long maxId,
+    long maxId,
 
-    @NotNull(message = "greenwayId is required")
     @JsonProperty("greenwayId")
-    Long greenwayId,
+    long greenwayId,
 
     @NotNull(message = "regDate is required")
     @Pattern(

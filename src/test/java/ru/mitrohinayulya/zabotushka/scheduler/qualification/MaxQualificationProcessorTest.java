@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
@@ -94,7 +94,7 @@ class MaxQualificationProcessorTest {
 
         verify(maxService, times(1)).removeMemberFromChat(chatId, 12345L);
         verify(membership).delete();
-        verify(maxService, never()).checkAndRemoveIfNotQualified(any(), any(), any());
+        verify(maxService, never()).checkAndRemoveIfNotQualified(anyLong(), anyLong(), anyLong());
         assertThat(result).as("stats should match").isEqualTo(new QualificationProcessStats(1, 1, 1, 0));
     }
 
@@ -126,7 +126,7 @@ class MaxQualificationProcessorTest {
         }
     }
 
-    private AuthorizedMaxUser maxUser(Long maxId, Long greenwayId) {
+    private AuthorizedMaxUser maxUser(long maxId, long greenwayId) {
         var user = new AuthorizedMaxUser();
         user.id = UUID.randomUUID();
         user.maxId = maxId;
@@ -136,7 +136,7 @@ class MaxQualificationProcessorTest {
         return user;
     }
 
-    private UserGroupMembership membership(Long platformUserId, Long chatId) {
+    private UserGroupMembership membership(long platformUserId, long chatId) {
         var membership = new UserGroupMembership();
         membership.id = UUID.randomUUID();
         membership.platformUserId = platformUserId;

@@ -172,6 +172,6 @@ Flyway migrations in `src/main/resources/db/migration/`. Current schema:
   ```java
   try { ... } catch (Exception _) { ... }
   ```
-- **Mappers**: Use MapStruct `@Mapper(componentModel = "cdi")` for DTO conversions  
+- **Mappers**: Use MapStruct with shared `@Mapper(config = MapStructConfig.class)`; only add `@Mapping` for ignored targets or when source/target names differ
 - **DTOs**: Records preferred for immutable DTOs when no complex mapping needed
   
