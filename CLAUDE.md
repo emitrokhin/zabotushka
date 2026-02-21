@@ -93,7 +93,8 @@ The core design uses a Template Method pattern for platform-agnostic group manag
 | Resources (REST) | `resource/` | Webhooks + authorization endpoints for Telegram & Max |
 | Services | `service/telegram/`, `service/max/` | Platform-specific implementations |
 | Greenway | `service/greenway/` | Partner auth + qualification checking |
-| Scheduler | `scheduler/` | Periodic re-qualification of all group members |
+| Scheduler | `scheduler/` | `GroupQualificationScheduler` — cron entry point (8th of month, 00:00); delegates to `GroupQualificationOrchestrator` |
+| Qualification | `scheduler/qualification/` | `GroupQualificationOrchestrator` collects all `PlatformQualificationProcessor` beans via CDI `Instance<>`, runs monthly check, merges `QualificationProcessStats`; `AbstractPlatformQualificationProcessor<U>` provides Template Method for per-chatId membership iteration, orphaned-member removal, and `lastCheckedAt` update; concrete classes: `TelegramQualificationProcessor`, `MaxQualificationProcessor` |
 | Clients | `client/` | REST clients: `TelegramAccessBotApi`, `TelegramMessageBotApi`, `MaxBotApi`, `MyGreenwayApi`, `MyGreenwayLoginApi` |
 | Entities | `entity/` | `AuthorizedTelegramUser`, `AuthorizedMaxUser`, `UserGroupMembership` (Panache active record) |
 | Config | `config/` | `TelegramChatGroupRequirements`, `MaxChatGroupRequirements` (implement `ChatGroupRequirements` interface) |
@@ -102,7 +103,7 @@ The core design uses a Template Method pattern for platform-agnostic group manag
 
 1. User starts bot → `TelegramAuthorizationResource` / `MaxAuthorizationResource` guides them through Greenway credential linking
 2. Webhook events (join requests for Telegram, `user_added` events for Max) trigger `TelegramJoinRequestService` / `MaxJoinRequestService`
-3. `GroupQualificationScheduler` periodically invokes `GreenwayQualificationService` → `AbstractGroupAccessService` to re-check all tracked memberships
+3. `GroupQualificationScheduler` (cron: 8th of month at 00:00) delegates to `GroupQualificationOrchestrator` → iterates all `PlatformQualificationProcessor` beans → each processor iterates `UserGroupMembership` per `chatId`, calls platform service to check/remove non-qualified users, handles orphaned memberships (user no longer in authorized users table), and returns `QualificationProcessStats`
 4. `UserGroupMembership` entity tracks each user's presence in each group with last-check timestamps
 
 ### Database
@@ -136,9 +137,21 @@ Flyway migrations in `src/main/resources/db/migration/`. Current schema:
 - **Parameterized tests**: Use `@ParameterizedTest` + `@ValueSource` for testing the same behavior across multiple input values (e.g., error codes)
 - **Test fixtures**: Extract reusable object creation into private helper methods (e.g., `createMockWebhookRequest(...)`)
 - **`var`**: Use for all local variables in tests
-- Call verify() without times(1), if only one call expected, i.e 
+- Call verify() without times(1), if only one call expected, i.e
   ```java
   verify(service).onlyOnce(someArg);
+  ```
+- **Static mocking of Panache active-record methods**: Use `MockedStatic` initialized in `@BeforeEach` and closed in `@AfterEach`:
+  ```java
+  MockedStatic<UserGroupMembership> membershipMock;
+
+  @BeforeEach void setUp() { membershipMock = mockStatic(UserGroupMembership.class); }
+  @AfterEach void tearDown() { membershipMock.close(); }
+  ```
+- **Spying on Panache entity instances** to stub `persist()` / `delete()`:
+  ```java
+  var membership = spy(createMembership(12345L, chatId));
+  doNothing().when(membership).persist();
   ```
 
 ### Security
