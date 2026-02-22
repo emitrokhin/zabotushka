@@ -20,7 +20,6 @@ import java.util.Optional;
 import ru.mitrohinayulya.zabotushka.exception.GreenwayApiException;
 import ru.mitrohinayulya.zabotushka.exception.GreenwayAuthenticationException;
 import ru.mitrohinayulya.zabotushka.service.PeriodCalculator;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Сервис для работы с MyGreenway API
@@ -45,11 +44,11 @@ public class GreenwayService {
     @Inject
     PeriodCalculator periodCalculator;
 
+    @Inject
+    GreenwayTokenStore tokenStore;
+
     @ConfigProperty(name = "greenway.init.enabled", defaultValue = "true")
     boolean initEnabled;
-
-    private final AtomicReference<String> accessToken = new AtomicReference<>();
-    private final AtomicReference<String> refreshToken = new AtomicReference<>();
 
     /**
      * Инициализация сервиса при старте приложения
@@ -125,8 +124,8 @@ public class GreenwayService {
 
         if (response != null && response.code() == null) {
             var token = response.accessToken();
-            this.accessToken.set(token);
-            this.refreshToken.set(response.refreshToken());
+            tokenStore.setAccessToken(token);
+            tokenStore.setRefreshToken(response.refreshToken());
             log.info("Session created successfully");
         } else {
             var code = response != null ? response.code() : "unknown";
@@ -140,7 +139,7 @@ public class GreenwayService {
      * Обновление JWT токенов
      */
     public void refreshToken() {
-        var currentRefreshToken = refreshToken.get();
+        var currentRefreshToken = tokenStore.getRefreshToken();
         if (currentRefreshToken == null) {
             throw new IllegalStateException("Refresh token is not available");
         }
@@ -152,15 +151,14 @@ public class GreenwayService {
         var response = apiClient.refreshToken(form);
 
         if (response != null && response.code() == null) {
-            this.accessToken.set(response.accessToken());
-            this.refreshToken.set(response.refreshToken());
+            tokenStore.setAccessToken(response.accessToken());
+            tokenStore.setRefreshToken(response.refreshToken());
             log.info("Token refreshed successfully");
         } else {
             var code = response != null ? response.code() : "unknown";
             var detail = response != null ? response.detail() : "No response received";
             log.error("Failed to refresh token: code={}, detail={}", code, detail);
-            accessToken.set(null);
-            refreshToken.set(null);
+            tokenStore.clear();
             throw new GreenwayApiException("Failed to refresh token", code, detail);
         }
     }
@@ -173,7 +171,7 @@ public class GreenwayService {
     }
 
     private PartnerListResponse getPartnerList(long partnerId, int previousPeriod, boolean isRetry) {
-        var currentAccessToken = accessToken.get();
+        var currentAccessToken = tokenStore.getAccessToken();
 
         if (currentAccessToken == null) {
             throw new IllegalStateException("Access token is not available. Please login first.");
