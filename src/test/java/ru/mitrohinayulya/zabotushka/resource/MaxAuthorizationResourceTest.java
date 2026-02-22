@@ -164,6 +164,7 @@ class MaxAuthorizationResourceTest {
 
         when(authorizedMaxUserService.existsByPlatformId(2006L)).thenReturn(false);
         when(greenwayPartnerService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
+        when(greenwayPartnerService.findPartnerById(any(PartnerListResponse.class), anyLong())).thenReturn(Optional.of(partner));
 
         given()
             .auth().basic("admin", "admin")
