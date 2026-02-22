@@ -9,7 +9,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.mitrohinayulya.zabotushka.client.MyGreenwayApi;
+import ru.mitrohinayulya.zabotushka.client.MyGreenwayAuthApi;
 import ru.mitrohinayulya.zabotushka.client.MyGreenwayLoginApi;
 import ru.mitrohinayulya.zabotushka.config.GreenwayConfig;
 import ru.mitrohinayulya.zabotushka.exception.GreenwayApiException;
@@ -32,7 +32,7 @@ public class GreenwaySessionManager {
 
     @Inject
     @RestClient
-    MyGreenwayApi apiClient;
+    MyGreenwayAuthApi authApi;
 
     @Inject
     GreenwayTokenStore tokenStore;
@@ -96,7 +96,7 @@ public class GreenwaySessionManager {
         log.info("Creating MyGreenway session with session_id: {}", sessionId);
 
         var form = new Form().param("session_id", sessionId);
-        var response = apiClient.createSession(form);
+        var response = authApi.createSession(form);
 
         if (response != null && response.code() == null) {
             tokenStore.setAccessToken(response.accessToken());
@@ -119,7 +119,7 @@ public class GreenwaySessionManager {
         log.info("Refreshing MyGreenway token");
 
         var form = new Form().param("refresh", currentRefreshToken);
-        var response = apiClient.refreshToken(form);
+        var response = authApi.refreshToken(form);
 
         if (response != null && response.code() == null) {
             tokenStore.setAccessToken(response.accessToken());

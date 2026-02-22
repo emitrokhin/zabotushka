@@ -47,7 +47,7 @@ quarkus:
     "ru.mitrohinayulya.zabotushka.client.MyGreenwayLoginApi":
       url: https://greenwaystart.com
       follow-redirects: true
-    "ru.mitrohinayulya.zabotushka.client.MyGreenwayApi":
+    my-greenway-api:
       url: https://pyapi.greenwaystart.com/pyapi/v1
       headers:
         User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36

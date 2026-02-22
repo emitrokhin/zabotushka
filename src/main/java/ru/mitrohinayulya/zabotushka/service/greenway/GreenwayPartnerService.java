@@ -2,21 +2,21 @@ package ru.mitrohinayulya.zabotushka.service.greenway;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.WebApplicationException;
-import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.mitrohinayulya.zabotushka.client.MyGreenwayApi;
+import ru.mitrohinayulya.zabotushka.client.MyGreenwayPartnerApi;
 import ru.mitrohinayulya.zabotushka.dto.greenway.Partner;
 import ru.mitrohinayulya.zabotushka.dto.greenway.PartnerListResponse;
 import ru.mitrohinayulya.zabotushka.exception.GreenwayApiException;
+import ru.mitrohinayulya.zabotushka.interceptor.RefreshTokenOnExpiry;
 import ru.mitrohinayulya.zabotushka.service.PeriodCalculator;
 
 import java.util.Optional;
 
-/// Facade for the MyGreenway partner API. Handles fetching partner data with
-/// token-refresh retry on HTTP 401.
+/// Facade for the MyGreenway partner API.
+/// Token injection is handled by GreenwayTokenRequestFilter.
+/// Retry on 401 with token refresh is handled by @RetryOnUnauthorized interceptor.
 @ApplicationScoped
 public class GreenwayPartnerService {
 
@@ -24,73 +24,29 @@ public class GreenwayPartnerService {
 
     @Inject
     @RestClient
-    MyGreenwayApi apiClient;
+    MyGreenwayPartnerApi apiClient;
 
     @Inject
     PeriodCalculator periodCalculator;
 
-    @Inject
-    GreenwayTokenStore tokenStore;
-
-    @Inject
-    GreenwaySessionManager sessionManager;
-
+    @RefreshTokenOnExpiry
     public PartnerListResponse getPartnerList(long partnerId, int previousPeriod) {
-        return getPartnerList(partnerId, previousPeriod, false);
-    }
+        log.debug("Fetching partner list for partnerId={}, period={}", partnerId, previousPeriod);
 
-    private PartnerListResponse getPartnerList(long partnerId, int previousPeriod, boolean isRetry) {
-        var currentAccessToken = tokenStore.getAccessToken();
+        var response = apiClient.getPartnerList(
+                partnerId,
+                previousPeriod > 0 ? previousPeriod : null
+        );
 
-        if (currentAccessToken == null) {
-            throw new IllegalStateException("Access token is not available. Please login first.");
+        if (response != null && response.code() != null) {
+            log.error("Failed to get partner list for partnerId={}, period={}: code={}, detail={}",
+                    partnerId, previousPeriod, response.code(), response.detail());
+            throw new GreenwayApiException(
+                    "Failed to get partner list for partnerId=%d, period=%d".formatted(partnerId, previousPeriod),
+                    response.code(), response.detail());
         }
 
-        log.debug("Fetching partner list for partnerId={}, period={}, isRetry={}",
-                partnerId, previousPeriod, isRetry);
-
-        try {
-            var response = apiClient.getPartnerList(
-                    "Bearer " + currentAccessToken,
-                    partnerId,
-                    previousPeriod > 0 ? previousPeriod : null
-            );
-
-            if (response != null && response.code() != null) {
-                log.error("Failed to get partner list for partnerId={}, period={}: code={}, detail={}",
-                        partnerId, previousPeriod, response.code(), response.detail());
-                throw new GreenwayApiException(
-                        "Failed to get partner list for partnerId=%d, period=%d".formatted(partnerId, previousPeriod),
-                        response.code(), response.detail());
-            }
-
-            return response;
-        } catch (WebApplicationException e) {
-            log.error("HTTP error fetching partner list for partnerId={}, period={}", partnerId, previousPeriod, e);
-
-            if (e.getResponse().getStatus() != Response.Status.UNAUTHORIZED.getStatusCode()) {
-                throw new GreenwayApiException(
-                        "Failed to get partner list for partnerId=%d, period=%d".formatted(partnerId, previousPeriod), e);
-            }
-
-            if (isRetry) {
-                throw new GreenwayApiException(
-                        "Failed to get partner list for partnerId=%d, period=%d after token refresh retry"
-                                .formatted(partnerId, previousPeriod), e);
-            }
-
-            log.info("Received 401, refreshing token and retrying for partnerId={}", partnerId);
-            try {
-                sessionManager.refreshToken();
-                return getPartnerList(partnerId, previousPeriod, true);
-            } catch (GreenwayApiException ex) {
-                throw ex;
-            } catch (Exception ex) {
-                throw new GreenwayApiException(
-                        "Failed to get partner list for partnerId=%d, period=%d after token refresh retry"
-                                .formatted(partnerId, previousPeriod), ex);
-            }
-        }
+        return response;
     }
 
     public int getPreviousPeriod() {

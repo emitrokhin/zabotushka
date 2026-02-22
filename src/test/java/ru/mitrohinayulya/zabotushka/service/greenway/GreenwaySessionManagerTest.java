@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.mitrohinayulya.zabotushka.client.MyGreenwayApi;
+import ru.mitrohinayulya.zabotushka.client.MyGreenwayAuthApi;
 import ru.mitrohinayulya.zabotushka.dto.greenway.RefreshTokenResponse;
 import ru.mitrohinayulya.zabotushka.exception.GreenwayApiException;
 
@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 class GreenwaySessionManagerTest {
 
     @Mock
-    MyGreenwayApi apiClient;
+    MyGreenwayAuthApi authApi;
 
     @Mock
     GreenwayTokenStore tokenStore;
@@ -32,7 +32,7 @@ class GreenwaySessionManagerTest {
     @DisplayName("refreshToken updates tokens in store when API returns success")
     void refreshToken_ShouldUpdateTokens_WhenApiReturnsSuccess() {
         when(tokenStore.getRefreshToken()).thenReturn("refresh-token");
-        when(apiClient.refreshToken(any(Form.class)))
+        when(authApi.refreshToken(any(Form.class)))
                 .thenReturn(new RefreshTokenResponse("new-access-token", "new-refresh-token", null, null));
 
         sessionManager.refreshToken();
@@ -45,7 +45,7 @@ class GreenwaySessionManagerTest {
     @DisplayName("refreshToken clears store and throws GreenwayApiException when API returns error payload")
     void refreshToken_ShouldClearStoreAndThrow_WhenApiReturnsErrorPayload() {
         when(tokenStore.getRefreshToken()).thenReturn("refresh-token");
-        when(apiClient.refreshToken(any(Form.class)))
+        when(authApi.refreshToken(any(Form.class)))
                 .thenReturn(new RefreshTokenResponse(null, null, "TOKEN_EXPIRED", "Token has expired"));
 
         assertThatThrownBy(() -> sessionManager.refreshToken())
