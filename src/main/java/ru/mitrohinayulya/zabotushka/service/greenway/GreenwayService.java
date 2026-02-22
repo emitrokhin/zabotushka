@@ -20,7 +20,6 @@ import java.util.Optional;
 import ru.mitrohinayulya.zabotushka.exception.GreenwayApiException;
 import ru.mitrohinayulya.zabotushka.exception.GreenwayAuthenticationException;
 import ru.mitrohinayulya.zabotushka.service.PeriodCalculator;
-
 import java.util.concurrent.atomic.AtomicReference;
 
 /**

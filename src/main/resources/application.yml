@@ -49,6 +49,15 @@ quarkus:
       follow-redirects: true
     "ru.mitrohinayulya.zabotushka.client.MyGreenwayApi":
       url: https://pyapi.greenwaystart.com/pyapi/v1
+      headers:
+        User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
+        Accept: application/json, text/plain, */*
+        sec-ch-ua: '" Not A;Brand";v="99", "Chromium";v="99", "Google Chrome";v="99"'
+        sec-ch-ua-mobile: '?0'
+        sec-ch-ua-platform: '"Windows"'
+        Origin: https://greenwaystart.com
+        Referer: https://greenwaystart.com/
+        Content-Language: ru-RU
 
 app:
   host: ${HOST}
