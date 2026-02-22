@@ -9,8 +9,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.mitrohinayulya.zabotushka.dto.greenway.Partner;
 import ru.mitrohinayulya.zabotushka.dto.greenway.PartnerListResponse;
 import ru.mitrohinayulya.zabotushka.dto.greenway.QualificationLevel;
+import ru.mitrohinayulya.zabotushka.service.greenway.GreenwayPartnerService;
 import ru.mitrohinayulya.zabotushka.service.greenway.GreenwayQualificationService;
-import ru.mitrohinayulya.zabotushka.service.greenway.GreenwayService;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 class GreenwayQualificationServiceTest {
 
     @Mock
-    GreenwayService greenwayService;
+    GreenwayPartnerService greenwayPartnerService;
 
     @InjectMocks
     GreenwayQualificationService qualificationService;
@@ -37,11 +37,11 @@ class GreenwayQualificationServiceTest {
         var currentResponse = new PartnerListResponse(null, List.of(currentPartner), null, null);
         var previousResponse = new PartnerListResponse(null, List.of(previousPartner), null, null);
 
-        when(greenwayService.getPreviousPeriod()).thenReturn(202501);
-        when(greenwayService.getPartnerList(greenwayId, 0)).thenReturn(currentResponse);
-        when(greenwayService.getPartnerList(greenwayId, 202501)).thenReturn(previousResponse);
-        when(greenwayService.findPartnerById(currentResponse, greenwayId)).thenReturn(Optional.of(currentPartner));
-        when(greenwayService.findPartnerById(previousResponse, greenwayId)).thenReturn(Optional.of(previousPartner));
+        when(greenwayPartnerService.getPreviousPeriod()).thenReturn(202501);
+        when(greenwayPartnerService.getPartnerList(greenwayId, 0)).thenReturn(currentResponse);
+        when(greenwayPartnerService.getPartnerList(greenwayId, 202501)).thenReturn(previousResponse);
+        when(greenwayPartnerService.findPartnerById(currentResponse, greenwayId)).thenReturn(Optional.of(currentPartner));
+        when(greenwayPartnerService.findPartnerById(previousResponse, greenwayId)).thenReturn(Optional.of(previousPartner));
 
         var result = qualificationService.getBestQualification(greenwayId);
 
@@ -57,11 +57,11 @@ class GreenwayQualificationServiceTest {
         var currentResponse = new PartnerListResponse(null, List.of(currentPartner), null, null);
         var previousResponse = new PartnerListResponse(null, List.of(), null, null);
 
-        when(greenwayService.getPreviousPeriod()).thenReturn(202501);
-        when(greenwayService.getPartnerList(greenwayId, 0)).thenReturn(currentResponse);
-        when(greenwayService.getPartnerList(greenwayId, 202501)).thenReturn(previousResponse);
-        when(greenwayService.findPartnerById(currentResponse, greenwayId)).thenReturn(Optional.of(currentPartner));
-        when(greenwayService.findPartnerById(previousResponse, greenwayId)).thenReturn(Optional.empty());
+        when(greenwayPartnerService.getPreviousPeriod()).thenReturn(202501);
+        when(greenwayPartnerService.getPartnerList(greenwayId, 0)).thenReturn(currentResponse);
+        when(greenwayPartnerService.getPartnerList(greenwayId, 202501)).thenReturn(previousResponse);
+        when(greenwayPartnerService.findPartnerById(currentResponse, greenwayId)).thenReturn(Optional.of(currentPartner));
+        when(greenwayPartnerService.findPartnerById(previousResponse, greenwayId)).thenReturn(Optional.empty());
 
         var result = qualificationService.getBestQualification(greenwayId);
 
@@ -77,11 +77,11 @@ class GreenwayQualificationServiceTest {
         var currentResponse = new PartnerListResponse(null, List.of(), null, null);
         var previousResponse = new PartnerListResponse(null, List.of(previousPartner), null, null);
 
-        when(greenwayService.getPreviousPeriod()).thenReturn(202501);
-        when(greenwayService.getPartnerList(greenwayId, 0)).thenReturn(currentResponse);
-        when(greenwayService.getPartnerList(greenwayId, 202501)).thenReturn(previousResponse);
-        when(greenwayService.findPartnerById(currentResponse, greenwayId)).thenReturn(Optional.empty());
-        when(greenwayService.findPartnerById(previousResponse, greenwayId)).thenReturn(Optional.of(previousPartner));
+        when(greenwayPartnerService.getPreviousPeriod()).thenReturn(202501);
+        when(greenwayPartnerService.getPartnerList(greenwayId, 0)).thenReturn(currentResponse);
+        when(greenwayPartnerService.getPartnerList(greenwayId, 202501)).thenReturn(previousResponse);
+        when(greenwayPartnerService.findPartnerById(currentResponse, greenwayId)).thenReturn(Optional.empty());
+        when(greenwayPartnerService.findPartnerById(previousResponse, greenwayId)).thenReturn(Optional.of(previousPartner));
 
         var result = qualificationService.getBestQualification(greenwayId);
 
@@ -96,11 +96,11 @@ class GreenwayQualificationServiceTest {
         var currentResponse = new PartnerListResponse(null, List.of(), null, null);
         var previousResponse = new PartnerListResponse(null, List.of(), null, null);
 
-        when(greenwayService.getPreviousPeriod()).thenReturn(202501);
-        when(greenwayService.getPartnerList(greenwayId, 0)).thenReturn(currentResponse);
-        when(greenwayService.getPartnerList(greenwayId, 202501)).thenReturn(previousResponse);
-        when(greenwayService.findPartnerById(currentResponse, greenwayId)).thenReturn(Optional.empty());
-        when(greenwayService.findPartnerById(previousResponse, greenwayId)).thenReturn(Optional.empty());
+        when(greenwayPartnerService.getPreviousPeriod()).thenReturn(202501);
+        when(greenwayPartnerService.getPartnerList(greenwayId, 0)).thenReturn(currentResponse);
+        when(greenwayPartnerService.getPartnerList(greenwayId, 202501)).thenReturn(previousResponse);
+        when(greenwayPartnerService.findPartnerById(currentResponse, greenwayId)).thenReturn(Optional.empty());
+        when(greenwayPartnerService.findPartnerById(previousResponse, greenwayId)).thenReturn(Optional.empty());
 
         var result = qualificationService.getBestQualification(greenwayId);
 
@@ -112,7 +112,7 @@ class GreenwayQualificationServiceTest {
     void getBestQualification_ShouldReturnNO_WhenExceptionOccurs() {
         var greenwayId = 100L;
 
-        when(greenwayService.getPreviousPeriod()).thenThrow(new RuntimeException("API error"));
+        when(greenwayPartnerService.getPreviousPeriod()).thenThrow(new RuntimeException("API error"));
 
         var result = qualificationService.getBestQualification(greenwayId);
 

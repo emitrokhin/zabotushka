@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import ru.mitrohinayulya.zabotushka.GreenwayServiceTestProfile;
 import ru.mitrohinayulya.zabotushka.dto.greenway.Partner;
 import ru.mitrohinayulya.zabotushka.dto.greenway.PartnerListResponse;
-import ru.mitrohinayulya.zabotushka.service.greenway.GreenwayService;
+import ru.mitrohinayulya.zabotushka.service.greenway.GreenwayPartnerService;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 class GreenwayResourceTest {
 
     @InjectMock
-    GreenwayService greenwayService;
+    GreenwayPartnerService greenwayPartnerService;
 
     @Test
     @DisplayName("checkUserId returns 200 with user data when partner exists")
@@ -31,8 +31,8 @@ class GreenwayResourceTest {
         var partner = createPartner(123456);
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
-        when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
-        when(greenwayService.findPartnerById(any(), anyLong()))
+        when(greenwayPartnerService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
+        when(greenwayPartnerService.findPartnerById(any(), anyLong()))
                 .thenReturn(Optional.of(partner));
 
         given()
@@ -49,8 +49,8 @@ class GreenwayResourceTest {
     void checkUserId_ShouldReturn404_WhenPartnerNotFound() {
         var response = new PartnerListResponse(null, List.of(), null, null);
 
-        when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
-        when(greenwayService.findPartnerById(any(), anyLong()))
+        when(greenwayPartnerService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
+        when(greenwayPartnerService.findPartnerById(any(), anyLong()))
                 .thenReturn(Optional.empty());
 
         given()
@@ -67,8 +67,8 @@ class GreenwayResourceTest {
         var partner = createPartnerWithLO(150.0);
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
-        when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
-        when(greenwayService.findPartnerById(any(), anyLong()))
+        when(greenwayPartnerService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
+        when(greenwayPartnerService.findPartnerById(any(), anyLong()))
                 .thenReturn(Optional.of(partner));
 
         given()
@@ -89,8 +89,8 @@ class GreenwayResourceTest {
         var partner = createPartnerWithLO(50.0);
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
-        when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
-        when(greenwayService.findPartnerById(any(), anyLong()))
+        when(greenwayPartnerService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
+        when(greenwayPartnerService.findPartnerById(any(), anyLong()))
                 .thenReturn(Optional.of(partner));
 
         given()
@@ -108,8 +108,8 @@ class GreenwayResourceTest {
         var partner = createPartnerWithLO(100.0);
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
-        when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
-        when(greenwayService.findPartnerById(any(), anyLong()))
+        when(greenwayPartnerService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
+        when(greenwayPartnerService.findPartnerById(any(), anyLong()))
                 .thenReturn(Optional.of(partner));
 
         given()
@@ -127,9 +127,9 @@ class GreenwayResourceTest {
         var partner = createPartnerWithLO(200.0);
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
-        when(greenwayService.getPreviousPeriod()).thenReturn(75);
-        when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
-        when(greenwayService.findPartnerById(any(), anyLong()))
+        when(greenwayPartnerService.getPreviousPeriod()).thenReturn(75);
+        when(greenwayPartnerService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
+        when(greenwayPartnerService.findPartnerById(any(), anyLong()))
                 .thenReturn(Optional.of(partner));
 
         given()
@@ -148,8 +148,8 @@ class GreenwayResourceTest {
         var partner = createPartnerWithSGO();
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
-        when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
-        when(greenwayService.findPartnerById(any(), anyLong()))
+        when(greenwayPartnerService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
+        when(greenwayPartnerService.findPartnerById(any(), anyLong()))
                 .thenReturn(Optional.of(partner));
 
         given()
@@ -168,8 +168,8 @@ class GreenwayResourceTest {
     void compareSGO_ShouldReturnNotFound_WhenPartnerNotFound() {
         var response = new PartnerListResponse(null, List.of(), null, null);
 
-        when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
-        when(greenwayService.findPartnerById(any(), anyLong()))
+        when(greenwayPartnerService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
+        when(greenwayPartnerService.findPartnerById(any(), anyLong()))
                 .thenReturn(Optional.empty());
 
         given()
@@ -187,8 +187,8 @@ class GreenwayResourceTest {
         var partner = createPartnerWithQualification("L2");
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
-        when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
-        when(greenwayService.findPartnerById(any(), anyLong()))
+        when(greenwayPartnerService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
+        when(greenwayPartnerService.findPartnerById(any(), anyLong()))
                 .thenReturn(Optional.of(partner));
 
         given()
@@ -206,8 +206,8 @@ class GreenwayResourceTest {
         var partner = createPartnerWithQualification("L2");
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
-        when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
-        when(greenwayService.findPartnerById(any(), anyLong()))
+        when(greenwayPartnerService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
+        when(greenwayPartnerService.findPartnerById(any(), anyLong()))
                 .thenReturn(Optional.of(partner));
 
         given()
@@ -225,9 +225,9 @@ class GreenwayResourceTest {
         var partner = createPartnerWithQualification("M1");
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
-        when(greenwayService.getPreviousPeriod()).thenReturn(75);
-        when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
-        when(greenwayService.findPartnerById(any(), anyLong()))
+        when(greenwayPartnerService.getPreviousPeriod()).thenReturn(75);
+        when(greenwayPartnerService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
+        when(greenwayPartnerService.findPartnerById(any(), anyLong()))
                 .thenReturn(Optional.of(partner));
 
         given()
@@ -248,12 +248,12 @@ class GreenwayResourceTest {
         var currentResponse = new PartnerListResponse(null, List.of(currentPartner), null, null);
         var previousResponse = new PartnerListResponse(null, List.of(previousPartner), null, null);
 
-        when(greenwayService.getPreviousPeriod()).thenReturn(75);
-        when(greenwayService.getPartnerList(123456L, 0)).thenReturn(currentResponse);
-        when(greenwayService.getPartnerList(123456L, 75)).thenReturn(previousResponse);
-        when(greenwayService.findPartnerById(eq(currentResponse), anyLong()))
+        when(greenwayPartnerService.getPreviousPeriod()).thenReturn(75);
+        when(greenwayPartnerService.getPartnerList(123456L, 0)).thenReturn(currentResponse);
+        when(greenwayPartnerService.getPartnerList(123456L, 75)).thenReturn(previousResponse);
+        when(greenwayPartnerService.findPartnerById(eq(currentResponse), anyLong()))
                 .thenReturn(Optional.of(currentPartner));
-        when(greenwayService.findPartnerById(eq(previousResponse), anyLong()))
+        when(greenwayPartnerService.findPartnerById(eq(previousResponse), anyLong()))
                 .thenReturn(Optional.of(previousPartner));
 
         given()
@@ -274,12 +274,12 @@ class GreenwayResourceTest {
         var currentResponse = new PartnerListResponse(null, List.of(currentPartner), null, null);
         var previousResponse = new PartnerListResponse(null, List.of(previousPartner), null, null);
 
-        when(greenwayService.getPreviousPeriod()).thenReturn(75);
-        when(greenwayService.getPartnerList(123456L, 0)).thenReturn(currentResponse);
-        when(greenwayService.getPartnerList(123456L, 75)).thenReturn(previousResponse);
-        when(greenwayService.findPartnerById(eq(currentResponse), anyLong()))
+        when(greenwayPartnerService.getPreviousPeriod()).thenReturn(75);
+        when(greenwayPartnerService.getPartnerList(123456L, 0)).thenReturn(currentResponse);
+        when(greenwayPartnerService.getPartnerList(123456L, 75)).thenReturn(previousResponse);
+        when(greenwayPartnerService.findPartnerById(eq(currentResponse), anyLong()))
                 .thenReturn(Optional.of(currentPartner));
-        when(greenwayService.findPartnerById(eq(previousResponse), anyLong()))
+        when(greenwayPartnerService.findPartnerById(eq(previousResponse), anyLong()))
                 .thenReturn(Optional.of(previousPartner));
 
         given()
@@ -296,8 +296,8 @@ class GreenwayResourceTest {
     void getQualification_ShouldReturnNO_WhenPartnerNotFound() {
         var response = new PartnerListResponse(null, List.of(), null, null);
 
-        when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
-        when(greenwayService.findPartnerById(any(), anyLong()))
+        when(greenwayPartnerService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
+        when(greenwayPartnerService.findPartnerById(any(), anyLong()))
                 .thenReturn(Optional.empty());
 
         given()

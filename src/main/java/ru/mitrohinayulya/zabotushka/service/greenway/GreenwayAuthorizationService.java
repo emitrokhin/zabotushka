@@ -14,8 +14,6 @@ import ru.mitrohinayulya.zabotushka.service.platform.PlatformAuthorizationServic
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Общий сервис авторизации через Greenway API.
@@ -27,7 +25,7 @@ public class GreenwayAuthorizationService {
     private static final Logger log = LoggerFactory.getLogger(GreenwayAuthorizationService.class);
 
     @Inject
-    GreenwayService greenwayService;
+    GreenwayPartnerService greenwayPartnerService;
 
     /**
      * Выполняет авторизацию пользователя через Greenway API
@@ -67,7 +65,7 @@ public class GreenwayAuthorizationService {
 
         // Выполняем авторизацию через Greenway API
         try {
-            var partnerListResponse = greenwayService.getPartnerList(greenwayId, 0);
+            var partnerListResponse = greenwayPartnerService.getPartnerList(greenwayId, 0);
 
             if (partnerListResponse == null
                     || partnerListResponse.partners() == null
@@ -76,7 +74,7 @@ public class GreenwayAuthorizationService {
                 return buildNotAuthorizedResponse(Response.Status.NOT_FOUND);
             }
 
-            return findPartnerById(partnerListResponse.partners(), greenwayId)
+            return greenwayPartnerService.findPartnerById(partnerListResponse, greenwayId)
                     .map(partner -> authorizePartner(partner, ops, platformId, greenwayId, regDate, platformName))
                     .orElseGet(() -> {
                         log.warn("Partner not found with greenwayId={}", greenwayId);
@@ -128,17 +126,6 @@ public class GreenwayAuthorizationService {
             log.warn("Failed to parse dates for comparison: date1={}, date2={}", date1, date2, e);
             return false;
         }
-    }
-
-    private Optional<Partner> findPartnerById(List<Partner> partners, long greenwayId) {
-        if (partners == null || partners.isEmpty()) {
-            return Optional.empty();
-        }
-
-        return partners.stream()
-                .filter(partner -> partner.number() != null)
-                .filter(partner -> partner.number().longValue() == greenwayId)
-                .findFirst();
     }
 
     private Response buildNotAuthorizedResponse(Response.Status status) {

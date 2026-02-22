@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mitrohinayulya.zabotushka.dto.greenway.*;
 import ru.mitrohinayulya.zabotushka.exception.GreenwayApiException;
-import ru.mitrohinayulya.zabotushka.service.greenway.GreenwayService;
+import ru.mitrohinayulya.zabotushka.service.greenway.GreenwayPartnerService;
 
 import java.util.Optional;
 
@@ -25,7 +25,7 @@ public class GreenwayResource {
     private static final Logger log = LoggerFactory.getLogger(GreenwayResource.class);
 
     @Inject
-    GreenwayService greenwayService;
+    GreenwayPartnerService greenwayPartnerService;
 
     /**
      * Проверяет существование партнера по ID
@@ -39,8 +39,8 @@ public class GreenwayResource {
         log.info("Checking user existence: userId={}", userId);
 
         try {
-            var partnerListResponse = greenwayService.getPartnerList(userId, 0);
-            var partnerOpt = greenwayService.findPartnerById(partnerListResponse, userId);
+            var partnerListResponse = greenwayPartnerService.getPartnerList(userId, 0);
+            var partnerOpt = greenwayPartnerService.findPartnerById(partnerListResponse, userId);
 
             return partnerOpt
                     .map(_ -> {
@@ -91,7 +91,7 @@ public class GreenwayResource {
     @GET
     @Path("/compare-lo/period/{userId}/{lo}")
     public CompareLOResponse compareLOPeriod(@PathParam("userId") long userId, @PathParam("lo") Double lo) {
-        var period = greenwayService.getPreviousPeriod();
+        var period = greenwayPartnerService.getPreviousPeriod();
         log.info("Comparing LO in previous period: userId={}, lo={}, period={}", userId, lo, period);
         return compareValue(userId, lo, period, true);
     }
@@ -120,7 +120,7 @@ public class GreenwayResource {
     @GET
     @Path("/compare-sgo/period/{userId}/{sgo}")
     public CompareSGOResponse compareSGOPeriod(@PathParam("userId") long userId, @PathParam("sgo") Double sgo) {
-        var period = greenwayService.getPreviousPeriod();
+        var period = greenwayPartnerService.getPreviousPeriod();
         log.info("Comparing SGO in previous period: userId={}, sgo={}, period={}", userId, sgo, period);
         return compareValue(userId, sgo, period, false);
     }
@@ -132,8 +132,8 @@ public class GreenwayResource {
     @SuppressWarnings("unchecked")
     private <T> T compareValue(long userId, Double value, int period, boolean isLO) {
         try {
-            var partnerListResponse = greenwayService.getPartnerList(userId, period);
-            var partnerOpt = greenwayService.findPartnerById(partnerListResponse, userId);
+            var partnerListResponse = greenwayPartnerService.getPartnerList(userId, period);
+            var partnerOpt = greenwayPartnerService.findPartnerById(partnerListResponse, userId);
 
             return (T) partnerOpt
                     .map(partner -> {
@@ -185,7 +185,7 @@ public class GreenwayResource {
     @GET
     @Path("/qualification/period/{userId}")
     public QualificationResponse getQualificationPeriod(@PathParam("userId") long userId) {
-        var period = greenwayService.getPreviousPeriod();
+        var period = greenwayPartnerService.getPreviousPeriod();
         log.info("Getting qualification in previous period: userId={}, period={}", userId, period);
         return getQualificationInternal(userId, period, false);
     }
@@ -212,7 +212,7 @@ public class GreenwayResource {
     @GET
     @Path("/qualification/exact/period/{userId}")
     public QualificationResponse getQualificationExactPeriod(@PathParam("userId") long userId) {
-        var period = greenwayService.getPreviousPeriod();
+        var period = greenwayPartnerService.getPreviousPeriod();
         log.info("Getting exact qualification in previous period: userId={}, period={}", userId, period);
         return getQualificationInternal(userId, period, true);
     }
@@ -230,17 +230,17 @@ public class GreenwayResource {
         log.info("Getting best qualification: userId={}", userId);
 
         try {
-            var previousPeriod = greenwayService.getPreviousPeriod();
+            var previousPeriod = greenwayPartnerService.getPreviousPeriod();
 
-            var currentPartnerList = greenwayService.getPartnerList(userId, 0);
-            var previousPartnerList = greenwayService.getPartnerList(userId, previousPeriod);
+            var currentPartnerList = greenwayPartnerService.getPartnerList(userId, 0);
+            var previousPartnerList = greenwayPartnerService.getPartnerList(userId, previousPeriod);
 
-            var currentQual = greenwayService.findPartnerById(currentPartnerList, userId)
+            var currentQual = greenwayPartnerService.findPartnerById(currentPartnerList, userId)
                     .map(Partner::qualification)
                     .map(QualificationLevel::fromString)
                     .orElse(QualificationLevel.NO);
 
-            var previousQual = greenwayService.findPartnerById(previousPartnerList, userId)
+            var previousQual = greenwayPartnerService.findPartnerById(previousPartnerList, userId)
                     .map(Partner::qualification)
                     .map(QualificationLevel::fromString)
                     .orElse(QualificationLevel.NO);
@@ -264,9 +264,9 @@ public class GreenwayResource {
      */
     private QualificationResponse getQualificationInternal(long userId, int period, boolean exact) {
         try {
-            var partnerListResponse = greenwayService.getPartnerList(userId, period);
+            var partnerListResponse = greenwayPartnerService.getPartnerList(userId, period);
 
-            return greenwayService.findPartnerById(partnerListResponse, userId)
+            return greenwayPartnerService.findPartnerById(partnerListResponse, userId)
                     .map(partner -> {
                         var qualification = exact
                                 ? partner.qualification()

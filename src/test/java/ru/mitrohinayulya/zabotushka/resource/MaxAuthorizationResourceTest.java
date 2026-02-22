@@ -10,10 +10,11 @@ import ru.mitrohinayulya.zabotushka.GreenwayServiceTestProfile;
 import ru.mitrohinayulya.zabotushka.dto.greenway.Partner;
 import ru.mitrohinayulya.zabotushka.dto.greenway.PartnerListResponse;
 import ru.mitrohinayulya.zabotushka.exception.GreenwayApiException;
+import ru.mitrohinayulya.zabotushka.service.greenway.GreenwayPartnerService;
 import ru.mitrohinayulya.zabotushka.service.max.AuthorizedMaxUserService;
-import ru.mitrohinayulya.zabotushka.service.greenway.GreenwayService;
 
 import java.util.List;
+import java.util.Optional;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
@@ -25,7 +26,7 @@ import static org.mockito.Mockito.*;
 class MaxAuthorizationResourceTest {
 
     @InjectMock
-    GreenwayService greenwayService;
+    GreenwayPartnerService greenwayPartnerService;
 
     @InjectMock
     AuthorizedMaxUserService authorizedMaxUserService;
@@ -38,7 +39,8 @@ class MaxAuthorizationResourceTest {
 
         when(authorizedMaxUserService.existsByPlatformId(2001L)).thenReturn(false);
         when(authorizedMaxUserService.existsByGreenwayId(123456L)).thenReturn(false);
-        when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(partnerListResponse);
+        when(greenwayPartnerService.getPartnerList(anyLong(), anyInt())).thenReturn(partnerListResponse);
+        when(greenwayPartnerService.findPartnerById(any(PartnerListResponse.class), anyLong())).thenReturn(Optional.of(partner));
 
         given()
             .auth().basic("admin", "admin")
@@ -81,7 +83,7 @@ class MaxAuthorizationResourceTest {
             .statusCode(200)
             .body("authorized", is("authorized"));
 
-        verify(greenwayService, never()).getPartnerList(anyLong(), anyInt());
+        verify(greenwayPartnerService, never()).getPartnerList(anyLong(), anyInt());
         verify(authorizedMaxUserService, never()).saveUser(anyLong(), anyLong(), anyString());
     }
 
@@ -107,7 +109,7 @@ class MaxAuthorizationResourceTest {
             .statusCode(403)
             .body("error", is("Authorization data does not match stored credentials"));
 
-        verify(greenwayService, never()).getPartnerList(anyLong(), anyInt());
+        verify(greenwayPartnerService, never()).getPartnerList(anyLong(), anyInt());
     }
 
     @Test
@@ -132,7 +134,7 @@ class MaxAuthorizationResourceTest {
             .statusCode(409)
             .body("error", is("This Greenway ID is already associated with another account"));
 
-        verify(greenwayService, never()).getPartnerList(anyLong(), anyInt());
+        verify(greenwayPartnerService, never()).getPartnerList(anyLong(), anyInt());
         verify(authorizedMaxUserService, never()).saveUser(anyLong(), anyLong(), anyString());
     }
 
@@ -161,7 +163,7 @@ class MaxAuthorizationResourceTest {
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
         when(authorizedMaxUserService.existsByPlatformId(2006L)).thenReturn(false);
-        when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
+        when(greenwayPartnerService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
 
         given()
             .auth().basic("admin", "admin")
@@ -186,7 +188,7 @@ class MaxAuthorizationResourceTest {
         var response = new PartnerListResponse(null, List.of(), null, null);
 
         when(authorizedMaxUserService.existsByPlatformId(2008L)).thenReturn(false);
-        when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
+        when(greenwayPartnerService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
 
         given()
             .auth().basic("admin", "admin")
@@ -209,7 +211,7 @@ class MaxAuthorizationResourceTest {
     @DisplayName("authorize returns 500 when Greenway API throws an exception")
     void authorize_ShouldReturn500_WhenGreenwayApiThrowsException() {
         when(authorizedMaxUserService.existsByPlatformId(2009L)).thenReturn(false);
-        when(greenwayService.getPartnerList(anyLong(), anyInt()))
+        when(greenwayPartnerService.getPartnerList(anyLong(), anyInt()))
             .thenThrow(new GreenwayApiException("API Error", "ERROR_CODE", "Error details"));
 
         given()

@@ -16,21 +16,21 @@ public class GreenwayQualificationService {
     private static final Logger log = LoggerFactory.getLogger(GreenwayQualificationService.class);
 
     @Inject
-    GreenwayService greenwayService;
+    GreenwayPartnerService greenwayPartnerService;
 
     public QualificationLevel getBestQualification(long greenwayId) {
         try {
-            var previousPeriod = greenwayService.getPreviousPeriod();
+            var previousPeriod = greenwayPartnerService.getPreviousPeriod();
 
-            var currentPartnerList = greenwayService.getPartnerList(greenwayId, 0);
-            var previousPartnerList = greenwayService.getPartnerList(greenwayId, previousPeriod);
+            var currentPartnerList = greenwayPartnerService.getPartnerList(greenwayId, 0);
+            var previousPartnerList = greenwayPartnerService.getPartnerList(greenwayId, previousPeriod);
 
-            var currentQual = greenwayService.findPartnerById(currentPartnerList, greenwayId)
+            var currentQual = greenwayPartnerService.findPartnerById(currentPartnerList, greenwayId)
                     .map(Partner::qualification)
                     .map(QualificationLevel::fromString)
                     .orElse(QualificationLevel.NO);
 
-            var previousQual = greenwayService.findPartnerById(previousPartnerList, greenwayId)
+            var previousQual = greenwayPartnerService.findPartnerById(previousPartnerList, greenwayId)
                     .map(Partner::qualification)
                     .map(QualificationLevel::fromString)
                     .orElse(QualificationLevel.NO);
