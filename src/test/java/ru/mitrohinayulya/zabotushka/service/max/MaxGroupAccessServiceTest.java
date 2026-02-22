@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.mitrohinayulya.zabotushka.client.MaxBotApi;
 import ru.mitrohinayulya.zabotushka.dto.greenway.QualificationLevel;
+import ru.mitrohinayulya.zabotushka.dto.max.MaxChatMember;
 import ru.mitrohinayulya.zabotushka.dto.max.MaxDeleteChatMemberResponse;
 import ru.mitrohinayulya.zabotushka.dto.max.MaxGetChatMemberResponse;
 import ru.mitrohinayulya.zabotushka.entity.Platform;
@@ -16,6 +17,7 @@ import ru.mitrohinayulya.zabotushka.service.greenway.GreenwayQualificationServic
 import ru.mitrohinayulya.zabotushka.service.platform.PlatformGroupMembershipService;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -59,7 +61,7 @@ class MaxGroupAccessServiceTest {
     @DisplayName("checkAndRemoveIfNotQualified removes user from chat when qualification is not allowed")
     void checkAndRemoveIfNotQualified_ShouldRemoveUser_WhenQualificationNotAllowed() {
         when(botApi.getChatMembers(anyLong(), any())).thenReturn(new MaxGetChatMemberResponse(
-                java.util.List.of(mock(ru.mitrohinayulya.zabotushka.dto.max.MaxChatMember.class))));
+                List.of(mock(MaxChatMember.class))));
         when(qualificationService.getBestQualification(456L)).thenReturn(QualificationLevel.NO);
         when(botApi.deleteChatMember(-71062621438079L, 123L))
                 .thenReturn(new MaxDeleteChatMemberResponse(true, null));
@@ -75,7 +77,7 @@ class MaxGroupAccessServiceTest {
     @DisplayName("checkAndRemoveIfNotQualified does not remove user when qualification is allowed")
     void checkAndRemoveIfNotQualified_ShouldNotRemoveUser_WhenQualificationAllowed() {
         when(botApi.getChatMembers(anyLong(), any())).thenReturn(new MaxGetChatMemberResponse(
-                java.util.List.of(mock(ru.mitrohinayulya.zabotushka.dto.max.MaxChatMember.class))));
+                List.of(mock(MaxChatMember.class))));
         when(qualificationService.getBestQualification(456L)).thenReturn(QualificationLevel.M);
 
         moderationService.checkAndRemoveIfNotQualified(-71062621438079L, 123L, 456L);
@@ -88,7 +90,7 @@ class MaxGroupAccessServiceTest {
     @DisplayName("isMemberOfChat returns true when member list is non-empty")
     void isMemberOfChat_ShouldReturnTrue_WhenMemberExists() {
         when(botApi.getChatMembers(anyLong(), any())).thenReturn(new MaxGetChatMemberResponse(
-                java.util.List.of(mock(ru.mitrohinayulya.zabotushka.dto.max.MaxChatMember.class))));
+                List.of(mock(MaxChatMember.class))));
 
         var result = moderationService.isMemberOfChat(-71062621438079L, 123L);
 

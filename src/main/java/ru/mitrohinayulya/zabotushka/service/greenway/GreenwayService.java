@@ -13,7 +13,10 @@ import org.slf4j.LoggerFactory;
 import ru.mitrohinayulya.zabotushka.client.MyGreenwayApi;
 import ru.mitrohinayulya.zabotushka.client.MyGreenwayLoginApi;
 import ru.mitrohinayulya.zabotushka.config.GreenwayConfig;
+import ru.mitrohinayulya.zabotushka.dto.greenway.Partner;
 import ru.mitrohinayulya.zabotushka.dto.greenway.PartnerListResponse;
+
+import java.util.Optional;
 import ru.mitrohinayulya.zabotushka.exception.GreenwayApiException;
 import ru.mitrohinayulya.zabotushka.exception.GreenwayAuthenticationException;
 import ru.mitrohinayulya.zabotushka.service.PeriodCalculator;
@@ -225,12 +228,10 @@ public class GreenwayService {
     /**
      * Находит партнера по ID в списке партнеров
      */
-    public java.util.Optional<ru.mitrohinayulya.zabotushka.dto.greenway.Partner> findPartnerById(
-            ru.mitrohinayulya.zabotushka.dto.greenway.PartnerListResponse response,
-            long partnerId) {
+    public Optional<Partner> findPartnerById(PartnerListResponse response, long partnerId) {
 
         if (response == null || response.partners() == null || response.partners().isEmpty()) {
-            return java.util.Optional.empty();
+            return Optional.empty();
         }
 
         return response.partners().stream()

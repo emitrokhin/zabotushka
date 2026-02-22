@@ -4,6 +4,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.mitrohinayulya.zabotushka.dto.greenway.QualificationLevel;
 
+import java.util.Arrays;
+import java.util.HashSet;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TelegramChatGroupRequirementsTest {
@@ -93,10 +96,10 @@ class TelegramChatGroupRequirementsTest {
     @DisplayName("All groups have a valid number of unique chat IDs")
     void getChatIds_ShouldNotExceedGroupCount() {
         var groups = TelegramChatGroupRequirements.values();
-        var chatIds = java.util.Arrays.stream(groups)
+        var chatIds = Arrays.stream(groups)
                 .map(TelegramChatGroupRequirements::getChatId)
                 .toList();
-        var uniqueChatIds = new java.util.HashSet<>(chatIds);
+        var uniqueChatIds = new HashSet<>(chatIds);
 
         assertThat(uniqueChatIds)
                 .as("Number of unique chat IDs should not exceed group count")

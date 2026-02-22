@@ -11,6 +11,7 @@ import ru.mitrohinayulya.zabotushka.dto.greenway.PartnerListResponse;
 import ru.mitrohinayulya.zabotushka.service.greenway.GreenwayService;
 
 import java.util.List;
+import java.util.Optional;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
@@ -32,7 +33,7 @@ class GreenwayResourceTest {
 
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
         when(greenwayService.findPartnerById(any(), anyLong()))
-                .thenReturn(java.util.Optional.of(partner));
+                .thenReturn(Optional.of(partner));
 
         given()
                 .auth().basic("admin", "admin")
@@ -50,7 +51,7 @@ class GreenwayResourceTest {
 
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
         when(greenwayService.findPartnerById(any(), anyLong()))
-                .thenReturn(java.util.Optional.empty());
+                .thenReturn(Optional.empty());
 
         given()
                 .auth().basic("admin", "admin")
@@ -68,7 +69,7 @@ class GreenwayResourceTest {
 
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
         when(greenwayService.findPartnerById(any(), anyLong()))
-                .thenReturn(java.util.Optional.of(partner));
+                .thenReturn(Optional.of(partner));
 
         given()
                 .auth().basic("admin", "admin")
@@ -90,7 +91,7 @@ class GreenwayResourceTest {
 
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
         when(greenwayService.findPartnerById(any(), anyLong()))
-                .thenReturn(java.util.Optional.of(partner));
+                .thenReturn(Optional.of(partner));
 
         given()
                 .auth().basic("admin", "admin")
@@ -109,7 +110,7 @@ class GreenwayResourceTest {
 
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
         when(greenwayService.findPartnerById(any(), anyLong()))
-                .thenReturn(java.util.Optional.of(partner));
+                .thenReturn(Optional.of(partner));
 
         given()
                 .auth().basic("admin", "admin")
@@ -129,7 +130,7 @@ class GreenwayResourceTest {
         when(greenwayService.getPreviousPeriod()).thenReturn(75);
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
         when(greenwayService.findPartnerById(any(), anyLong()))
-                .thenReturn(java.util.Optional.of(partner));
+                .thenReturn(Optional.of(partner));
 
         given()
                 .auth().basic("admin", "admin")
@@ -149,7 +150,7 @@ class GreenwayResourceTest {
 
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
         when(greenwayService.findPartnerById(any(), anyLong()))
-                .thenReturn(java.util.Optional.of(partner));
+                .thenReturn(Optional.of(partner));
 
         given()
                 .auth().basic("admin", "admin")
@@ -169,7 +170,7 @@ class GreenwayResourceTest {
 
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
         when(greenwayService.findPartnerById(any(), anyLong()))
-                .thenReturn(java.util.Optional.empty());
+                .thenReturn(Optional.empty());
 
         given()
                 .auth().basic("admin", "admin")
@@ -188,7 +189,7 @@ class GreenwayResourceTest {
 
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
         when(greenwayService.findPartnerById(any(), anyLong()))
-                .thenReturn(java.util.Optional.of(partner));
+                .thenReturn(Optional.of(partner));
 
         given()
                 .auth().basic("admin", "admin")
@@ -207,7 +208,7 @@ class GreenwayResourceTest {
 
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
         when(greenwayService.findPartnerById(any(), anyLong()))
-                .thenReturn(java.util.Optional.of(partner));
+                .thenReturn(Optional.of(partner));
 
         given()
                 .auth().basic("admin", "admin")
@@ -227,7 +228,7 @@ class GreenwayResourceTest {
         when(greenwayService.getPreviousPeriod()).thenReturn(75);
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
         when(greenwayService.findPartnerById(any(), anyLong()))
-                .thenReturn(java.util.Optional.of(partner));
+                .thenReturn(Optional.of(partner));
 
         given()
                 .auth().basic("admin", "admin")
@@ -251,9 +252,9 @@ class GreenwayResourceTest {
         when(greenwayService.getPartnerList(123456L, 0)).thenReturn(currentResponse);
         when(greenwayService.getPartnerList(123456L, 75)).thenReturn(previousResponse);
         when(greenwayService.findPartnerById(eq(currentResponse), anyLong()))
-                .thenReturn(java.util.Optional.of(currentPartner));
+                .thenReturn(Optional.of(currentPartner));
         when(greenwayService.findPartnerById(eq(previousResponse), anyLong()))
-                .thenReturn(java.util.Optional.of(previousPartner));
+                .thenReturn(Optional.of(previousPartner));
 
         given()
                 .auth().basic("admin", "admin")
@@ -277,9 +278,9 @@ class GreenwayResourceTest {
         when(greenwayService.getPartnerList(123456L, 0)).thenReturn(currentResponse);
         when(greenwayService.getPartnerList(123456L, 75)).thenReturn(previousResponse);
         when(greenwayService.findPartnerById(eq(currentResponse), anyLong()))
-                .thenReturn(java.util.Optional.of(currentPartner));
+                .thenReturn(Optional.of(currentPartner));
         when(greenwayService.findPartnerById(eq(previousResponse), anyLong()))
-                .thenReturn(java.util.Optional.of(previousPartner));
+                .thenReturn(Optional.of(previousPartner));
 
         given()
                 .auth().basic("admin", "admin")
@@ -297,7 +298,7 @@ class GreenwayResourceTest {
 
         when(greenwayService.getPartnerList(anyLong(), anyInt())).thenReturn(response);
         when(greenwayService.findPartnerById(any(), anyLong()))
-                .thenReturn(java.util.Optional.empty());
+                .thenReturn(Optional.empty());
 
         given()
                 .auth().basic("admin", "admin")
