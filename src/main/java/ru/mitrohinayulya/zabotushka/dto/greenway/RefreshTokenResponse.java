@@ -2,11 +2,11 @@ package ru.mitrohinayulya.zabotushka.dto.greenway;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/// Ответ на запрос создания сессии или обновления токена
-/// @param accessToken JWT access токен
-/// @param refreshToken JWT refresh токен
-/// @param code Код ошибки (если есть)
-/// @param detail Детали ошибки (если есть)
+/// Response for session creation or token refresh requests
+/// @param accessToken JWT access token
+/// @param refreshToken JWT refresh token
+/// @param code Error code (if any)
+/// @param detail Error details (if any)
 public record RefreshTokenResponse(
     @JsonProperty("access_token")
     String accessToken,

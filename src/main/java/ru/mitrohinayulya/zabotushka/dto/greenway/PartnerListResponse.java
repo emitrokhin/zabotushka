@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-/// Ответ на запрос списка партнеров
-/// @param authPartner Авторизованный партнер (от имени которого выполняется запрос)
-/// @param partners Список найденных партнеров
-/// @param code Код ошибки (если есть)
-/// @param detail Детали ошибки (если есть)
+/// Response for a partner list request
+/// @param authPartner Authorized partner (on whose behalf the request is made)
+/// @param partners List of found partners
+/// @param code Error code (if any)
+/// @param detail Error details (if any)
 public record PartnerListResponse(
     @JsonProperty("auth_partner")
     Partner authPartner,

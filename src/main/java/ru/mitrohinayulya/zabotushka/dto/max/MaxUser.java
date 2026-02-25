@@ -2,8 +2,8 @@ package ru.mitrohinayulya.zabotushka.dto.max;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/// Пользователь или бот в Max
-/// Объект содержит общую информацию о пользователе или боте без аватара
+/// A user or bot in Max
+/// Contains general information about a user or bot without avatar data
 public record MaxUser(
         @JsonProperty("user_id") long userId,
         @JsonProperty("first_name") String firstName,

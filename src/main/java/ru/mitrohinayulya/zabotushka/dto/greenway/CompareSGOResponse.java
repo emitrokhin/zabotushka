@@ -2,7 +2,7 @@ package ru.mitrohinayulya.zabotushka.dto.greenway;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/// Ответ на сравнение СГО (Структурный Групповой Оборот)
+/// Response for comparing SGO (Structural Group Turnover)
 public record CompareSGOResponse(
         long userId,
         Double sgo,

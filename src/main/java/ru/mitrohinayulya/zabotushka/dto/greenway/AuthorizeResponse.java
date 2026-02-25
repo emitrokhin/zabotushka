@@ -2,18 +2,18 @@ package ru.mitrohinayulya.zabotushka.dto.greenway;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/// Ответ на запрос авторизации партнера MyGreenway
-/// @param authorized Статус авторизации: "authorized" если дата регистрации совпадает, "not_authorized" если не совпадает
+/// Response to a MyGreenway partner authorization request
+/// @param authorized Authorization status: "authorized" if registration date matches, "not_authorized" otherwise
 public record AuthorizeResponse(
     @JsonProperty("authorized")
     String authorized
 ) {
-    /// Создает ответ с успешной авторизацией
+    /// Creates a successful authorization response
     public static AuthorizeResponse createAuthorized() {
         return new AuthorizeResponse("authorized");
     }
 
-    /// Создает ответ с неуспешной авторизацией
+    /// Creates an unsuccessful authorization response
     public static AuthorizeResponse createNotAuthorized() {
         return new AuthorizeResponse("not_authorized");
     }

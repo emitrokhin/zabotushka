@@ -2,19 +2,19 @@ package ru.mitrohinayulya.zabotushka.dto.telegram;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/// Представляет участника чата в Telegram
+/// Represents a chat member in Telegram
 public record ChatMember(
         @JsonProperty("status") String status,
         @JsonProperty("user") User user
 ) {
-    /// Проверяет, является ли пользователь членом группы
+    /// Checks if the user is a member of the group
     public boolean isMember() {
         return "member".equals(status)
                 || "administrator".equals(status)
                 || "creator".equals(status);
     }
 
-    /// Проверяет, является ли пользователь администратором
+    /// Checks if the user is an administrator
     public boolean isAdmin() {
         return "administrator".equals(status) || "creator".equals(status);
     }

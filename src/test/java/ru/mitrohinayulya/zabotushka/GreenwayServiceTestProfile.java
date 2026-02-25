@@ -3,12 +3,12 @@ package ru.mitrohinayulya.zabotushka;
 import io.quarkus.test.junit.QuarkusTestProfile;
 import java.util.Set;
 
-/// Профиль для тестов - отключает GreenwayPartnerService startup
+/// Test profile that disables GreenwayPartnerService startup
 public class GreenwayServiceTestProfile implements QuarkusTestProfile {
 
     @Override
     public Set<Class<?>> getEnabledAlternatives() {
-        // Отключаем @Startup для GreenwayPartnerService в тестах
+        // Disable @Startup for GreenwayPartnerService in tests
         return Set.of();
     }
 

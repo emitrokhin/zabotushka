@@ -4,8 +4,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import ru.mitrohinayulya.zabotushka.dto.telegram.ChatJoinRequest;
 
-/// Фасад для операций Telegram платформы.
-/// @see TelegramWebhookRegistrar.
+/// Facade for Telegram platform operations.
+/// @see TelegramWebhookRegistrar
 @ApplicationScoped
 public class TelegramService {
 

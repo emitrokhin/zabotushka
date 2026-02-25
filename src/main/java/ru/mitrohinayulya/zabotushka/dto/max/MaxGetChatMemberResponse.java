@@ -2,7 +2,7 @@ package ru.mitrohinayulya.zabotushka.dto.max;
 
 import java.util.List;
 
-/// Результат запроса участников чата с информацией о времени последней активности
+/// Result of a chat members request, including last activity time information
 public record MaxGetChatMemberResponse(
         List<MaxChatMember> members
 ) {

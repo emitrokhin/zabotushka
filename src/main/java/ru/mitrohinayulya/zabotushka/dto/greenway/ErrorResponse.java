@@ -2,8 +2,8 @@ package ru.mitrohinayulya.zabotushka.dto.greenway;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/// Ответ с ошибкой
-/// @param error Описание ошибки
+/// Error response
+/// @param error Error description
 public record ErrorResponse(
     @JsonProperty("error")
     String error

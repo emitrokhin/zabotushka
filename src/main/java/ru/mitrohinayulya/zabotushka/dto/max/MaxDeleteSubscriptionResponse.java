@@ -1,7 +1,7 @@
 package ru.mitrohinayulya.zabotushka.dto.max;
 
-/// Отписывает бота от получения обновлений через Webhook. После вызова этого метода бот перестаёт
-/// получать уведомления о новых событиях, и становится доступна доставка уведомлений через API с длительным опросом
+/// Unsubscribes the bot from receiving updates via Webhook. After calling this method, the bot stops
+/// receiving event notifications, and long-polling delivery becomes available via the API.
 public record MaxDeleteSubscriptionResponse(
         boolean success,
         String message

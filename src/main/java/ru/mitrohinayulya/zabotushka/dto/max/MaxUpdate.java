@@ -2,7 +2,7 @@ package ru.mitrohinayulya.zabotushka.dto.max;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/// Объект MaxUpdate представляет различные типы событий, произошедших в чате Max.
+/// MaxUpdate represents various types of events that occurred in a Max chat.
 public record MaxUpdate(
         @JsonProperty("update_type") String updateType,
         long timestamp,

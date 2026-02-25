@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-/// Участник чата в Max. Содержит информацию о пользователе или боте,
-/// а также данные о членстве в чате (роль, права, время вступления).
+/// Chat member in Max. Contains information about a user or bot,
+/// as well as chat membership data (role, permissions, join time).
 public record MaxChatMember(
         @JsonProperty("user_id") long userId,
         @JsonProperty("first_name") String firstName,
