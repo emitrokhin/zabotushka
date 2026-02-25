@@ -2,14 +2,25 @@ package ru.mitrohinayulya.zabotushka.resource;
 
 import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.mitrohinayulya.zabotushka.dto.greenway.*;
+import ru.mitrohinayulya.zabotushka.dto.greenway.CheckUserIdResponse;
+import ru.mitrohinayulya.zabotushka.dto.greenway.CompareLOResponse;
+import ru.mitrohinayulya.zabotushka.dto.greenway.CompareSGOResponse;
+import ru.mitrohinayulya.zabotushka.dto.greenway.ComparisonResult;
+import ru.mitrohinayulya.zabotushka.dto.greenway.Partner;
+import ru.mitrohinayulya.zabotushka.dto.greenway.QualificationLevel;
+import ru.mitrohinayulya.zabotushka.dto.greenway.QualificationResponse;
 import ru.mitrohinayulya.zabotushka.exception.GreenwayApiException;
 import ru.mitrohinayulya.zabotushka.service.greenway.GreenwayPartnerService;
+import ru.mitrohinayulya.zabotushka.service.greenway.GreenwayQualificationService;
 
 import java.util.Optional;
 
@@ -26,6 +37,9 @@ public class GreenwayResource {
 
     @Inject
     GreenwayPartnerService greenwayPartnerService;
+
+    @Inject
+    GreenwayQualificationService greenwayQualificationService;
 
     /**
      * Проверяет существование партнера по ID
@@ -228,34 +242,9 @@ public class GreenwayResource {
     @Path("/qualification/best/{userId}")
     public QualificationResponse getQualificationBest(@PathParam("userId") long userId) {
         log.info("Getting best qualification: userId={}", userId);
-
-        try {
-            var previousPeriod = greenwayPartnerService.getPreviousPeriod();
-
-            var currentPartnerList = greenwayPartnerService.getPartnerList(userId, 0);
-            var previousPartnerList = greenwayPartnerService.getPartnerList(userId, previousPeriod);
-
-            var currentQual = greenwayPartnerService.findPartnerById(currentPartnerList, userId)
-                    .map(Partner::qualification)
-                    .map(QualificationLevel::fromString)
-                    .orElse(QualificationLevel.NO);
-
-            var previousQual = greenwayPartnerService.findPartnerById(previousPartnerList, userId)
-                    .map(Partner::qualification)
-                    .map(QualificationLevel::fromString)
-                    .orElse(QualificationLevel.NO);
-
-            var bestQual = QualificationLevel.best(currentQual, previousQual);
-
-            log.info("Best qualification result: userId={}, current={}, previous={}, best={}",
-                    userId, currentQual, previousQual, bestQual);
-
-            return QualificationResponse.of(bestQual);
-
-        } catch (Exception e) {
-            log.error("Error during qualification check: userId={}", userId, e);
-            return QualificationResponse.of(QualificationLevel.NO);
-        }
+        var bestQual = greenwayQualificationService.getBestQualification(userId);
+        log.info("Best qualification result: userId={}, best={}", userId, bestQual);
+        return QualificationResponse.of(bestQual);
     }
 
     /**
