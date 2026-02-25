@@ -3,7 +3,6 @@ package ru.mitrohinayulya.zabotushka.config;
 import ru.mitrohinayulya.zabotushka.dto.greenway.QualificationLevel;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 /// Qualification requirements for Telegram groups bound to platform chat IDs.
@@ -30,8 +29,8 @@ public enum TelegramChatGroupRequirements {
         return requirements.getGroupName();
     }
 
-    public List<QualificationLevel> getAllowedQualifications() {
-        return requirements.getAllowedQualifications();
+    public QualificationLevel getMinimumLevel() {
+        return requirements.getMinimumLevel();
     }
 
     public boolean isQualificationAllowed(QualificationLevel qualification) {

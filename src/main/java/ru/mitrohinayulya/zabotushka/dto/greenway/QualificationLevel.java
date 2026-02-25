@@ -21,12 +21,8 @@ public enum QualificationLevel {
         return name();
     }
 
-    public int getRank() {
-        return rank;
-    }
-
     /// Extracts the qualification letter from a full qualification string
-    /// For example: "S1" -> S, "L3" -> L, "M2" -> M, "GM4" -> GM
+    /// For example, "S1" -> S, "L3" -> L, "M2" -> M, "GM4" -> GM
     public static QualificationLevel fromString(String qualification) {
         if (qualification == null || qualification.isBlank()) {
             return NO;
@@ -45,6 +41,11 @@ public enum QualificationLevel {
         } else {
             return NO;
         }
+    }
+
+    /// Returns true if this qualification level meets or exceeds the required level
+    public boolean isAtLeast(QualificationLevel required) {
+        return this.rank >= required.rank;
     }
 
     /// Returns the better of two qualifications

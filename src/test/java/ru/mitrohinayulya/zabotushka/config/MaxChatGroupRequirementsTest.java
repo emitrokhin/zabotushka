@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import ru.mitrohinayulya.zabotushka.dto.greenway.QualificationLevel;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.mitrohinayulya.zabotushka.dto.greenway.QualificationLevel.M;
 
 class MaxChatGroupRequirementsTest {
 
@@ -63,16 +64,10 @@ class MaxChatGroupRequirementsTest {
     }
 
     @Test
-    @DisplayName("getAllowedQualifications returns M and GM for GOLD_CLUB")
-    void getAllowedQualifications_ShouldReturnMAndGM_WhenGoldClub() {
-        var allowedQuals = MaxChatGroupRequirements.GOLD_CLUB.getAllowedQualifications();
+    @DisplayName("getMinimumLevel returns M for GOLD_CLUB")
+    void getMinimumLevel_ShouldReturnM_WhenGoldClub() {
+        var minimumLevel = MaxChatGroupRequirements.GOLD_CLUB.getMinimumLevel();
 
-        assertThat(allowedQuals)
-                .as("GOLD_CLUB should have exactly 2 allowed qualifications")
-                .hasSize(2)
-                .as("GOLD_CLUB allowed qualifications should contain M")
-                .contains(QualificationLevel.M)
-                .as("GOLD_CLUB allowed qualifications should contain GM")
-                .contains(QualificationLevel.GM);
+        assertThat(minimumLevel).as("GOLD_CLUB minimum level should be M").isEqualTo(M);
     }
 }
