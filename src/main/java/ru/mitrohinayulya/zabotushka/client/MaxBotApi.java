@@ -1,11 +1,24 @@
 package ru.mitrohinayulya.zabotushka.client;
 
 import io.quarkiverse.bucket4j.runtime.RateLimited;
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
-import ru.mitrohinayulya.zabotushka.dto.max.*;
+import ru.mitrohinayulya.zabotushka.dto.max.MaxDeleteChatMemberResponse;
+import ru.mitrohinayulya.zabotushka.dto.max.MaxDeleteSubscriptionResponse;
+import ru.mitrohinayulya.zabotushka.dto.max.MaxGetChatMemberResponse;
+import ru.mitrohinayulya.zabotushka.dto.max.MaxSendMessageRequest;
+import ru.mitrohinayulya.zabotushka.dto.max.MaxSetSubscriptionRequest;
+
+import java.util.List;
 
 /// REST client for *Max Bot API*
 /// Handles sending messages to users
@@ -35,7 +48,7 @@ public interface MaxBotApi {
     /// Возвращает список участников чата
     @GET
     @Path("/chats/{chatId}/members")
-    MaxGetChatMemberResponse getChatMembers(@PathParam("chatId") long chatId, MaxGetChatMemberRequest request);
+    MaxGetChatMemberResponse getChatMembers(@PathParam("chatId") long chatId, @QueryParam("user_ids") List<Long> userIds);
 
     ///Удаляет участника из группового чата.
     @DELETE

@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import ru.mitrohinayulya.zabotushka.client.MaxBotApi;
 import ru.mitrohinayulya.zabotushka.config.ChatGroupRequirements;
 import ru.mitrohinayulya.zabotushka.config.MaxChatGroupRequirements;
-import ru.mitrohinayulya.zabotushka.dto.max.MaxGetChatMemberRequest;
 import ru.mitrohinayulya.zabotushka.entity.Platform;
 import ru.mitrohinayulya.zabotushka.service.platform.AbstractGroupAccessService;
 
@@ -41,8 +40,7 @@ public class MaxGroupAccessService extends AbstractGroupAccessService {
     @Override
     public boolean isMemberOfChat(long chatId, long userId) {
         try {
-            var request = MaxGetChatMemberRequest.ofMemberList(List.of(userId));
-            var response = botApi.getChatMembers(chatId, request);
+            var response = botApi.getChatMembers(chatId, List.of(userId));
             return !response.members().isEmpty();
         } catch (Exception e) {
             log.error("Error checking chat membership: chatId={}, userId={}", chatId, userId, e);

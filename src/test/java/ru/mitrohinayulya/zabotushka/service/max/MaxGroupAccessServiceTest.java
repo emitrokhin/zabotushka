@@ -20,11 +20,15 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MaxGroupAccessServiceTest {
@@ -48,7 +52,7 @@ class MaxGroupAccessServiceTest {
     @Test
     @DisplayName("checkAndRemoveIfNotQualified only removes membership when user has already left the chat")
     void checkAndRemoveIfNotQualified_ShouldRemoveOnlyMembership_WhenUserHasLeft() {
-        when(botApi.getChatMembers(anyLong(), any())).thenReturn(new MaxGetChatMemberResponse(Collections.emptyList()));
+        when(botApi.getChatMembers(anyLong(), anyList())).thenReturn(new MaxGetChatMemberResponse(Collections.emptyList()));
 
         moderationService.checkAndRemoveIfNotQualified(-71062621438079L, 123L, 456L);
 
@@ -60,7 +64,7 @@ class MaxGroupAccessServiceTest {
     @Test
     @DisplayName("checkAndRemoveIfNotQualified removes user from chat when qualification is not allowed")
     void checkAndRemoveIfNotQualified_ShouldRemoveUser_WhenQualificationNotAllowed() {
-        when(botApi.getChatMembers(anyLong(), any())).thenReturn(new MaxGetChatMemberResponse(
+        when(botApi.getChatMembers(anyLong(), anyList())).thenReturn(new MaxGetChatMemberResponse(
                 List.of(mock(MaxChatMember.class))));
         when(qualificationService.getBestQualification(456L)).thenReturn(QualificationLevel.NO);
         when(botApi.deleteChatMember(-71062621438079L, 123L))
@@ -76,7 +80,7 @@ class MaxGroupAccessServiceTest {
     @Test
     @DisplayName("checkAndRemoveIfNotQualified does not remove user when qualification is allowed")
     void checkAndRemoveIfNotQualified_ShouldNotRemoveUser_WhenQualificationAllowed() {
-        when(botApi.getChatMembers(anyLong(), any())).thenReturn(new MaxGetChatMemberResponse(
+        when(botApi.getChatMembers(anyLong(), anyList())).thenReturn(new MaxGetChatMemberResponse(
                 List.of(mock(MaxChatMember.class))));
         when(qualificationService.getBestQualification(456L)).thenReturn(QualificationLevel.M);
 
@@ -89,7 +93,7 @@ class MaxGroupAccessServiceTest {
     @Test
     @DisplayName("isMemberOfChat returns true when member list is non-empty")
     void isMemberOfChat_ShouldReturnTrue_WhenMemberExists() {
-        when(botApi.getChatMembers(anyLong(), any())).thenReturn(new MaxGetChatMemberResponse(
+        when(botApi.getChatMembers(anyLong(), anyList())).thenReturn(new MaxGetChatMemberResponse(
                 List.of(mock(MaxChatMember.class))));
 
         var result = moderationService.isMemberOfChat(-71062621438079L, 123L);
@@ -100,7 +104,7 @@ class MaxGroupAccessServiceTest {
     @Test
     @DisplayName("isMemberOfChat returns false when member list is empty")
     void isMemberOfChat_ShouldReturnFalse_WhenMemberListIsEmpty() {
-        when(botApi.getChatMembers(anyLong(), any())).thenReturn(new MaxGetChatMemberResponse(Collections.emptyList()));
+        when(botApi.getChatMembers(anyLong(), anyList())).thenReturn(new MaxGetChatMemberResponse(Collections.emptyList()));
 
         var result = moderationService.isMemberOfChat(-71062621438079L, 123L);
 
