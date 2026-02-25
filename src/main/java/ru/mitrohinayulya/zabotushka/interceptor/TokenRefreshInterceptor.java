@@ -1,5 +1,6 @@
 package ru.mitrohinayulya.zabotushka.interceptor;
 
+import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
 import jakarta.interceptor.AroundInvoke;
 import jakarta.interceptor.Interceptor;
@@ -18,6 +19,7 @@ import java.util.Arrays;
 /// If refresh itself fails, the error propagates — a full re-login is needed.
 @Interceptor
 @RefreshTokenOnExpiry
+@Priority(Interceptor.Priority.APPLICATION)
 public class TokenRefreshInterceptor {
 
     private static final Logger log = LoggerFactory.getLogger(TokenRefreshInterceptor.class);
