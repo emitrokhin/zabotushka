@@ -1,7 +1,11 @@
 package ru.mitrohinayulya.zabotushka.resource.max;
 
 import jakarta.inject.Inject;
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -39,6 +43,7 @@ public class MaxWebhookResource {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
+        // Проверка совпадения события - user_added
         if (!USER_ADDED_UPDATE_TYPE.equals(update.updateType())) {
             log.debug("Update does not contain user_added, ignoring");
             return Response.ok().build();
@@ -49,7 +54,6 @@ public class MaxWebhookResource {
                 update.user().username(),
                 update.user().userId());
 
-        // Обработка запроса на вступление в чат
         maxService.processUserAddedUpdate(update);
 
         return Response.ok().build();

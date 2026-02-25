@@ -2,9 +2,7 @@ package ru.mitrohinayulya.zabotushka.dto.telegram;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * Telegram Chat object
- */
+/// Telegram Chat object
 public record Chat(
         long id,
         String type,

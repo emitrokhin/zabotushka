@@ -2,9 +2,7 @@ package ru.mitrohinayulya.zabotushka.dto.greenway;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * Ответ на сравнение ЛО (Личный Оборот)
- */
+/// Ответ на сравнение ЛО (Личный Оборот)
 public record CompareLOResponse(
         long userId,
         Double lo,

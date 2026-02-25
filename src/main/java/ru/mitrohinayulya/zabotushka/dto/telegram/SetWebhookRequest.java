@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-/**
- * Request to set webhook for Telegram bot
- */
+/// Request to set webhook for Telegram bot
 public record SetWebhookRequest(
         String url,
         @JsonProperty("allowed_updates") List<String> allowedUpdates,

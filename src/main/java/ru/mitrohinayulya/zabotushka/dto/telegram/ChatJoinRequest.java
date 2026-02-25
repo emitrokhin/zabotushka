@@ -2,10 +2,8 @@ package ru.mitrohinayulya.zabotushka.dto.telegram;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * Telegram ChatJoinRequest object
- * Represents a join request sent to a chat
- */
+/// Telegram ChatJoinRequest object
+/// Represents a join request sent to a chat
 public record ChatJoinRequest(
         Chat chat,
         User from,

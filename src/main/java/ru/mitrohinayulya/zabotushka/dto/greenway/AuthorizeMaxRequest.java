@@ -4,13 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
-/**
- * Запрос на авторизацию партнера MyGreenway через Max
- *
- * @param maxId      ID пользователя в Max
- * @param greenwayId ID партнера в системе Greenway
- * @param regDate    Дата регистрации партнера в формате DD.MM.YYYY
- */
+/// Запрос на авторизацию партнера MyGreenway через Max
+/// @param maxId ID пользователя в Max
+/// @param greenwayId ID партнера в системе Greenway
+/// @param regDate Дата регистрации партнера в формате DD.MM.YYYY
 public record AuthorizeMaxRequest(
     @JsonProperty("maxId")
     long maxId,

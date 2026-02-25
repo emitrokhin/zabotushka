@@ -1,8 +1,6 @@
 package ru.mitrohinayulya.zabotushka.exception;
 
-/**
- * Исключение при ошибке работы с MyGreenway API
- */
+/// Исключение при ошибке работы с MyGreenway API
 public class GreenwayApiException extends RuntimeException {
 
     private final String errorCode;

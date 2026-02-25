@@ -4,13 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
-/**
- * Запрос на авторизацию партнера MyGreenway через Telegram
- *
- * @param telegramId ID пользователя в Telegram
- * @param greenwayId ID партнера в системе Greenway
- * @param regDate    Дата регистрации партнера в формате DD.MM.YYYY
- */
+/// Запрос на авторизацию партнера MyGreenway через Telegram
+/// @param telegramId ID пользователя в Telegram
+/// @param greenwayId ID партнера в системе Greenway
+/// @param regDate Дата регистрации партнера в формате DD.MM.YYYY
 public record AuthorizeTelegramRequest(
     @JsonProperty("telegramId")
     long telegramId,

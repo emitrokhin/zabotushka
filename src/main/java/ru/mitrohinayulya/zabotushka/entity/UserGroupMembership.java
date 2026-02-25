@@ -1,15 +1,21 @@
 package ru.mitrohinayulya.zabotushka.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Entity для хранения информации о членстве пользователей в группах
- */
+/// Entity для хранения информации о членстве пользователей в группах
 @Entity
 @Table(name = "user_group_memberships",
        uniqueConstraints = @UniqueConstraint(columnNames = {"platform_user_id", "chat_id", "platform"}))
@@ -39,23 +45,17 @@ public class UserGroupMembership extends PanacheEntityBase {
     @Column(name = "last_checked_at")
     public LocalDateTime lastCheckedAt;
 
-    /**
-     * Поиск всех членов конкретной группы для указанной платформы
-     */
+    /// Поиск всех членов конкретной группы для указанной платформы
     public static List<UserGroupMembership> findByChatIdAndPlatform(long chatId, Platform platform) {
         return list("chatId = ?1 and platform = ?2", chatId, platform);
     }
 
-    /**
-     * Проверка существования записи о членстве
-     */
+    /// Проверка существования записи о членстве
     public static boolean exists(long platformUserId, long chatId, Platform platform) {
         return count(QUERY_BY_PLATFORM_USER_AND_CHAT_AND_PLATFORM, platformUserId, chatId, platform) > 0;
     }
 
-    /**
-     * Удаление записи о членстве
-     */
+    /// Удаление записи о членстве
     public static boolean removeMembership(long platformUserId, long chatId, Platform platform) {
         return delete(QUERY_BY_PLATFORM_USER_AND_CHAT_AND_PLATFORM, platformUserId, chatId, platform) > 0;
     }

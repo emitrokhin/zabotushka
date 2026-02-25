@@ -2,9 +2,7 @@ package ru.mitrohinayulya.zabotushka.dto.telegram;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * Запрос для разбана участника чата
- */
+/// Запрос для разбана участника чата
 public record UnbanChatMemberRequest(
         @JsonProperty("chat_id") long chatId,
         @JsonProperty("user_id") long userId,

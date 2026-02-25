@@ -2,9 +2,7 @@ package ru.mitrohinayulya.zabotushka.dto.telegram;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * Запрос для получения информации об участнике чата
- */
+/// Запрос для получения информации об участнике чата
 public record GetChatMemberRequest(
         @JsonProperty("chat_id") long chatId,
         @JsonProperty("user_id") long userId

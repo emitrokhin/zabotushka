@@ -2,9 +2,7 @@ package ru.mitrohinayulya.zabotushka.dto.telegram;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * Telegram ChatInviteLink object
- */
+/// Telegram ChatInviteLink object
 public record InviteLink(
         @JsonProperty("invite_link") String inviteLink,
         User creator,

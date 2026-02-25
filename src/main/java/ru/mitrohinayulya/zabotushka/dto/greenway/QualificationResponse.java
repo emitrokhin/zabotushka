@@ -1,8 +1,6 @@
 package ru.mitrohinayulya.zabotushka.dto.greenway;
 
-/**
- * Ответ с квалификацией партнера
- */
+/// Ответ с квалификацией партнера
 public record QualificationResponse(
         String qualification
 ) {

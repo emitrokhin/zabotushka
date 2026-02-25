@@ -1,14 +1,18 @@
 package ru.mitrohinayulya.zabotushka.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-/**
- * Entity для хранения авторизованных Max пользователей
- */
+/// Entity для хранения авторизованных Max пользователей
 @Entity
 @Table(name = "authorized_max_users",
        uniqueConstraints = {
@@ -33,23 +37,17 @@ public class AuthorizedMaxUser extends PanacheEntityBase {
     @Column(name = "creation_date", nullable = false)
     public LocalDateTime creationDate;
 
-    /**
-     * Поиск пользователя по maxId
-     */
+    /// Поиск пользователя по maxId
     public static AuthorizedMaxUser findByMaxId(long maxId) {
         return find("maxId", maxId).firstResult();
     }
 
-    /**
-     * Проверка существования пользователя по maxId
-     */
+    /// Проверка существования пользователя по maxId
     public static boolean existsByMaxId(long maxId) {
         return count("maxId", maxId) > 0;
     }
 
-    /**
-     * Проверка существования пользователя по greenwayId
-     */
+    /// Проверка существования пользователя по greenwayId
     public static boolean existsByGreenwayId(long greenwayId) {
         return count("greenwayId", greenwayId) > 0;
     }

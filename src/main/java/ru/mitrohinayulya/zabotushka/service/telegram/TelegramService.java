@@ -4,10 +4,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import ru.mitrohinayulya.zabotushka.dto.telegram.ChatJoinRequest;
 
-/**
- * Фасад для операций Telegram платформы.
- * Webhook-регистрация управляется в {@link ru.mitrohinayulya.zabotushka.service.telegram.TelegramWebhookRegistrar}.
- */
+/// Фасад для операций Telegram платформы.
+/// @see TelegramWebhookRegistrar.
 @ApplicationScoped
 public class TelegramService {
 

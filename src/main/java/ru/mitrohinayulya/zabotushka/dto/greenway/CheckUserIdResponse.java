@@ -2,9 +2,7 @@ package ru.mitrohinayulya.zabotushka.dto.greenway;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-/**
- * Ответ на проверку существования партнера
- */
+/// Ответ на проверку существования партнера
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record CheckUserIdResponse(
         Long userId

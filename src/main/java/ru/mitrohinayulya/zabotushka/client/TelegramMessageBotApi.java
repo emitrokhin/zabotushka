@@ -10,10 +10,8 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import ru.mitrohinayulya.zabotushka.dto.telegram.SendMessageRequest;
 import ru.mitrohinayulya.zabotushka.dto.telegram.TelegramResponse;
 
-/**
- * REST client for Telegram Bot API - Message Bot
- * Handles sending messages to users
- */
+/// REST client for Telegram Bot API - Message Bot
+/// Handles sending messages to users
 @RegisterRestClient(configKey = "telegram-message-bot-api")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)

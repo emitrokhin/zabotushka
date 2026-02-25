@@ -2,9 +2,7 @@ package ru.mitrohinayulya.zabotushka.dto.greenway;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * Данные партнера из MyGreenway API
- */
+/// Данные партнера из MyGreenway API
 public record Partner(
     @JsonProperty("id")
     Integer id,

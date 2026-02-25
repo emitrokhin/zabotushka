@@ -2,9 +2,7 @@ package ru.mitrohinayulya.zabotushka.dto.greenway;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-/**
- * Результат сравнения числовых значений
- */
+/// Результат сравнения числовых значений
 public enum ComparisonResult {
     GREATER("greater"),
     LESS("less"),

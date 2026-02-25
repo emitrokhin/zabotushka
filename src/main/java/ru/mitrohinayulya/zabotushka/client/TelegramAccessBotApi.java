@@ -7,12 +7,16 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
-import ru.mitrohinayulya.zabotushka.dto.telegram.*;
+import ru.mitrohinayulya.zabotushka.dto.telegram.ApproveChatJoinRequest;
+import ru.mitrohinayulya.zabotushka.dto.telegram.ChatMember;
+import ru.mitrohinayulya.zabotushka.dto.telegram.DeclineChatJoinRequest;
+import ru.mitrohinayulya.zabotushka.dto.telegram.GetChatMemberRequest;
+import ru.mitrohinayulya.zabotushka.dto.telegram.SetWebhookRequest;
+import ru.mitrohinayulya.zabotushka.dto.telegram.TelegramResponse;
+import ru.mitrohinayulya.zabotushka.dto.telegram.UnbanChatMemberRequest;
 
-/**
- * REST client for Telegram Bot API - Access Bot
- * Handles webhook registration and access control operations
- */
+/// REST client for Telegram Bot API - Access Bot
+/// Handles webhook registration and access control operations
 @RegisterRestClient(configKey = "telegram-access-bot-api")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)

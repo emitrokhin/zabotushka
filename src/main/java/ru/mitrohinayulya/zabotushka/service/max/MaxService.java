@@ -4,10 +4,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import ru.mitrohinayulya.zabotushka.dto.max.MaxUpdate;
 
-/**
- * Фасад для операций Max платформы.
- * Webhook-регистрация управляется в {@link ru.mitrohinayulya.zabotushka.service.max.MaxWebhookRegistrar}.
- */
+/// Фасад для операций Max платформы.
+/// @see MaxWebhookRegistrar
 @ApplicationScoped
 public class MaxService {
 

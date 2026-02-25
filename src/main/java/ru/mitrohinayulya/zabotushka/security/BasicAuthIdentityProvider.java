@@ -14,9 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mitrohinayulya.zabotushka.config.BasicAuthConfig;
 
-/**
- * Custom Identity Provider для Basic Authentication
- */
+/// Custom Identity Provider для Basic Authentication
 @ApplicationScoped
 public class BasicAuthIdentityProvider implements IdentityProvider<UsernamePasswordAuthenticationRequest> {
 
@@ -38,7 +36,6 @@ public class BasicAuthIdentityProvider implements IdentityProvider<UsernamePassw
 
         log.debug("Attempting authentication for user: {}", username);
 
-        // Проверяем учетные данные
         if (authConfig.username().equals(username) && authConfig.password().equals(password)) {
             log.info("User authenticated successfully: {}", username);
             return Uni.createFrom().item(QuarkusSecurityIdentity.builder()

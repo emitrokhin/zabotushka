@@ -2,9 +2,7 @@ package ru.mitrohinayulya.zabotushka.dto.telegram;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * Telegram User object
- */
+/// Telegram User object
 public record User(
         long id,
         @JsonProperty("is_bot") Boolean isBot,

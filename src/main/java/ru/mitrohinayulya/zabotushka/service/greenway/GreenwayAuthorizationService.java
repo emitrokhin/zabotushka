@@ -15,10 +15,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
-/**
- * Общий сервис авторизации через Greenway API.
- * Содержит shared-логику проверки партнера, вынесенную из GreenwayResource.
- */
+/// Общий сервис авторизации через Greenway API.
+/// Содержит shared-логику проверки партнера, вынесенную из GreenwayResource.
 @ApplicationScoped
 public class GreenwayAuthorizationService {
 
@@ -27,16 +25,13 @@ public class GreenwayAuthorizationService {
     @Inject
     GreenwayPartnerService greenwayPartnerService;
 
-    /**
-     * Выполняет авторизацию пользователя через Greenway API
-     *
-     * @param ops        платформо-зависимые операции
-     * @param platformId ID пользователя на платформе
-     * @param greenwayId ID партнера в Greenway
-     * @param regDate    дата регистрации
-     * @param platformName название платформы для логирования
-     * @return HTTP ответ
-     */
+    /// Выполняет авторизацию пользователя через Greenway API
+    /// @param ops платформо-зависимые операции
+    /// @param platformId ID пользователя на платформе
+    /// @param greenwayId ID партнера в Greenway
+    /// @param regDate дата регистрации
+    /// @param platformName название платформы для логирования
+    /// @return HTTP ответ
     public Response authorize(PlatformAuthorizationService ops, long platformId, long greenwayId, String regDate, String platformName) {
         log.info("Authorizing partner with {}Id={}, greenwayId={}, regDate={}",
                 platformName, platformId, greenwayId, regDate);
@@ -53,7 +48,6 @@ public class GreenwayAuthorizationService {
                         .build();
             }
         }
-
         // Проверяем, не используется ли этот greenwayId другим пользователем
         if (ops.existsByGreenwayId(greenwayId)) {
             log.warn("Authorization rejected: greenwayId={} is already associated with another account",
@@ -62,7 +56,6 @@ public class GreenwayAuthorizationService {
                     .entity(ErrorResponse.of("This Greenway ID is already associated with another account"))
                     .build();
         }
-
         // Выполняем авторизацию через Greenway API
         try {
             var partnerListResponse = greenwayPartnerService.getPartnerList(greenwayId, 0);

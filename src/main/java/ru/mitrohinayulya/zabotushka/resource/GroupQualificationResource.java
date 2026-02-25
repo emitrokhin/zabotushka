@@ -2,16 +2,17 @@ package ru.mitrohinayulya.zabotushka.resource;
 
 import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mitrohinayulya.zabotushka.scheduler.GroupQualificationScheduler;
 
-/**
- * REST ресурс для управления проверкой квалификаций в группах
- */
+/// REST ресурс для управления проверкой квалификаций в группах
 @Path("/group-qualification")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -23,11 +24,8 @@ public class GroupQualificationResource {
     @Inject
     GroupQualificationScheduler groupQualificationScheduler;
 
-    /**
-     * Запускает проверку квалификаций пользователей во всех группах
-     *
-     * @return результат выполнения
-     */
+    /// Запускает проверку квалификаций пользователей во всех группах
+    /// @return результат выполнения
     @POST
     @Path("/check")
     public Response checkGroupQualifications() {
@@ -47,8 +45,6 @@ public class GroupQualificationResource {
         }
     }
 
-    /**
-     * DTO для ответа
-     */
+    /// DTO для ответа
     public record CheckResponse(String status, String message) {}
 }

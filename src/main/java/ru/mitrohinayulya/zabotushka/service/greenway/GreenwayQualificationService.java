@@ -7,9 +7,7 @@ import org.slf4j.LoggerFactory;
 import ru.mitrohinayulya.zabotushka.dto.greenway.Partner;
 import ru.mitrohinayulya.zabotushka.dto.greenway.QualificationLevel;
 
-/**
- * Общая логика определения лучшей квалификации пользователя.
- */
+/// Общая логика определения лучшей квалификации пользователя.
 @ApplicationScoped
 public class GreenwayQualificationService {
 

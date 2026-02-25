@@ -2,9 +2,7 @@ package ru.mitrohinayulya.zabotushka.dto.greenway;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-/**
- * Уровень квалификации партнера MyGreenway
- */
+/// Уровень квалификации партнера MyGreenway
 public enum QualificationLevel {
     NO(0),
     S(1),
@@ -27,10 +25,8 @@ public enum QualificationLevel {
         return rank;
     }
 
-    /**
-     * Извлекает букву квалификации из полной строки
-     * Например: "S1" -> S, "L3" -> L, "M2" -> M, "GM4" -> GM
-     */
+    /// Извлекает букву квалификации из полной строки
+    /// Например: "S1" -> S, "L3" -> L, "M2" -> M, "GM4" -> GM
     public static QualificationLevel fromString(String qualification) {
         if (qualification == null || qualification.isBlank()) {
             return NO;
@@ -51,9 +47,7 @@ public enum QualificationLevel {
         }
     }
 
-    /**
-     * Возвращает лучшую квалификацию из двух
-     */
+    /// Возвращает лучшую квалификацию из двух
     public static QualificationLevel best(QualificationLevel q1, QualificationLevel q2) {
         return q1.rank > q2.rank ? q1 : q2;
     }

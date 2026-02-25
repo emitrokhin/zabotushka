@@ -3,9 +3,7 @@ package ru.mitrohinayulya.zabotushka;
 import io.quarkus.test.junit.QuarkusTestProfile;
 import java.util.Set;
 
-/**
- * Профиль для тестов - отключает GreenwayPartnerService startup
- */
+/// Профиль для тестов - отключает GreenwayPartnerService startup
 public class GreenwayServiceTestProfile implements QuarkusTestProfile {
 
     @Override
