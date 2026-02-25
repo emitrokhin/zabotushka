@@ -2,13 +2,13 @@ package ru.mitrohinayulya.zabotushka.config;
 
 import io.smallrye.config.ConfigMapping;
 
-/// Конфигурация для Basic Authentication
+/// Configuration for Basic Authentication
 @ConfigMapping(prefix = "app.basic-auth")
 public interface BasicAuthConfig {
 
-    /// Имя пользователя для Basic Auth
+    /// Username for Basic Auth
     String username();
 
-    /// Пароль для Basic Auth
+    /// Password for Basic Auth
     String password();
 }

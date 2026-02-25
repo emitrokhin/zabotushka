@@ -4,8 +4,8 @@ import ru.mitrohinayulya.zabotushka.dto.greenway.QualificationLevel;
 
 import java.util.List;
 
-/// Общие требования по квалификации для клубных групп (без привязки к ID платформы).
-/// Конкретные ID чатов определяются в платформо-специфичных конфигурациях:
+/// Common qualification requirements for club groups (without binding to platform chat IDs).
+/// Specific chat IDs are defined in platform-specific configurations:
 /// @see TelegramChatGroupRequirements
 /// @see MaxChatGroupRequirements
 public enum ChatGroupRequirements {

@@ -7,7 +7,7 @@ import ru.mitrohinayulya.zabotushka.entity.UserGroupMembership;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/// Шаблонный обработчик ежемесячной проверки квалификации для конкретной платформы.
+/// Template processor for monthly qualification checks for a specific platform.
 public abstract class AbstractPlatformQualificationProcessor<U> implements PlatformQualificationProcessor {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractPlatformQualificationProcessor.class);

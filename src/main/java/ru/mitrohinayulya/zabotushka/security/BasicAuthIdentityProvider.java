@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mitrohinayulya.zabotushka.config.BasicAuthConfig;
 
-/// Custom Identity Provider для Basic Authentication
+/// Custom Identity Provider for Basic Authentication
 @ApplicationScoped
 public class BasicAuthIdentityProvider implements IdentityProvider<UsernamePasswordAuthenticationRequest> {
 

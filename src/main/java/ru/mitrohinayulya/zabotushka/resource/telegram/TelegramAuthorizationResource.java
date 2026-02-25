@@ -13,7 +13,7 @@ import ru.mitrohinayulya.zabotushka.dto.greenway.AuthorizeTelegramRequest;
 import ru.mitrohinayulya.zabotushka.service.telegram.AuthorizedTelegramUserService;
 import ru.mitrohinayulya.zabotushka.service.greenway.GreenwayAuthorizationService;
 
-/// REST ресурс для авторизации партнеров MyGreenway через Telegram
+/// REST resource for authorizing MyGreenway partners via Telegram
 @Path("/greenway/authorize/telegram")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)

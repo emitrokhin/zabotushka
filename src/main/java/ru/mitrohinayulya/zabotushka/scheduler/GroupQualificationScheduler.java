@@ -8,8 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mitrohinayulya.zabotushka.scheduler.qualification.GroupQualificationOrchestrator;
 
-/// Планировщик для проверки квалификации пользователей в группах
-/// Запускается каждый месяц 8 числа в 00:00
+/// Scheduler for checking user qualification in groups
+/// Runs on the 8th of each month at 00:00
 @ApplicationScoped
 public class GroupQualificationScheduler {
 
@@ -18,8 +18,8 @@ public class GroupQualificationScheduler {
     @Inject
     GroupQualificationOrchestrator orchestrator;
 
-    /// Проверяет квалификацию пользователей в группах
-    /// Запускается каждый месяц 8 числа в 00:00
+    /// Checks user qualification in groups
+    /// Runs on the 8th of each month at 00:00
     @Scheduled(cron = "0 0 0 8 * ?")
     @Transactional
     public void checkGroupQualifications() {

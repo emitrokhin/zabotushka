@@ -11,7 +11,7 @@ import ru.mitrohinayulya.zabotushka.mapper.UserGroupMembershipMapper;
 
 import java.time.LocalDateTime;
 
-/// Общая логика работы с членством пользователей в группах.
+/// Common logic for managing user group memberships.
 @ApplicationScoped
 public class PlatformGroupMembershipService {
 

@@ -12,7 +12,7 @@ import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-/// Entity для хранения авторизованных Telegram пользователей
+/// Entity for storing authorized Telegram users
 @Entity
 @Table(name = "authorized_telegram_users",
        uniqueConstraints = {
@@ -37,17 +37,17 @@ public class AuthorizedTelegramUser extends PanacheEntityBase {
     @Column(name = "creation_date", nullable = false)
     public LocalDateTime creationDate;
 
-    /// Поиск пользователя по telegramId
+    /// Finds a user by telegramId
     public static AuthorizedTelegramUser findByTelegramId(long telegramId) {
         return find("telegramId", telegramId).firstResult();
     }
 
-    /// Проверка существования пользователя по telegramId
+    /// Checks if a user exists by telegramId
     public static boolean existsByTelegramId(long telegramId) {
         return count("telegramId", telegramId) > 0;
     }
 
-    /// Проверка существования пользователя по greenwayId
+    /// Checks if a user exists by greenwayId
     public static boolean existsByGreenwayId(long greenwayId) {
         return count("greenwayId", greenwayId) > 0;
     }

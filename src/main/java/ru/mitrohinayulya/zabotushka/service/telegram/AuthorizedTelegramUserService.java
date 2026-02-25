@@ -11,7 +11,7 @@ import ru.mitrohinayulya.zabotushka.service.platform.PlatformAuthorizationServic
 import java.time.LocalDateTime;
 import java.util.List;
 
-/// Сервис для работы с авторизованными Telegram пользователями
+/// Service for managing authorized Telegram users
 @ApplicationScoped
 public class AuthorizedTelegramUserService implements PlatformAuthorizationService {
 
@@ -28,14 +28,14 @@ public class AuthorizedTelegramUserService implements PlatformAuthorizationServi
         saveAuthorizedUser(platformId, greenwayId, regDate);
     }
 
-    /// Проверяет существование пользователя по telegramId
+    /// Checks if a user exists by telegramId
     public boolean existsByTelegramId(long telegramId) {
         return AuthorizedTelegramUser.existsByTelegramId(telegramId);
     }
 
-    /// Сохраняет нового авторизованного пользователя
-    /// Проверяет уникальность greenwayId перед сохранением в таблице Telegram
-    /// @throws GreenwayIdAlreadyExistsException если greenwayId уже используется
+    /// Saves a new authorized user
+    /// Validates greenwayId uniqueness before saving to the Telegram table
+    /// @throws GreenwayIdAlreadyExistsException if the greenwayId is already in use
     @Transactional
     public AuthorizedTelegramUser saveAuthorizedUser(long telegramId, long greenwayId, String regDate) {
         if (existsByGreenwayId(greenwayId)) {
@@ -47,8 +47,8 @@ public class AuthorizedTelegramUserService implements PlatformAuthorizationServi
         return user;
     }
 
-    /// Проверяет совпадение данных пользователя с сохраненными в БД
-    /// @return true если greenwayId и regDate совпадают
+    /// Checks if the user data matches stored records in the DB
+    /// @return true if greenwayId and regDate match
     public boolean matchesStoredData(long telegramId, long greenwayId, String regDate) {
         var user = findByTelegramId(telegramId);
         if (user == null) {
@@ -58,18 +58,18 @@ public class AuthorizedTelegramUserService implements PlatformAuthorizationServi
     }
 
 
-    /// Поиск пользователя по telegramId
+    /// Finds a user by telegramId
     public AuthorizedTelegramUser findByTelegramId(long telegramId) {
         return AuthorizedTelegramUser.findByTelegramId(telegramId);
     }
 
 
-    /// Получает всех авторизованных пользователей
+    /// Returns all authorized users
     public List<AuthorizedTelegramUser> findAll() {
         return AuthorizedTelegramUser.listAll();
     }
 
-    /// Проверка существования пользователя по greenwayId в таблице Telegram
+    /// Checks if a user exists by greenwayId in the Telegram table
     public boolean existsByGreenwayId(long greenwayId) {
         return AuthorizedTelegramUser.existsByGreenwayId(greenwayId);
     }

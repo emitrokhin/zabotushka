@@ -11,7 +11,7 @@ import ru.mitrohinayulya.zabotushka.service.platform.PlatformAuthorizationServic
 import java.time.LocalDateTime;
 import java.util.List;
 
-/// Сервис для работы с авторизованными Max пользователями
+/// Service for managing authorized Max users
 @ApplicationScoped
 public class AuthorizedMaxUserService implements PlatformAuthorizationService {
 
@@ -28,14 +28,14 @@ public class AuthorizedMaxUserService implements PlatformAuthorizationService {
         saveAuthorizedUser(platformId, greenwayId, regDate);
     }
 
-    /// Проверяет существование пользователя по maxId
+    /// Checks if a user exists by maxId
     public boolean existsByMaxId(long maxId) {
         return AuthorizedMaxUser.existsByMaxId(maxId);
     }
 
-    /// Сохраняет нового авторизованного пользователя
-    /// Проверяет уникальность greenwayId перед сохранением в таблице Max
-    /// @throws GreenwayIdAlreadyExistsException если greenwayId уже используется
+    /// Saves a new authorized user
+    /// Validates greenwayId uniqueness before saving to the Max table
+    /// @throws GreenwayIdAlreadyExistsException if the greenwayId is already in use
     @Transactional
     public AuthorizedMaxUser saveAuthorizedUser(long maxId, long greenwayId, String regDate) {
         if (existsByGreenwayId(greenwayId)) {
@@ -47,8 +47,8 @@ public class AuthorizedMaxUserService implements PlatformAuthorizationService {
         return user;
     }
 
-    /// Проверяет совпадение данных пользователя с сохраненными в БД
-    /// @return true если greenwayId и regDate совпадают
+    /// Checks if the user data matches stored records in the DB
+    /// @return true if greenwayId and regDate match
     public boolean matchesStoredData(long maxId, long greenwayId, String regDate) {
         var user = findByMaxId(maxId);
         if (user == null) {
@@ -57,17 +57,17 @@ public class AuthorizedMaxUserService implements PlatformAuthorizationService {
         return user.greenwayId == greenwayId && user.regDate.equals(regDate);
     }
 
-    /// Поиск пользователя по maxId
+    /// Finds a user by maxId
     public AuthorizedMaxUser findByMaxId(long maxId) {
         return AuthorizedMaxUser.findByMaxId(maxId);
     }
 
-    /// Получает всех авторизованных пользователей
+    /// Returns all authorized users
     public List<AuthorizedMaxUser> findAll() {
         return AuthorizedMaxUser.listAll();
     }
 
-    /// Проверка существования пользователя по greenwayId в таблице Max
+    /// Checks if a user exists by greenwayId in the Max table
     public boolean existsByGreenwayId(long greenwayId) {
         return AuthorizedMaxUser.existsByGreenwayId(greenwayId);
     }

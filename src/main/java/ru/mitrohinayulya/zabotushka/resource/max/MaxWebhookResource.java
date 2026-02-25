@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import ru.mitrohinayulya.zabotushka.dto.max.MaxUpdate;
 import ru.mitrohinayulya.zabotushka.service.max.MaxService;
 
-/// REST ресурс для обработки Max webhook
+/// REST resource for handling Max webhook events
 @Path("/max/webhook")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -37,13 +37,13 @@ public class MaxWebhookResource {
             MaxUpdate update) {
         log.debug("Received webhook update: timestamp={}", update.timestamp());
 
-        // Проверка секретного токена
+        // Validate secret token
         if (webhookSecret != null && !webhookSecret.equals(secretToken)) {
             log.warn("Invalid secret token received");
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
-        // Проверка совпадения события - user_added
+        // Check that the event type is user_added
         if (!USER_ADDED_UPDATE_TYPE.equals(update.updateType())) {
             log.debug("Update does not contain user_added, ignoring");
             return Response.ok().build();

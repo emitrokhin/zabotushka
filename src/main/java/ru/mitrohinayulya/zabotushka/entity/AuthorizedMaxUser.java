@@ -12,7 +12,7 @@ import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-/// Entity для хранения авторизованных Max пользователей
+/// Entity for storing authorized Max users
 @Entity
 @Table(name = "authorized_max_users",
        uniqueConstraints = {
@@ -37,17 +37,17 @@ public class AuthorizedMaxUser extends PanacheEntityBase {
     @Column(name = "creation_date", nullable = false)
     public LocalDateTime creationDate;
 
-    /// Поиск пользователя по maxId
+    /// Finds a user by maxId
     public static AuthorizedMaxUser findByMaxId(long maxId) {
         return find("maxId", maxId).firstResult();
     }
 
-    /// Проверка существования пользователя по maxId
+    /// Checks if a user exists by maxId
     public static boolean existsByMaxId(long maxId) {
         return count("maxId", maxId) > 0;
     }
 
-    /// Проверка существования пользователя по greenwayId
+    /// Checks if a user exists by greenwayId
     public static boolean existsByGreenwayId(long greenwayId) {
         return count("greenwayId", greenwayId) > 0;
     }

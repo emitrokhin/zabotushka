@@ -25,32 +25,32 @@ import java.util.List;
 @RegisterRestClient(configKey = "max-bot-api")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-@RateLimited(bucket = "telegram") // общий бакет с телеграм
+@RateLimited(bucket = "telegram") // shared bucket with Telegram
 public interface MaxBotApi {
 
-    /// Подписывает бота на получение обновлений через WebHook.
-    /// После вызова этого метода бот будет получать уведомления о новых событиях в чатах на указанный URL.
+    /// Subscribes the bot to receive updates via WebHook.
+    /// After calling this method, the bot will receive notifications about new events in chats at the specified URL.
     @POST
     @Path("/subscriptions")
     Response setSubscription(MaxSetSubscriptionRequest request);
 
-    /// Подписывает бота на получение обновлений через WebHook.
-    /// После вызова этого метода бот будет получать уведомления о новых событиях в чатах на указанный URL.
+    /// Subscribes the bot to receive updates via WebHook.
+    /// After calling this method, the bot will receive notifications about new events in chats at the specified URL.
     @POST
     @Path("/subscriptions")
     MaxDeleteSubscriptionResponse deleteSubscription(@QueryParam("url") String url);
 
-    /// Отправляет сообщение пользователю
+    /// Sends a message to a user
     @POST
     @Path("/messages")
     Response sendMessage(@QueryParam("user_id") long userId, MaxSendMessageRequest request);
 
-    /// Возвращает список участников чата
+    /// Returns the list of chat members
     @GET
     @Path("/chats/{chatId}/members")
     MaxGetChatMemberResponse getChatMembers(@PathParam("chatId") long chatId, @QueryParam("user_ids") List<Long> userIds);
 
-    ///Удаляет участника из группового чата.
+    /// Removes a member from a group chat.
     @DELETE
     @Path("/chats/{chatId}/members")
     MaxDeleteChatMemberResponse deleteChatMember(@PathParam("chatId") long chatId, @QueryParam("user_id") long userId);

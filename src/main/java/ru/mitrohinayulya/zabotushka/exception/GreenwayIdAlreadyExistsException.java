@@ -1,7 +1,7 @@
 package ru.mitrohinayulya.zabotushka.exception;
 
-/// Исключение, возникающее при попытке сохранить пользователя с greenwayId,
-/// который уже используется другим пользователем
+/// Exception thrown when attempting to save a user with a greenwayId
+/// that is already associated with another user
 public class GreenwayIdAlreadyExistsException extends RuntimeException {
 
     public GreenwayIdAlreadyExistsException(long greenwayId) {

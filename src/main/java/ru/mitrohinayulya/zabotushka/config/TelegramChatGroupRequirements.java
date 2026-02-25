@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-/// Требования по квалификации для Telegram-групп с привязкой к ID чатов платформы.
+/// Qualification requirements for Telegram groups bound to platform chat IDs.
 public enum TelegramChatGroupRequirements {
     GOLD_CLUB(-1001968543887L, ChatGroupRequirements.GOLD_CLUB),
     SILVER_CLUB(-1001891048040L, ChatGroupRequirements.SILVER_CLUB),

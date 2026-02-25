@@ -1,6 +1,6 @@
 package ru.mitrohinayulya.zabotushka.scheduler.qualification;
 
-/// Агрегированная статистика проверки квалификации.
+/// Aggregated statistics for a qualification check.
 public record QualificationProcessStats(int checked, int removed, int orphanedRemoved, int errors) {
 
     public static QualificationProcessStats empty() {

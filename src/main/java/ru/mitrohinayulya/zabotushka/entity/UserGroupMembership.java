@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-/// Entity для хранения информации о членстве пользователей в группах
+/// Entity for storing user group membership information
 @Entity
 @Table(name = "user_group_memberships",
        uniqueConstraints = @UniqueConstraint(columnNames = {"platform_user_id", "chat_id", "platform"}))
@@ -45,17 +45,17 @@ public class UserGroupMembership extends PanacheEntityBase {
     @Column(name = "last_checked_at")
     public LocalDateTime lastCheckedAt;
 
-    /// Поиск всех членов конкретной группы для указанной платформы
+    /// Finds all members of a specific group for the given platform
     public static List<UserGroupMembership> findByChatIdAndPlatform(long chatId, Platform platform) {
         return list("chatId = ?1 and platform = ?2", chatId, platform);
     }
 
-    /// Проверка существования записи о членстве
+    /// Checks if a membership record exists
     public static boolean exists(long platformUserId, long chatId, Platform platform) {
         return count(QUERY_BY_PLATFORM_USER_AND_CHAT_AND_PLATFORM, platformUserId, chatId, platform) > 0;
     }
 
-    /// Удаление записи о членстве
+    /// Removes a membership record
     public static boolean removeMembership(long platformUserId, long chatId, Platform platform) {
         return delete(QUERY_BY_PLATFORM_USER_AND_CHAT_AND_PLATFORM, platformUserId, chatId, platform) > 0;
     }

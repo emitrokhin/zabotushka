@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import ru.mitrohinayulya.zabotushka.dto.telegram.Update;
 import ru.mitrohinayulya.zabotushka.service.telegram.TelegramService;
 
-/// REST ресурс для обработки Telegram webhook
+/// REST resource for handling Telegram webhook events
 @Path("/telegram/webhook")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -35,7 +35,7 @@ public class TelegramWebhookResource {
             @HeaderParam(TELEGRAM_SECRET_HEADER) String secretToken,
             Update update) {
         log.debug("Received webhook update: updateId={}", update.updateId());
-        /// Проверка секретного токена
+        /// Validate secret token
         if (webhookSecret != null && !webhookSecret.equals(secretToken)) {
             log.warn("Invalid secret token received");
             return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -52,7 +52,7 @@ public class TelegramWebhookResource {
                 chatJoinRequest.from().username(),
                 chatJoinRequest.from().id(),
                 chatJoinRequest.bio());
-        /// Обработка запроса на вступление в чат
+        /// Process the chat join request
         telegramService.processChatJoinRequest(chatJoinRequest);
 
         return Response.ok().build();

@@ -8,9 +8,9 @@ import ru.mitrohinayulya.zabotushka.service.greenway.GreenwayQualificationServic
 
 import java.util.Optional;
 
-/// Шаблонный метод для общей логики обработки запросов на вступление в группу.
-/// Шаги 1–4 (поиск требований, авторизация, квалификация) реализованы здесь.
-/// Платформо-специфичные действия одобрения/отклонения реализуются в подклассах.
+/// Template method for common logic of handling group join requests.
+/// Steps 1–4 (finding requirements, authorization, qualification) are implemented here.
+/// Platform-specific approve/decline actions are implemented in subclasses.
 public abstract class AbstractJoinRequestService<E, U> {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractJoinRequestService.class);

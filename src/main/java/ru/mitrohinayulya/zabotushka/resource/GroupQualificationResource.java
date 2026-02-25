@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mitrohinayulya.zabotushka.scheduler.GroupQualificationScheduler;
 
-/// REST ресурс для управления проверкой квалификаций в группах
+/// REST resource for managing group qualification checks
 @Path("/group-qualification")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -24,8 +24,8 @@ public class GroupQualificationResource {
     @Inject
     GroupQualificationScheduler groupQualificationScheduler;
 
-    /// Запускает проверку квалификаций пользователей во всех группах
-    /// @return результат выполнения
+    /// Triggers a qualification check for all users in all groups
+    /// @return execution result
     @POST
     @Path("/check")
     public Response checkGroupQualifications() {
@@ -45,6 +45,6 @@ public class GroupQualificationResource {
         }
     }
 
-    /// DTO для ответа
+    /// Response DTO
     public record CheckResponse(String status, String message) {}
 }

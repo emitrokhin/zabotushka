@@ -4,7 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import ru.mitrohinayulya.zabotushka.dto.max.MaxUpdate;
 
-/// Фасад для операций Max платформы.
+/// Facade for Max platform operations.
 /// @see MaxWebhookRegistrar
 @ApplicationScoped
 public class MaxService {

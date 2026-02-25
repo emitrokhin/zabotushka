@@ -13,7 +13,7 @@ import ru.mitrohinayulya.zabotushka.dto.greenway.AuthorizeMaxRequest;
 import ru.mitrohinayulya.zabotushka.service.max.AuthorizedMaxUserService;
 import ru.mitrohinayulya.zabotushka.service.greenway.GreenwayAuthorizationService;
 
-/// REST ресурс для авторизации партнеров MyGreenway через Max
+/// REST resource for authorizing MyGreenway partners via Max
 @Path("/greenway/authorize/max")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)

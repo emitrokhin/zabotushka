@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-/// Требования по квалификации для Max-групп с привязкой к ID чатов платформы.
+/// Qualification requirements for Max groups bound to platform chat IDs.
 public enum MaxChatGroupRequirements {
     GOLD_CLUB(-71062621438079L, ChatGroupRequirements.GOLD_CLUB);
 

@@ -24,7 +24,7 @@ import ru.mitrohinayulya.zabotushka.service.greenway.GreenwayQualificationServic
 
 import java.util.Optional;
 
-/// REST ресурс для работы с MyGreenway API
+/// REST resource for interacting with the MyGreenway API
 @Path("/greenway")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -39,9 +39,9 @@ public class GreenwayResource {
     @Inject
     GreenwayQualificationService greenwayQualificationService;
 
-    /// Проверяет существование партнера по ID
-    /// @param userId ID партнера
-    /// @return ID партнера если существует, иначе 404
+    /// Checks if a partner exists by ID
+    /// @param userId partner ID
+    /// @return partner ID if found, otherwise 404
     @GET
     @Path("/check-user/{userId}")
     public Response checkUserId(@PathParam("userId") long userId) {
@@ -76,10 +76,10 @@ public class GreenwayResource {
         }
     }
 
-    /// Сравнивает ЛО партнера с заданным значением в текущем периоде
-    /// @param userId ID партнера
-    /// @param lo значение для сравнения
-    /// @return результат сравнения
+    /// Compares a partner's LO with a given value in the current period
+    /// @param userId partner ID
+    /// @param lo value to compare against
+    /// @return comparison result
     @GET
     @Path("/compare-lo/{userId}/{lo}")
     public CompareLOResponse compareLO(@PathParam("userId") long userId, @PathParam("lo") Double lo) {
@@ -87,10 +87,10 @@ public class GreenwayResource {
         return compareValue(userId, lo, 0, true);
     }
 
-    /// Сравнивает ЛО партнера с заданным значением в предыдущем периоде
-    /// @param userId ID партнера
-    /// @param lo значение для сравнения
-    /// @return результат сравнения
+    /// Compares a partner's LO with a given value in the previous period
+    /// @param userId partner ID
+    /// @param lo value to compare against
+    /// @return comparison result
     @GET
     @Path("/compare-lo/period/{userId}/{lo}")
     public CompareLOResponse compareLOPeriod(@PathParam("userId") long userId, @PathParam("lo") Double lo) {
@@ -99,10 +99,10 @@ public class GreenwayResource {
         return compareValue(userId, lo, period, true);
     }
 
-    /// Сравнивает СГО партнера с заданным значением в текущем периоде
-    /// @param userId ID партнера
-    /// @param sgo значение для сравнения
-    /// @return результат сравнения
+    /// Compares a partner's SGO with a given value in the current period
+    /// @param userId partner ID
+    /// @param sgo value to compare against
+    /// @return comparison result
     @GET
     @Path("/compare-sgo/{userId}/{sgo}")
     public CompareSGOResponse compareSGO(@PathParam("userId") long userId, @PathParam("sgo") Double sgo) {
@@ -110,10 +110,10 @@ public class GreenwayResource {
         return compareValue(userId, sgo, 0, false);
     }
 
-    /// Сравнивает СГО партнера с заданным значением в предыдущем периоде
-    /// @param userId ID партнера
-    /// @param sgo значение для сравнения
-    /// @return результат сравнения
+    /// Compares a partner's SGO with a given value in the previous period
+    /// @param userId partner ID
+    /// @param sgo value to compare against
+    /// @return comparison result
     @GET
     @Path("/compare-sgo/period/{userId}/{sgo}")
     public CompareSGOResponse compareSGOPeriod(@PathParam("userId") long userId, @PathParam("sgo") Double sgo) {
@@ -122,8 +122,8 @@ public class GreenwayResource {
         return compareValue(userId, sgo, period, false);
     }
 
-    /// Универсальный метод для сравнения значений (ЛО или СГО)
-    /// Использует pattern matching и sealed interfaces (Java 25)
+    /// Generic method for comparing values (LO or SGO)
+    /// Uses pattern matching and sealed interfaces (Java 25)
     @SuppressWarnings("unchecked")
     private <T> T compareValue(long userId, Double value, int period, boolean isLO) {
         try {
@@ -158,9 +158,9 @@ public class GreenwayResource {
         }
     }
 
-    /// Получает квалификацию партнера в текущем периоде
-    /// @param userId ID партнера
-    /// @return квалификация партнера
+    /// Retrieves a partner's qualification in the current period
+    /// @param userId partner ID
+    /// @return partner qualification
     @GET
     @Path("/qualification/{userId}")
     public QualificationResponse getQualification(@PathParam("userId") long userId) {
@@ -168,9 +168,9 @@ public class GreenwayResource {
         return getQualificationInternal(userId, 0, false);
     }
 
-    /// Получает квалификацию партнера в предыдущем периоде
-    /// @param userId ID партнера
-    /// @return квалификация партнера
+    /// Retrieves a partner's qualification in the previous period
+    /// @param userId partner ID
+    /// @return partner qualification
     @GET
     @Path("/qualification/period/{userId}")
     public QualificationResponse getQualificationPeriod(@PathParam("userId") long userId) {
@@ -179,9 +179,9 @@ public class GreenwayResource {
         return getQualificationInternal(userId, period, false);
     }
 
-    /// Получает точную квалификацию партнера (со ступенью) в текущем периоде
-    /// @param userId ID партнера
-    /// @return точная квалификация партнера
+    /// Retrieves the exact qualification (with step) of a partner in the current period
+    /// @param userId partner ID
+    /// @return exact partner qualification
     @GET
     @Path("/qualification/exact/{userId}")
     public QualificationResponse getQualificationExact(@PathParam("userId") long userId) {
@@ -189,9 +189,9 @@ public class GreenwayResource {
         return getQualificationInternal(userId, 0, true);
     }
 
-    /// Получает точную квалификацию партнера (со ступенью) в предыдущем периоде
-    /// @param userId ID партнера
-    /// @return точная квалификация партнера
+    /// Retrieves the exact qualification (with step) of a partner in the previous period
+    /// @param userId partner ID
+    /// @return exact partner qualification
     @GET
     @Path("/qualification/exact/period/{userId}")
     public QualificationResponse getQualificationExactPeriod(@PathParam("userId") long userId) {
@@ -200,10 +200,10 @@ public class GreenwayResource {
         return getQualificationInternal(userId, period, true);
     }
 
-    /// Получает лучшую квалификацию партнера из текущего и предыдущего периодов
-    /// Использует stream API и Optional (Java 25)
-    /// @param userId ID партнера
-    /// @return лучшая квалификация
+    /// Returns the best partner qualification from the current and previous periods
+    /// Uses stream API and Optional (Java 25)
+    /// @param userId partner ID
+    /// @return best qualification
     @GET
     @Path("/qualification/best/{userId}")
     public QualificationResponse getQualificationBest(@PathParam("userId") long userId) {
@@ -213,8 +213,8 @@ public class GreenwayResource {
         return QualificationResponse.of(bestQual);
     }
 
-    /// Внутренний метод для получения квалификации
-    /// Использует switch expression (Java 25) и pattern matching
+    /// Internal method for retrieving qualification
+    /// Uses switch expression (Java 25) and pattern matching
     private QualificationResponse getQualificationInternal(long userId, int period, boolean exact) {
         try {
             var partnerListResponse = greenwayPartnerService.getPartnerList(userId, period);
@@ -241,12 +241,12 @@ public class GreenwayResource {
         }
     }
 
-    /// Извлекает ЛО из партнера с использованием Optional.ofNullable (Java 25)
+    /// Extracts LO from a partner using Optional.ofNullable (Java 25)
     private Double extractLO(Partner partner) {
         return Optional.ofNullable(partner.lo()).orElse(0.0);
     }
 
-    /// Извлекает СГО из партнера с использованием Optional.ofNullable (Java 25)
+    /// Extracts SGO from a partner using Optional.ofNullable (Java 25)
     private Double extractSGO(Partner partner) {
         return Optional.ofNullable(partner.sgo()).orElse(0.0);
     }

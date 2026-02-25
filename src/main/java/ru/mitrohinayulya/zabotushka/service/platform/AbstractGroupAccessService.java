@@ -9,8 +9,8 @@ import ru.mitrohinayulya.zabotushka.service.greenway.GreenwayQualificationServic
 
 import java.util.Optional;
 
-///Шаблонный метод для общей логики проверки и удаления участников по квалификации.
-///Платформо-специфичные детали реализуются в подклассах.
+/// Template method for common logic of checking and removing members based on qualification.
+/// Platform-specific details are implemented in subclasses.
 public abstract class AbstractGroupAccessService implements PlatformGroupAccessService {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractGroupAccessService.class);

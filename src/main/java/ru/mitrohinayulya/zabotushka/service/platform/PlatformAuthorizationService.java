@@ -1,6 +1,6 @@
 package ru.mitrohinayulya.zabotushka.service.platform;
 
-/// Интерфейс для платформо-зависимых операций с пользователями
+/// Interface for platform-specific user operations
 public interface PlatformAuthorizationService {
     boolean existsByPlatformId(long platformId);
     boolean matchesStoredData(long platformId, long greenwayId, String regDate);

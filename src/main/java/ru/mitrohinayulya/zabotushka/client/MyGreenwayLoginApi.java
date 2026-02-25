@@ -18,7 +18,7 @@ import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam;
 public interface MyGreenwayLoginApi {
 
     @POST
-    @Path("/") // Важно сохранить конечный слэш, иначе сервер отвечает 301 и не отдает куки
+    @Path("/") // Important: trailing slash must be preserved, otherwise the server responds with 301 and does not return cookies
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     Response login(Form form);
 }
