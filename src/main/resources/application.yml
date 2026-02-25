@@ -1,4 +1,6 @@
 quarkus:
+  application:
+    name: zabotushka
   rate-limiter:
     buckets:
       telegram:
@@ -17,10 +19,10 @@ quarkus:
       basic: true
   otel:
     logs:
-      enabled: false
-    traces:
-      enabled: false
+      enabled: ${DEV_ENABLE_OTEL:false}
     metrics:
+      enabled: ${DEV_ENABLE_OTEL:false}
+    traces:
       enabled: false
   datasource:
     db-kind: postgresql
@@ -86,15 +88,19 @@ app:
     otel:
       logs:
         enabled: true
-        level: WARN
+      metrics:
+        enabled: true
       exporter:
         otlp:
           protocol: http/protobuf
+          metrics:
+            endpoint: ${OTLP_URL}
+            headers: "Authorization=Basic ${OTLP_TOKEN_BASE64}"
           logs:
             endpoint: ${OTLP_URL}
-            headers: "Authorization=Basic ${OTLP_TOKEN}"
+            headers: "Authorization=Basic ${OTLP_TOKEN_BASE64}"
       resource:
-        attributes: "service.name=zabotushka,deployment.environment=prod"
+        attributes: "deployment.environment=${QUARKUS_PROFILE:dev}"
   rest-client:
     access-bot-api:
       url: "https://api.telegram.org/bot${app.telegram.access-bot-token}"
