@@ -92,10 +92,11 @@ The core design uses a Template Method pattern for platform-agnostic group manag
 |-------|---------|---------|
 | Resources (REST) | `resource/` | Webhooks + authorization endpoints for Telegram & Max |
 | Services | `service/telegram/`, `service/max/` | Platform-specific implementations |
-| Greenway | `service/greenway/` | Partner auth + qualification checking |
+| Greenway | `service/greenway/` | Split into: `GreenwayTokenStore` (token storage), `GreenwaySessionManager` (login/refresh), `GreenwayPartnerService` (partner data), `GreenwayAuthorizationService` (credential linking), `GreenwayQualificationService` (qualification checks) |
 | Scheduler | `scheduler/` | `GroupQualificationScheduler` — cron entry point (8th of month, 00:00); delegates to `GroupQualificationOrchestrator` |
 | Qualification | `scheduler/qualification/` | `GroupQualificationOrchestrator` collects all `PlatformQualificationProcessor` beans via CDI `Instance<>`, runs monthly check, merges `QualificationProcessStats`; `AbstractPlatformQualificationProcessor<U>` provides Template Method for per-chatId membership iteration, orphaned-member removal, and `lastCheckedAt` update; concrete classes: `TelegramQualificationProcessor`, `MaxQualificationProcessor` |
-| Clients | `client/` | REST clients: `TelegramAccessBotApi`, `TelegramMessageBotApi`, `MaxBotApi`, `MyGreenwayApi`, `MyGreenwayLoginApi` |
+| Clients | `client/` | REST clients: `TelegramAccessBotApi`, `TelegramMessageBotApi`, `MaxBotApi`, `MyGreenwayAuthApi` (auth endpoints), `MyGreenwayPartnerApi` (partner data, uses `GreenwayTokenRequestFilter`); `client/filter/` — `GreenwayTokenRequestFilter` injects Bearer token into outgoing Greenway API requests |
+| Interceptors | `interceptor/` | `TokenRefreshInterceptor` + `@RefreshTokenOnExpiry` — CDI interceptor that automatically refreshes the Greenway token on HTTP 401 and retries the call once |
 | Entities | `entity/` | `AuthorizedTelegramUser`, `AuthorizedMaxUser`, `UserGroupMembership` (Panache active record) |
 | Config | `config/` | `TelegramChatGroupRequirements`, `MaxChatGroupRequirements` (implement `ChatGroupRequirements` interface) |
 
