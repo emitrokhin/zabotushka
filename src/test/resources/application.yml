@@ -19,6 +19,8 @@ quarkus:
     "ru.mitrohinayulya.zabotushka.client.MyGreenwayLoginApi":
       url: https://greenwaystart.com
       follow-redirects: true
+    vk-bot-api:
+      url: https://api.vk.com/method
     my-greenway-api:
       url: https://pyapi.greenwaystart.com/pyapi/v1
       headers:
@@ -60,6 +62,12 @@ app:
     bot-token: test-max-token
     webhook:
       secret: test-max-secret
+      enabled: false
+  vk:
+    group-id: 12345
+    bot-token: test-vk-token
+    webhook:
+      secret: test-vk-secret
       enabled: false
   greenway:
     id: test-id

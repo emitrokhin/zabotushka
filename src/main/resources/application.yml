@@ -46,6 +46,8 @@ quarkus:
       url: https://platform-api.max.ru
       headers:
         Authorization: ${app.max.bot-token}
+    vk-bot-api:
+      url: https://api.vk.com/method
     "ru.mitrohinayulya.zabotushka.client.MyGreenwayLoginApi":
       url: https://greenwaystart.com
       follow-redirects: true
@@ -76,6 +78,13 @@ app:
       path: /max/webhook
       secret: ${MAX_BOT_WEBHOOK_SECRET}
       enabled: ${MAX_BOT_WEBHOOK_ENABLED:true}
+  vk:
+    group-id: ${VK_GROUP_ID}
+    bot-token: ${VK_BOT_TOKEN}
+    webhook:
+      path: /vk/webhook
+      secret: ${VK_BOT_WEBHOOK_SECRET}
+      enabled: ${VK_BOT_WEBHOOK_ENABLED:true}
   greenway:
     id: ${GREENWAY_ID:}
     password: ${GREENWAY_PASSWORD:}
