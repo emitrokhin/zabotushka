@@ -4,8 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Zabotushka is a Quarkus-based bot platform integrating with **Telegram** and **Max** (Russian messaging platform) 
-to manage group memberships based on **Greenway** partner qualification data. Users authorize via bot, link their 
+Zabotushka is a Quarkus-based bot platform integrating with **Telegram**, **Max** (Russian messaging platform), and **VK** (VKontakte)
+to manage group memberships based on **Greenway** partner qualification data. Users authorize via bot, link their
 Greenway partner ID, and the system automatically adds/removes them from groups based on qualification checks.
 
 ## Build and Development Commands
@@ -59,6 +59,10 @@ export TELEGRAM_ACCESS_BOT_TOKEN=
 export TELEGRAM_ACCESS_BOT_WEBHOOK_ENABLED=
 export TELEGRAM_ACCESS_BOT_WEBHOOK_SECRET=
 export TELEGRAM_MESSAGE_BOT_TOKEN=
+export VK_BOT_TOKEN=
+export VK_BOT_WEBHOOK_ENABLED=
+export VK_BOT_WEBHOOK_SECRET=
+export VK_GROUP_ID=
 
 # Run with Maven
 mvn quarkus:dev
@@ -82,7 +86,7 @@ OpenTelemetry.
 ### Multi-Platform Abstraction
 
 The core design uses a Template Method pattern for platform-agnostic group management:
-- `AbstractGroupAccessService` — defines qualification check flow; subclasses (`TelegramGroupAccessService`, `MaxGroupAccessService`) provide platform-specific kick/notification logic
+- `AbstractGroupAccessService` — defines qualification check flow; subclasses (`TelegramGroupAccessService`, `MaxGroupAccessService`, `VkGroupAccessService`) provide platform-specific kick/notification logic
 - `AbstractJoinRequestService` — same pattern for handling join requests
 - `PlatformGroupAccessService`, `PlatformMessageService`, `MessengerWebhookRegistrar` — interfaces for each platform capability
 
@@ -90,20 +94,20 @@ The core design uses a Template Method pattern for platform-agnostic group manag
 
 | Layer | Package | Purpose |
 |-------|---------|---------|
-| Resources (REST) | `resource/` | Webhooks + authorization endpoints for Telegram & Max |
-| Services | `service/telegram/`, `service/max/` | Platform-specific implementations |
+| Resources (REST) | `resource/` | Webhooks + authorization endpoints for Telegram, Max & VK |
+| Services | `service/telegram/`, `service/max/`, `service/vk/` | Platform-specific implementations |
 | Greenway | `service/greenway/` | Split into: `GreenwayTokenStore` (token storage), `GreenwaySessionManager` (login/refresh), `GreenwayPartnerService` (partner data), `GreenwayAuthorizationService` (credential linking), `GreenwayQualificationService` (qualification checks) |
 | Scheduler | `scheduler/` | `GroupQualificationScheduler` — cron entry point (8th of month, 00:00); delegates to `GroupQualificationOrchestrator` |
-| Qualification | `scheduler/qualification/` | `GroupQualificationOrchestrator` collects all `PlatformQualificationProcessor` beans via CDI `Instance<>`, runs monthly check, merges `QualificationProcessStats`; `AbstractPlatformQualificationProcessor<U>` provides Template Method for per-chatId membership iteration, orphaned-member removal, and `lastCheckedAt` update; concrete classes: `TelegramQualificationProcessor`, `MaxQualificationProcessor` |
-| Clients | `client/` | REST clients: `TelegramAccessBotApi`, `TelegramMessageBotApi`, `MaxBotApi`, `MyGreenwayAuthApi` (auth endpoints), `MyGreenwayPartnerApi` (partner data, uses `GreenwayTokenRequestFilter`); `client/filter/` — `GreenwayTokenRequestFilter` injects Bearer token into outgoing Greenway API requests |
+| Qualification | `scheduler/qualification/` | `GroupQualificationOrchestrator` collects all `PlatformQualificationProcessor` beans via CDI `Instance<>`, runs monthly check, merges `QualificationProcessStats`; `AbstractPlatformQualificationProcessor<U>` provides Template Method for per-chatId membership iteration, orphaned-member removal, and `lastCheckedAt` update; concrete classes: `TelegramQualificationProcessor`, `MaxQualificationProcessor`, `VkQualificationProcessor` |
+| Clients | `client/` | REST clients: `TelegramAccessBotApi`, `TelegramMessageBotApi`, `MaxBotApi`, `VkBotApi`, `MyGreenwayAuthApi` (auth endpoints), `MyGreenwayPartnerApi` (partner data, uses `GreenwayTokenRequestFilter`); `client/filter/` — `GreenwayTokenRequestFilter` injects Bearer token into outgoing Greenway API requests; `VkTokenRequestFilter` injects VK access token into outgoing VK API requests |
 | Interceptors | `interceptor/` | `TokenRefreshInterceptor` + `@RefreshTokenOnExpiry` — CDI interceptor that automatically refreshes the Greenway token on HTTP 401 and retries the call once |
-| Entities | `entity/` | `AuthorizedTelegramUser`, `AuthorizedMaxUser`, `UserGroupMembership` (Panache active record) |
-| Config | `config/` | `TelegramChatGroupRequirements`, `MaxChatGroupRequirements` (implement `ChatGroupRequirements` interface) |
+| Entities | `entity/` | `AuthorizedTelegramUser`, `AuthorizedMaxUser`, `AuthorizedVkUser`, `UserGroupMembership` (Panache active record) |
+| Config | `config/` | `TelegramChatGroupRequirements`, `MaxChatGroupRequirements`, `VkChatGroupRequirements` (implement `ChatGroupRequirements` interface) |
 
 ### Data Flow
 
 1. User starts bot → `TelegramAuthorizationResource` / `MaxAuthorizationResource` guides them through Greenway credential linking
-2. Webhook events (join requests for Telegram, `user_added` events for Max) trigger `TelegramJoinRequestService` / `MaxJoinRequestService`
+2. Webhook events (join requests for Telegram, `user_added` events for Max, `group_join` events for VK) trigger `TelegramJoinRequestService` / `MaxJoinRequestService` / `VkJoinRequestService`
 3. `GroupQualificationScheduler` (cron: 8th of month at 00:00) delegates to `GroupQualificationOrchestrator` → iterates all `PlatformQualificationProcessor` beans → each processor iterates `UserGroupMembership` per `chatId`, calls platform service to check/remove non-qualified users, handles orphaned memberships (user no longer in authorized users table), and returns `QualificationProcessStats`
 4. `UserGroupMembership` entity tracks each user's presence in each group with last-check timestamps
 
@@ -112,6 +116,7 @@ The core design uses a Template Method pattern for platform-agnostic group manag
 Flyway migrations in `src/main/resources/db/migration/`. Current schema:
 - `authorized_telegram_users` — maps `telegram_id` → `greenway_id`
 - `authorized_max_users` — maps `max_id` → `greenway_id`
+- `authorized_vk_users` — maps `vk_id` → `greenway_id`
 - `user_group_memberships` — tracks `(platform_user_id, chat_id, platform)` with timestamps
 
 - When adding new database changes:
@@ -160,6 +165,7 @@ Flyway migrations in `src/main/resources/db/migration/`. Current schema:
 - HTTP Basic Auth on protected endpoints (`BasicAuthIdentityProvider`)
 - Telegram webhook secret verified via request header
 - Max webhook secret verified via `X-Max-Bot-Api-Secret` header
+- VK webhook secret verified via `secret` field in the callback payload
 - All bot tokens/credentials loaded from environment variables
 
 ### Configuration
