@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.mitrohinayulya.zabotushka.client.MaxBotApi;
 import ru.mitrohinayulya.zabotushka.dto.greenway.QualificationLevel;
+import ru.mitrohinayulya.zabotushka.dto.greenway.QualificationResult;
 import ru.mitrohinayulya.zabotushka.dto.max.MaxChatMember;
 import ru.mitrohinayulya.zabotushka.dto.max.MaxDeleteChatMemberResponse;
 import ru.mitrohinayulya.zabotushka.dto.max.MaxGetChatMemberResponse;
@@ -57,7 +58,7 @@ class MaxGroupAccessServiceTest {
         moderationService.checkAndRemoveIfNotQualified(-71062621438079L, 123L, 456L);
 
         verify(membershipService).removeMembership(-71062621438079L, 123L, Platform.MAX);
-        verify(qualificationService, never()).getBestQualification(anyLong());
+        verify(qualificationService, never()).getBestQualificationResult(anyLong());
         verify(botApi, never()).deleteChatMember(anyLong(), anyLong());
     }
 
@@ -66,7 +67,8 @@ class MaxGroupAccessServiceTest {
     void checkAndRemoveIfNotQualified_ShouldRemoveUser_WhenQualificationNotAllowed() {
         when(botApi.getChatMembers(anyLong(), anyList())).thenReturn(new MaxGetChatMemberResponse(
                 List.of(mock(MaxChatMember.class))));
-        when(qualificationService.getBestQualification(456L)).thenReturn(QualificationLevel.NO);
+        when(qualificationService.getBestQualificationResult(456L))
+                .thenReturn(new QualificationResult(QualificationLevel.NO, null));
         when(botApi.deleteChatMember(-71062621438079L, 123L))
                 .thenReturn(new MaxDeleteChatMemberResponse(true, null));
 
@@ -82,7 +84,8 @@ class MaxGroupAccessServiceTest {
     void checkAndRemoveIfNotQualified_ShouldNotRemoveUser_WhenQualificationAllowed() {
         when(botApi.getChatMembers(anyLong(), anyList())).thenReturn(new MaxGetChatMemberResponse(
                 List.of(mock(MaxChatMember.class))));
-        when(qualificationService.getBestQualification(456L)).thenReturn(QualificationLevel.M);
+        when(qualificationService.getBestQualificationResult(456L))
+                .thenReturn(new QualificationResult(QualificationLevel.M, null));
 
         moderationService.checkAndRemoveIfNotQualified(-71062621438079L, 123L, 456L);
 

@@ -4,6 +4,7 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mitrohinayulya.zabotushka.config.ChatGroupRequirements;
+import ru.mitrohinayulya.zabotushka.dto.greenway.QualificationResult;
 import ru.mitrohinayulya.zabotushka.entity.Platform;
 import ru.mitrohinayulya.zabotushka.service.greenway.GreenwayQualificationService;
 
@@ -25,6 +26,10 @@ public abstract class AbstractGroupAccessService implements PlatformGroupAccessS
 
     protected abstract Optional<ChatGroupRequirements> findRequirements(long chatId);
 
+    protected void onUserRemainsQualified(long chatId, long userId, QualificationResult result) {
+        // no-op by default
+    }
+
     @Override
     public final void checkAndRemoveIfNotQualified(long chatId, long userId, long greenwayId) {
         log.info("Checking qualification: platform={}, chatId={}, userId={}, greenwayId={}",
@@ -43,18 +48,19 @@ public abstract class AbstractGroupAccessService implements PlatformGroupAccessS
             return;
         }
 
-        var qualification = qualificationService.getBestQualification(greenwayId);
+        var qualResult = qualificationService.getBestQualificationResult(greenwayId);
 
         log.info("User qualification check: platform={}, chatId={}, userId={}, greenwayId={}, qualification={}",
-                getPlatform(), chatId, userId, greenwayId, qualification);
+                getPlatform(), chatId, userId, greenwayId, qualResult.level());
 
-        if (!groupRequirements.get().isQualificationAllowed(qualification)) {
+        if (!groupRequirements.get().isQualificationAllowed(qualResult.level())) {
             log.info("Qualification does not meet requirements, removing user: platform={}, chatId={}, userId={}, qualification={}",
-                    getPlatform(), chatId, userId, qualification);
+                    getPlatform(), chatId, userId, qualResult.level());
             removeMemberFromChat(chatId, userId);
         } else {
             log.info("Qualification meets requirements: platform={}, chatId={}, userId={}, qualification={}",
-                    getPlatform(), chatId, userId, qualification);
+                    getPlatform(), chatId, userId, qualResult.level());
+            onUserRemainsQualified(chatId, userId, qualResult);
         }
     }
 }

@@ -9,7 +9,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import ru.mitrohinayulya.zabotushka.client.TelegramAccessBotApi;
 import ru.mitrohinayulya.zabotushka.dto.greenway.QualificationLevel;
-import ru.mitrohinayulya.zabotushka.dto.telegram.*;
+import ru.mitrohinayulya.zabotushka.dto.greenway.QualificationResult;
+import ru.mitrohinayulya.zabotushka.dto.telegram.ChatMember;
+import ru.mitrohinayulya.zabotushka.dto.telegram.SetChatMemberTagRequest;
+import ru.mitrohinayulya.zabotushka.dto.telegram.TelegramResponse;
+import ru.mitrohinayulya.zabotushka.dto.telegram.UnbanChatMemberRequest;
+import ru.mitrohinayulya.zabotushka.dto.telegram.User;
 import ru.mitrohinayulya.zabotushka.entity.Platform;
 import ru.mitrohinayulya.zabotushka.service.greenway.GreenwayQualificationService;
 import ru.mitrohinayulya.zabotushka.service.platform.PlatformGroupMembershipService;
@@ -17,7 +22,12 @@ import ru.mitrohinayulya.zabotushka.service.platform.PlatformGroupMembershipServ
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.contains;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TelegramGroupAccessServiceTest {
@@ -83,7 +93,7 @@ class TelegramGroupAccessServiceTest {
         moderationService.checkAndRemoveIfNotQualified(-1001968543887L, 123L, 456L);
 
         verify(membershipService).removeMembership(-1001968543887L, 123L, Platform.TELEGRAM);
-        verify(qualificationService, never()).getBestQualification(anyLong());
+        verify(qualificationService, never()).getBestQualificationResult(anyLong());
         verify(telegramAccessBotApi, never()).unbanChatMember(any());
     }
 
@@ -93,7 +103,8 @@ class TelegramGroupAccessServiceTest {
         var member = new ChatMember("member", new User(123L, false, "Test", null, null, null));
         when(telegramAccessBotApi.getChatMember(any()))
                 .thenReturn(new TelegramResponse<>(true, member, null));
-        when(qualificationService.getBestQualification(456L)).thenReturn(QualificationLevel.NO);
+        when(qualificationService.getBestQualificationResult(456L))
+                .thenReturn(new QualificationResult(QualificationLevel.NO, null));
         when(telegramAccessBotApi.unbanChatMember(any()))
                 .thenReturn(new TelegramResponse<>(true, true, null));
 
@@ -110,11 +121,15 @@ class TelegramGroupAccessServiceTest {
         var member = new ChatMember("member", new User(123L, false, "Test", null, null, null));
         when(telegramAccessBotApi.getChatMember(any()))
                 .thenReturn(new TelegramResponse<>(true, member, null));
-        when(qualificationService.getBestQualification(456L)).thenReturn(QualificationLevel.M);
+        when(qualificationService.getBestQualificationResult(456L))
+                .thenReturn(new QualificationResult(QualificationLevel.M, "M1"));
+        when(telegramAccessBotApi.setChatMemberTag(any()))
+                .thenReturn(new TelegramResponse<>(true, true, null));
 
         moderationService.checkAndRemoveIfNotQualified(-1001968543887L, 123L, 456L);
 
         verify(telegramAccessBotApi, never()).unbanChatMember(any());
         verify(messageService, never()).sendMessage(anyLong(), anyString());
+        verify(telegramAccessBotApi).setChatMemberTag(new SetChatMemberTagRequest(-1001968543887L, 123L, "M1"));
     }
 }
