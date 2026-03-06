@@ -13,6 +13,7 @@ import ru.mitrohinayulya.zabotushka.dto.telegram.DeclineChatJoinRequest;
 import ru.mitrohinayulya.zabotushka.dto.telegram.GetChatMemberRequest;
 import ru.mitrohinayulya.zabotushka.dto.telegram.SetWebhookRequest;
 import ru.mitrohinayulya.zabotushka.dto.telegram.TelegramResponse;
+import ru.mitrohinayulya.zabotushka.dto.telegram.SetChatMemberTagRequest;
 import ru.mitrohinayulya.zabotushka.dto.telegram.UnbanChatMemberRequest;
 
 /// REST client for Telegram Bot API - Access Bot
@@ -42,4 +43,8 @@ public interface TelegramAccessBotApi {
     @POST
     @Path("/unbanChatMember")
     TelegramResponse<Boolean> unbanChatMember(UnbanChatMemberRequest request);
+
+    @POST
+    @Path("/setChatMemberTag")
+    TelegramResponse<Boolean> setChatMemberTag(SetChatMemberTagRequest request);
 }

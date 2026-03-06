@@ -119,6 +119,92 @@ class GreenwayQualificationServiceTest {
         assertThat(result).as("Should return NO when API throws exception").isEqualTo(QualificationLevel.NO);
     }
 
+    @Test
+    @DisplayName("getBestQualificationResult returns current raw qualification when current period is better")
+    void getBestQualificationResult_ShouldReturnCurrentRawQual_WhenCurrentIsBetter() {
+        var greenwayId = 100L;
+        var currentPartner = createPartner(100, "GM4");
+        var previousPartner = createPartner(100, "M2");
+
+        var currentResponse = new PartnerListResponse(null, List.of(currentPartner), null, null);
+        var previousResponse = new PartnerListResponse(null, List.of(previousPartner), null, null);
+
+        when(greenwayPartnerService.getPreviousPeriod()).thenReturn(202501);
+        when(greenwayPartnerService.getPartnerList(greenwayId, 0)).thenReturn(currentResponse);
+        when(greenwayPartnerService.getPartnerList(greenwayId, 202501)).thenReturn(previousResponse);
+        when(greenwayPartnerService.findPartnerById(currentResponse, greenwayId)).thenReturn(Optional.of(currentPartner));
+        when(greenwayPartnerService.findPartnerById(previousResponse, greenwayId)).thenReturn(Optional.of(previousPartner));
+
+        var result = qualificationService.getBestQualificationResult(greenwayId);
+
+        assertThat(result.level()).as("Level should be GM from current period").isEqualTo(QualificationLevel.GM);
+        assertThat(result.rawQual()).as("Raw qualification should be the current period string GM4").isEqualTo("GM4");
+    }
+
+    @Test
+    @DisplayName("getBestQualificationResult returns previous raw qualification when previous period is better")
+    void getBestQualificationResult_ShouldReturnPreviousRawQual_WhenPreviousIsBetter() {
+        var greenwayId = 100L;
+        var currentPartner = createPartner(100, "S1");
+        var previousPartner = createPartner(100, "L3");
+
+        var currentResponse = new PartnerListResponse(null, List.of(currentPartner), null, null);
+        var previousResponse = new PartnerListResponse(null, List.of(previousPartner), null, null);
+
+        when(greenwayPartnerService.getPreviousPeriod()).thenReturn(202501);
+        when(greenwayPartnerService.getPartnerList(greenwayId, 0)).thenReturn(currentResponse);
+        when(greenwayPartnerService.getPartnerList(greenwayId, 202501)).thenReturn(previousResponse);
+        when(greenwayPartnerService.findPartnerById(currentResponse, greenwayId)).thenReturn(Optional.of(currentPartner));
+        when(greenwayPartnerService.findPartnerById(previousResponse, greenwayId)).thenReturn(Optional.of(previousPartner));
+
+        var result = qualificationService.getBestQualificationResult(greenwayId);
+
+        assertThat(result.level()).as("Level should be L from previous period").isEqualTo(QualificationLevel.L);
+        assertThat(result.rawQual()).as("Raw qualification should be the previous period string L3").isEqualTo("L3");
+    }
+
+    @Test
+    @DisplayName("getBestQualificationResult returns null raw qualification when neither period has partner")
+    void getBestQualificationResult_ShouldReturnNullRawQual_WhenNeitherHasPartner() {
+        var greenwayId = 100L;
+
+        var currentResponse = new PartnerListResponse(null, List.of(), null, null);
+        var previousResponse = new PartnerListResponse(null, List.of(), null, null);
+
+        when(greenwayPartnerService.getPreviousPeriod()).thenReturn(202501);
+        when(greenwayPartnerService.getPartnerList(greenwayId, 0)).thenReturn(currentResponse);
+        when(greenwayPartnerService.getPartnerList(greenwayId, 202501)).thenReturn(previousResponse);
+        when(greenwayPartnerService.findPartnerById(currentResponse, greenwayId)).thenReturn(Optional.empty());
+        when(greenwayPartnerService.findPartnerById(previousResponse, greenwayId)).thenReturn(Optional.empty());
+
+        var result = qualificationService.getBestQualificationResult(greenwayId);
+
+        assertThat(result.level()).as("Level should be NO when partner not found").isEqualTo(QualificationLevel.NO);
+        assertThat(result.rawQual()).as("Raw qualification should be null when partner not found").isNull();
+    }
+
+    @Test
+    @DisplayName("getBestQualificationResult returns previous raw qualification when both periods have equal level")
+    void getBestQualificationResult_ShouldReturnPreviousRawQual_WhenBothPeriodsHaveEqualLevel() {
+        var greenwayId = 100L;
+        var currentPartner = createPartner(100, "M1");
+        var previousPartner = createPartner(100, "M3");
+
+        var currentResponse = new PartnerListResponse(null, List.of(currentPartner), null, null);
+        var previousResponse = new PartnerListResponse(null, List.of(previousPartner), null, null);
+
+        when(greenwayPartnerService.getPreviousPeriod()).thenReturn(202501);
+        when(greenwayPartnerService.getPartnerList(greenwayId, 0)).thenReturn(currentResponse);
+        when(greenwayPartnerService.getPartnerList(greenwayId, 202501)).thenReturn(previousResponse);
+        when(greenwayPartnerService.findPartnerById(currentResponse, greenwayId)).thenReturn(Optional.of(currentPartner));
+        when(greenwayPartnerService.findPartnerById(previousResponse, greenwayId)).thenReturn(Optional.of(previousPartner));
+
+        var result = qualificationService.getBestQualificationResult(greenwayId);
+
+        assertThat(result.level()).as("Level should be M when both periods have M").isEqualTo(QualificationLevel.M);
+        assertThat(result.rawQual()).as("Raw qualification should be from previous period when levels are equal").isEqualTo("M3");
+    }
+
     private Partner createPartner(int number, String qualification) {
         return new Partner(
                 null, null, null, null, null, null, null,

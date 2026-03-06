@@ -48,6 +48,11 @@ public enum QualificationLevel {
         return this.rank >= required.rank;
     }
 
+    /// Returns true if this qualification level is strictly higher than the other
+    public boolean isStrictlyBetterThan(QualificationLevel other) {
+        return this.rank > other.rank;
+    }
+
     /// Returns the better of two qualifications
     public static QualificationLevel best(QualificationLevel q1, QualificationLevel q2) {
         return q1.rank > q2.rank ? q1 : q2;

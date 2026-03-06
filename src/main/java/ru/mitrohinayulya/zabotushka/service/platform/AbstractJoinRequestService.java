@@ -33,7 +33,7 @@ public abstract class AbstractJoinRequestService<E, U> {
 
     protected abstract long getGreenwayId(U user);
 
-    protected abstract void onApproved(E event, U user, ChatGroupRequirements req);
+    protected abstract void onApproved(E event, U user, ChatGroupRequirements req, String qualTag);
 
     protected abstract void onDeclined(E event);
 
@@ -58,13 +58,13 @@ public abstract class AbstractJoinRequestService<E, U> {
             return;
         }
 
-        var qual = qualificationService.getBestQualification(getGreenwayId(user));
+        var qualResult = qualificationService.getBestQualificationResult(getGreenwayId(user));
 
-        log.info("User qualification: userId={}, greenwayId={}, qualification={}", userId, getGreenwayId(user), qual);
+        log.info("User qualification: userId={}, greenwayId={}, qualification={}", userId, getGreenwayId(user), qualResult.level());
 
-        if (req.get().isQualificationAllowed(qual)) {
+        if (req.get().isQualificationAllowed(qualResult.level())) {
             log.info("Qualification meets requirements, approving: chatId={}, userId={}", chatId, userId);
-            onApproved(event, user, req.get());
+            onApproved(event, user, req.get(), qualResult.rawQual());
         } else {
             log.info("Qualification does not meet requirements, declining: chatId={}, userId={}", chatId, userId);
             onDeclined(event);

@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.mitrohinayulya.zabotushka.dto.greenway.QualificationLevel;
+import ru.mitrohinayulya.zabotushka.dto.greenway.QualificationResult;
 import ru.mitrohinayulya.zabotushka.dto.max.MaxUpdate;
 import ru.mitrohinayulya.zabotushka.dto.max.MaxUser;
 import ru.mitrohinayulya.zabotushka.entity.AuthorizedMaxUser;
@@ -15,7 +16,10 @@ import ru.mitrohinayulya.zabotushka.service.greenway.GreenwayQualificationServic
 import ru.mitrohinayulya.zabotushka.service.platform.PlatformGroupMembershipService;
 
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MaxJoinRequestServiceTest {
@@ -47,7 +51,8 @@ class MaxJoinRequestServiceTest {
         authorizedUser.greenwayId = 999888L;
 
         when(authorizedUserService.findByMaxId(555L)).thenReturn(authorizedUser);
-        when(qualificationService.getBestQualification(999888L)).thenReturn(QualificationLevel.M);
+        when(qualificationService.getBestQualificationResult(999888L))
+                .thenReturn(new QualificationResult(QualificationLevel.M, "M1"));
 
         joinRequestService.processUserAddedUpdate(update);
 

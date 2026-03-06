@@ -11,6 +11,7 @@ import ru.mitrohinayulya.zabotushka.config.TelegramChatGroupRequirements;
 import ru.mitrohinayulya.zabotushka.dto.telegram.ApproveChatJoinRequest;
 import ru.mitrohinayulya.zabotushka.dto.telegram.ChatJoinRequest;
 import ru.mitrohinayulya.zabotushka.dto.telegram.DeclineChatJoinRequest;
+import ru.mitrohinayulya.zabotushka.dto.telegram.SetChatMemberTagRequest;
 import ru.mitrohinayulya.zabotushka.entity.AuthorizedTelegramUser;
 import ru.mitrohinayulya.zabotushka.entity.Platform;
 import ru.mitrohinayulya.zabotushka.service.platform.AbstractJoinRequestService;
@@ -68,7 +69,7 @@ public class TelegramJoinRequestService extends AbstractJoinRequestService<ChatJ
     }
 
     @Override
-    protected void onApproved(ChatJoinRequest event, AuthorizedTelegramUser user, ChatGroupRequirements req) {
+    protected void onApproved(ChatJoinRequest event, AuthorizedTelegramUser user, ChatGroupRequirements req, String qualTag) {
         var chatId = event.chat().id();
         var userId = event.from().id();
         try {
@@ -80,12 +81,33 @@ public class TelegramJoinRequestService extends AbstractJoinRequestService<ChatJ
                 var message = String.format("Ваш запрос на вступление в «%s» одобрен", req.getGroupName());
                 messageService.sendMessage(userId, message);
                 membershipService.saveMembership(chatId, userId, Platform.TELEGRAM);
+                setMemberTag(chatId, userId, qualTag);
             } else {
                 log.error("Failed to approve join request: chatId={}, userId={}, description={}",
                         chatId, userId, response.description());
             }
         } catch (Exception e) {
             log.error("Error approving join request: chatId={}, userId={}", chatId, userId, e);
+        }
+    }
+
+    private void setMemberTag(long chatId, long userId, String qualTag) {
+        if (qualTag == null || qualTag.isBlank()) {
+            log.warn("Member tag is absent: chatId={}, userId={}",
+                    chatId, userId);
+            return;
+        }
+        try {
+            var tagRequest = SetChatMemberTagRequest.of(chatId, userId, qualTag);
+            var tagResponse = telegramAccessBotApi.setChatMemberTag(tagRequest);
+            if (Boolean.TRUE.equals(tagResponse.ok())) {
+                log.info("Member tag set successfully: chatId={}, userId={}, tag={}", chatId, userId, qualTag);
+            } else {
+                log.warn("Failed to set member tag: chatId={}, userId={}, tag={}, description={}",
+                        chatId, userId, qualTag, tagResponse.description());
+            }
+        } catch (Exception e) {
+            log.warn("Error setting member tag: chatId={}, userId={}, tag={}", chatId, userId, qualTag, e);
         }
     }
 

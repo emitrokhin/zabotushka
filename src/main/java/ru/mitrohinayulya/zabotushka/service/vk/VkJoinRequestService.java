@@ -56,7 +56,7 @@ public class VkJoinRequestService extends AbstractJoinRequestService<VkUpdate, A
     }
 
     @Override
-    protected void onApproved(VkUpdate event, AuthorizedVkUser user, ChatGroupRequirements req) {
+    protected void onApproved(VkUpdate event, AuthorizedVkUser user, ChatGroupRequirements req, String qualTag) {
         membershipService.saveMembership(event.groupId(), user.vkId, Platform.VK);
     }
 

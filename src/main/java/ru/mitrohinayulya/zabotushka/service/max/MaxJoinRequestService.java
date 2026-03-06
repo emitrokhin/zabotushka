@@ -56,7 +56,8 @@ public class MaxJoinRequestService extends AbstractJoinRequestService<MaxUpdate,
     }
 
     @Override
-    protected void onApproved(MaxUpdate event, AuthorizedMaxUser user, ChatGroupRequirements req) {
+    protected void onApproved(MaxUpdate event, AuthorizedMaxUser user, ChatGroupRequirements req, String qualTag) {
+        // qualTag is not implemented yet
         membershipService.saveMembership(event.chatId(), user.maxId, Platform.MAX);
     }
 

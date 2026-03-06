@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mitrohinayulya.zabotushka.dto.greenway.Partner;
 import ru.mitrohinayulya.zabotushka.dto.greenway.QualificationLevel;
+import ru.mitrohinayulya.zabotushka.dto.greenway.QualificationResult;
 
 /// Common logic for determining the best user qualification.
 @ApplicationScoped
@@ -17,26 +18,36 @@ public class GreenwayQualificationService {
     GreenwayPartnerService greenwayPartnerService;
 
     public QualificationLevel getBestQualification(long greenwayId) {
+        return getBestQualificationResult(greenwayId).level();
+    }
+
+    public QualificationResult getBestQualificationResult(long greenwayId) {
         try {
             var previousPeriod = greenwayPartnerService.getPreviousPeriod();
 
             var currentPartnerList = greenwayPartnerService.getPartnerList(greenwayId, 0);
             var previousPartnerList = greenwayPartnerService.getPartnerList(greenwayId, previousPeriod);
 
-            var currentQual = greenwayPartnerService.findPartnerById(currentPartnerList, greenwayId)
-                    .map(Partner::qualification)
+            var currentPartner = greenwayPartnerService.findPartnerById(currentPartnerList, greenwayId);
+            var previousPartner = greenwayPartnerService.findPartnerById(previousPartnerList, greenwayId);
+
+            var currentQual = currentPartner.map(Partner::qualification)
                     .map(QualificationLevel::fromString)
                     .orElse(QualificationLevel.NO);
 
-            var previousQual = greenwayPartnerService.findPartnerById(previousPartnerList, greenwayId)
-                    .map(Partner::qualification)
+            var previousQual = previousPartner.map(Partner::qualification)
                     .map(QualificationLevel::fromString)
                     .orElse(QualificationLevel.NO);
 
-            return QualificationLevel.best(currentQual, previousQual);
+            var bestLevel = QualificationLevel.best(currentQual, previousQual);
+            var rawQual = currentQual.isStrictlyBetterThan(previousQual)
+                    ? currentPartner.map(Partner::qualification).orElse(null)
+                    : previousPartner.map(Partner::qualification).orElse(null);
+
+            return new QualificationResult(bestLevel, rawQual);
         } catch (Exception e) {
             log.error("Error during qualification check: greenwayId={}", greenwayId, e);
-            return QualificationLevel.NO;
+            return new QualificationResult(QualificationLevel.NO, null);
         }
     }
 }

@@ -10,7 +10,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import ru.mitrohinayulya.zabotushka.client.TelegramAccessBotApi;
 import ru.mitrohinayulya.zabotushka.dto.greenway.QualificationLevel;
-import ru.mitrohinayulya.zabotushka.dto.telegram.*;
+import ru.mitrohinayulya.zabotushka.dto.greenway.QualificationResult;
+import ru.mitrohinayulya.zabotushka.dto.telegram.ApproveChatJoinRequest;
+import ru.mitrohinayulya.zabotushka.dto.telegram.Chat;
+import ru.mitrohinayulya.zabotushka.dto.telegram.ChatJoinRequest;
+import ru.mitrohinayulya.zabotushka.dto.telegram.DeclineChatJoinRequest;
+import ru.mitrohinayulya.zabotushka.dto.telegram.SetChatMemberTagRequest;
+import ru.mitrohinayulya.zabotushka.dto.telegram.TelegramResponse;
+import ru.mitrohinayulya.zabotushka.dto.telegram.User;
 import ru.mitrohinayulya.zabotushka.entity.AuthorizedTelegramUser;
 import ru.mitrohinayulya.zabotushka.entity.Platform;
 import ru.mitrohinayulya.zabotushka.service.greenway.GreenwayQualificationService;
@@ -18,7 +25,11 @@ import ru.mitrohinayulya.zabotushka.service.platform.PlatformGroupMembershipServ
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.contains;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TelegramJoinRequestServiceTest {
@@ -59,8 +70,11 @@ class TelegramJoinRequestServiceTest {
         authorizedUser.greenwayId = 999888L;
 
         when(authorizedUserService.findByTelegramId(12345L)).thenReturn(authorizedUser);
-        when(qualificationService.getBestQualification(999888L)).thenReturn(QualificationLevel.M);
+        when(qualificationService.getBestQualificationResult(999888L))
+                .thenReturn(new QualificationResult(QualificationLevel.M, "M1"));
         when(telegramAccessBotApi.approveChatJoinRequest(any()))
+                .thenReturn(new TelegramResponse<>(true, true, null));
+        when(telegramAccessBotApi.setChatMemberTag(any()))
                 .thenReturn(new TelegramResponse<>(true, true, null));
 
         joinRequestService.processChatJoinRequest(chatJoinRequest);
@@ -69,6 +83,7 @@ class TelegramJoinRequestServiceTest {
         verify(telegramAccessBotApi, never()).declineChatJoinRequest(any());
         verify(messageService).sendMessage(eq(12345L), contains("одобрен"));
         verify(membershipService).saveMembership(-1001968543887L, 12345L, Platform.TELEGRAM);
+        verify(telegramAccessBotApi).setChatMemberTag(new SetChatMemberTagRequest(-1001968543887L, 12345L, "M1"));
     }
 
     @Test
@@ -82,7 +97,7 @@ class TelegramJoinRequestServiceTest {
 
         verify(telegramAccessBotApi).declineChatJoinRequest(any(DeclineChatJoinRequest.class));
         verify(telegramAccessBotApi, never()).approveChatJoinRequest(any());
-        verify(qualificationService, never()).getBestQualification(anyLong());
+        verify(qualificationService, never()).getBestQualificationResult(anyLong());
         verify(membershipService, never()).saveMembership(anyLong(), anyLong(), any());
     }
 
@@ -110,7 +125,8 @@ class TelegramJoinRequestServiceTest {
         authorizedUser.greenwayId = 999888L;
 
         when(authorizedUserService.findByTelegramId(12345L)).thenReturn(authorizedUser);
-        when(qualificationService.getBestQualification(999888L)).thenReturn(QualificationLevel.NO);
+        when(qualificationService.getBestQualificationResult(999888L))
+                .thenReturn(new QualificationResult(QualificationLevel.NO, null));
         when(telegramAccessBotApi.declineChatJoinRequest(any()))
                 .thenReturn(new TelegramResponse<>(true, true, null));
 
