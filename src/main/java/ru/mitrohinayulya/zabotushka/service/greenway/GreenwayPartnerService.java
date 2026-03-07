@@ -53,6 +53,10 @@ public class GreenwayPartnerService {
         return periodCalculator.calculatePreviousPeriod();
     }
 
+    public Optional<Partner> findCurrentPartner(long partnerId) {
+        return findPartnerById(getPartnerList(partnerId, 0), partnerId);
+    }
+
     public Optional<Partner> findPartnerById(PartnerListResponse response, long partnerId) {
         if (response == null || response.partners() == null || response.partners().isEmpty()) {
             return Optional.empty();

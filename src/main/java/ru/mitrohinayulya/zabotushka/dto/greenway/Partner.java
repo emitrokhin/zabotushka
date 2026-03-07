@@ -67,6 +67,9 @@ public record Partner(
     @JsonProperty("qual")
     String qualification,
 
+    @JsonProperty("prev_qual")
+    String prevQualification,
+
     @JsonProperty("level")
     Integer level,
 

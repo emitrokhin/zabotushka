@@ -239,7 +239,7 @@ class MaxAuthorizationResourceTest {
             number, "ACTIVE", "15.01.2023",
             "Россия", 1, "Москва",
             null, null, null, null,
-            0.0, 0.0, 0.0, "NO", 1, false, "Петров Петр"
+            0.0, 0.0, 0.0, "NO", null, 1, false, "Петров Петр"
         );
     }
 }

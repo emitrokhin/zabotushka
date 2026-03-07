@@ -240,21 +240,10 @@ class GreenwayResourceTest {
     }
 
     @Test
-    @DisplayName("getQualificationBest returns current period qualification when it is higher")
+    @DisplayName("getQualificationBest returns qual when it is higher than prev_qual")
     void getQualificationBest_ShouldReturnCurrentQualification_WhenCurrentIsBetter() {
-        var currentPartner = createPartnerWithQualification("M1");
-        var previousPartner = createPartnerWithQualification("L2");
-
-        var currentResponse = new PartnerListResponse(null, List.of(currentPartner), null, null);
-        var previousResponse = new PartnerListResponse(null, List.of(previousPartner), null, null);
-
-        when(greenwayPartnerService.getPreviousPeriod()).thenReturn(75);
-        when(greenwayPartnerService.getPartnerList(123456L, 0)).thenReturn(currentResponse);
-        when(greenwayPartnerService.getPartnerList(123456L, 75)).thenReturn(previousResponse);
-        when(greenwayPartnerService.findPartnerById(eq(currentResponse), anyLong()))
-                .thenReturn(Optional.of(currentPartner));
-        when(greenwayPartnerService.findPartnerById(eq(previousResponse), anyLong()))
-                .thenReturn(Optional.of(previousPartner));
+        when(greenwayPartnerService.findCurrentPartner(123456L))
+                .thenReturn(Optional.of(createPartnerWithQualifications("M1", "L2")));
 
         given()
                 .auth().basic("admin", "admin")
@@ -266,21 +255,10 @@ class GreenwayResourceTest {
     }
 
     @Test
-    @DisplayName("getQualificationBest returns previous period qualification when it is higher")
+    @DisplayName("getQualificationBest returns prev_qual when it is higher than qual")
     void getQualificationBest_ShouldReturnPreviousQualification_WhenPreviousIsBetter() {
-        var currentPartner = createPartnerWithQualification("S1");
-        var previousPartner = createPartnerWithQualification("GM4");
-
-        var currentResponse = new PartnerListResponse(null, List.of(currentPartner), null, null);
-        var previousResponse = new PartnerListResponse(null, List.of(previousPartner), null, null);
-
-        when(greenwayPartnerService.getPreviousPeriod()).thenReturn(75);
-        when(greenwayPartnerService.getPartnerList(123456L, 0)).thenReturn(currentResponse);
-        when(greenwayPartnerService.getPartnerList(123456L, 75)).thenReturn(previousResponse);
-        when(greenwayPartnerService.findPartnerById(eq(currentResponse), anyLong()))
-                .thenReturn(Optional.of(currentPartner));
-        when(greenwayPartnerService.findPartnerById(eq(previousResponse), anyLong()))
-                .thenReturn(Optional.of(previousPartner));
+        when(greenwayPartnerService.findCurrentPartner(123456L))
+                .thenReturn(Optional.of(createPartnerWithQualifications("S1", "GM4")));
 
         given()
                 .auth().basic("admin", "admin")
@@ -316,7 +294,7 @@ class GreenwayResourceTest {
             number, "ACTIVE", "15.01.2023",
             "Россия", 1, "Москва",
             null, null, null, null,
-            0.0, 0.0, 0.0, "NO", 1, false, "Петров Петр"
+            0.0, 0.0, 0.0, "NO", null, 1, false, "Петров Петр"
         );
     }
 
@@ -327,7 +305,7 @@ class GreenwayResourceTest {
                 123456, "ACTIVE", "15.01.2023",
                 "Россия", 1, "Москва",
                 null, null, null, null,
-                lo, 0.0, 0.0, "NO", 1, false, "Петров Петр"
+                lo, 0.0, 0.0, "NO", null, 1, false, "Петров Петр"
         );
     }
 
@@ -338,18 +316,22 @@ class GreenwayResourceTest {
                 123456, "ACTIVE", "15.01.2023",
                 "Россия", 1, "Москва",
                 null, null, null, null,
-                0.0, 0.0, 500.0, "NO", 1, false, "Петров Петр"
+                0.0, 0.0, 500.0, "NO", null, 1, false, "Петров Петр"
         );
     }
 
     private Partner createPartnerWithQualification(String qualification) {
+        return createPartnerWithQualifications(qualification, null);
+    }
+
+    private Partner createPartnerWithQualifications(String qualification, String prevQualification) {
         return new Partner(
                 123456, "Иванов", "Иван", "Иванович",
                 "01.01.1990", "test@example.com", "+79001234567",
                 123456, "ACTIVE", "15.01.2023",
                 "Россия", 1, "Москва",
                 null, null, null, null,
-                0.0, 0.0, 0.0, qualification, 1, false, "Петров Петр"
+                0.0, 0.0, 0.0, qualification, prevQualification, 1, false, "Петров Петр"
         );
     }
 }

@@ -23,26 +23,20 @@ public class GreenwayQualificationService {
 
     public QualificationResult getBestQualificationResult(long greenwayId) {
         try {
-            var previousPeriod = greenwayPartnerService.getPreviousPeriod();
+            var partner = greenwayPartnerService.findCurrentPartner(greenwayId);
 
-            var currentPartnerList = greenwayPartnerService.getPartnerList(greenwayId, 0);
-            var previousPartnerList = greenwayPartnerService.getPartnerList(greenwayId, previousPeriod);
-
-            var currentPartner = greenwayPartnerService.findPartnerById(currentPartnerList, greenwayId);
-            var previousPartner = greenwayPartnerService.findPartnerById(previousPartnerList, greenwayId);
-
-            var currentQual = currentPartner.map(Partner::qualification)
+            var currentQual = partner.map(Partner::qualification)
                     .map(QualificationLevel::fromString)
                     .orElse(QualificationLevel.NO);
 
-            var previousQual = previousPartner.map(Partner::qualification)
+            var previousQual = partner.map(Partner::prevQualification)
                     .map(QualificationLevel::fromString)
                     .orElse(QualificationLevel.NO);
 
             var bestLevel = QualificationLevel.best(currentQual, previousQual);
             var rawQual = currentQual.isStrictlyBetterThan(previousQual)
-                    ? currentPartner.map(Partner::qualification).orElse(null)
-                    : previousPartner.map(Partner::qualification).orElse(null);
+                    ? partner.map(Partner::qualification).orElse(null)
+                    : partner.map(Partner::prevQualification).orElse(null);
 
             return new QualificationResult(bestLevel, rawQual);
         } catch (Exception e) {

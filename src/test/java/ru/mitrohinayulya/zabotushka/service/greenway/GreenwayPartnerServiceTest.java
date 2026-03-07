@@ -64,10 +64,34 @@ class GreenwayPartnerServiceTest {
     }
 
     @Test
+    @DisplayName("findCurrentPartner returns partner when found in current period")
+    void findCurrentPartner_ShouldReturnPartner_WhenFoundInCurrentPeriod() {
+        var partner = new Partner(1, null, null, null, null, null, null, 123,
+                null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        var response = new PartnerListResponse(null, List.of(partner), null, null);
+        when(apiClient.getPartnerList(123L, null)).thenReturn(response);
+
+        var result = greenwayPartnerService.findCurrentPartner(123L);
+
+        assertThat(result).as("Should find the partner in the current period").isPresent().contains(partner);
+    }
+
+    @Test
+    @DisplayName("findCurrentPartner returns empty when partner not found in current period")
+    void findCurrentPartner_ShouldReturnEmpty_WhenPartnerNotFound() {
+        var response = new PartnerListResponse(null, List.of(), null, null);
+        when(apiClient.getPartnerList(999L, null)).thenReturn(response);
+
+        var result = greenwayPartnerService.findCurrentPartner(999L);
+
+        assertThat(result).as("Should be empty when partner is not found").isEmpty();
+    }
+
+    @Test
     @DisplayName("findPartnerById returns partner when matching number exists")
     void findPartnerById_ShouldReturnPartner_WhenMatchingNumberExists() {
         var partner = new Partner(1, null, null, null, null, null, null, 123,
-                null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+                null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
         var result = greenwayPartnerService.findPartnerById(response, 123L);
@@ -79,7 +103,7 @@ class GreenwayPartnerServiceTest {
     @DisplayName("findPartnerById returns empty when no matching partner")
     void findPartnerById_ShouldReturnEmpty_WhenNoMatchingPartner() {
         var partner = new Partner(1, null, null, null, null, null, null, 456,
-                null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+                null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         var response = new PartnerListResponse(null, List.of(partner), null, null);
 
         var result = greenwayPartnerService.findPartnerById(response, 123L);
